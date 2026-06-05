@@ -5,40 +5,98 @@ import Hero from "./components/Hero"
 import Services from "./components/Services"
 import Workers from "./components/Workers"
 import BookingForm from "./components/BookingForm"
-import Dashboard from "./components/Dashboard"
+import CustomerDashboard from "./components/CustomerDashboard"
+import WorkerDashboard from "./components/WorkerDashboard"
+import WorkerLogin from "./components/WorkerLogin"
+import MyBookings from "./components/MyBookings"
 import Footer from "./components/Footer"
 import WhatsappButton from "./components/WhatsappButton"
+import Login from "./components/Login"
+import Register from "./components/Register"
 
 function App() {
 
   const [selectedWorker, setSelectedWorker] = useState(null)
 
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("user")
+  )
+
+  const [workerLoggedIn, setWorkerLoggedIn] = useState(
+    !!localStorage.getItem("worker")
+  )
+
+  const [showLogin, setShowLogin] = useState(true)
+  const [showRegister, setShowRegister] = useState(false)
+
   return (
 
-    <div className="bg-zinc-950">
+    <div className="bg-zinc-950 min-h-screen">
 
-      <Navbar />
+      {!isLoggedIn ? (
 
-      <Hero />
+        <>
+          {showLogin && (
+            <Login
+              setIsLoggedIn={setIsLoggedIn}
+              setShowLogin={setShowLogin}
+              setShowRegister={setShowRegister}
+            />
+          )}
 
-      <Services />
+          {showRegister && (
+            <Register
+              setShowLogin={setShowLogin}
+              setShowRegister={setShowRegister}
+            />
+          )}
 
-<Dashboard />
+          {!workerLoggedIn ? (
 
-<Workers setSelectedWorker={setSelectedWorker} />
+  <WorkerLogin
+    setWorkerLoggedIn={setWorkerLoggedIn}
+  />
+
+) : (
+
+  <WorkerDashboard />
+
+)}
+        </>
+
+      ) : (
+
+        <>
+          <Navbar />
+
+          <Hero />
+
+<Services />
+
+<Workers
+  setSelectedWorker={setSelectedWorker}
+/>
 
 <BookingForm
   selectedWorker={selectedWorker}
   setSelectedWorker={setSelectedWorker}
 />
 
-      <Footer />
+<CustomerDashboard />
 
-      <WhatsappButton />
+<MyBookings />
+
+<Footer />
+
+<WhatsappButton />
+        </>
+
+      )}
 
     </div>
 
   )
+
 }
 
 export default App

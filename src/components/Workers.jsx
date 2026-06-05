@@ -7,13 +7,38 @@ function Workers({ setSelectedWorker }) {
 
   useEffect(() => {
 
-    fetch("https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec")
+  const fetchWorkers = () => {
+
+    fetch(
+      "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec"
+    )
       .then((res) => res.json())
       .then((data) => {
-        setWorkers(data)
+
+  console.log("Workers Data:", data)
+
+  if (Array.isArray(data)) {
+    setWorkers(data)
+  } else {
+    setWorkers([])
+  }
+
+})
+      .catch((error) => {
+        console.log(error)
       })
 
-  }, [])
+  }
+
+  fetchWorkers()
+
+  const interval = setInterval(() => {
+    fetchWorkers()
+  }, 3000)
+
+  return () => clearInterval(interval)
+
+}, [])
 
   return (
 

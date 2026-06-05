@@ -1,9 +1,5 @@
-function App() {
-  return (
-    <div>
-      <h1>Urban Sathi</h1>
-    </div>
-  )
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
 }
-
-export default App

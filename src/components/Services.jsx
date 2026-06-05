@@ -2,10 +2,10 @@ function Services() {
 
   const services = [
     "Electrician",
-    "Plumbing",
-    "Cleaning",
+    "Plumber",
+    "Carpenter",
     "AC Repair",
-    "Delivery"
+    "Cook"
   ]
 
   return (

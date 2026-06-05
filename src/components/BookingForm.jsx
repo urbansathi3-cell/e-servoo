@@ -102,8 +102,6 @@ return (
       worker: ""
     })
 
-    window.location.reload()
-
   }}
   className="bg-orange-500 px-6 py-3 rounded-xl mt-6 hover:bg-orange-600"
 >
