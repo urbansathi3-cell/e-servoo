@@ -110,6 +110,10 @@ const [search, setSearch] = useState("")
                 <p className="text-center mt-3 text-yellow-400 font-semibold">
   ⭐ {worker.rating}/5
 </p>
+
+<p className="text-center mt-2 text-green-400 font-bold text-lg">
+  ₹{worker.fare}
+</p>
                 <div className="text-center mt-3">
 
   {worker.status?.trim() === "Available" ? (

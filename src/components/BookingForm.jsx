@@ -141,6 +141,10 @@ return (
           {selectedWorker.service}
         </p>
 
+        <p className="text-green-400 font-bold">
+  Service Charge: {selectedWorker?.fare}
+</p>
+
         <form
           onSubmit={handleSubmit}
           className="flex flex-col gap-4 mt-8"
