@@ -4,7 +4,8 @@ function Workers({ setSelectedWorker }) {
 
   const [workers, setWorkers] = useState([])
   const [filter, setFilter] = useState("All")
-
+const [search, setSearch] = useState("")
+  
   useEffect(() => {
 
   const fetchWorkers = () => {
@@ -44,22 +45,32 @@ function Workers({ setSelectedWorker }) {
 
     <section
   id="workers"
-  className="bg-zinc-900 text-white py-20 px-5"
+  className="bg-black text-white py-24 px-5"
 >
 
-      <h2 className="text-5xl font-bold text-center text-orange-500 mb-12">
+      <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">
         Our Workers
       </h2>
 
+    <div className="max-w-xl mx-auto mb-8">
 
+  <input
+    type="text"
+    placeholder="Search worker or service..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white focus:border-blue-500 outline-none"
+  />
+
+</div>
       <div className="flex justify-center gap-4 mb-12 flex-wrap">
 
   <button
     onClick={() => setFilter("All")}
     className={`px-5 py-2 rounded-xl ${
       filter === "All"
-        ? "bg-orange-500"
-        : "bg-zinc-800 hover:bg-orange-500"
+        ? "bg-blue-500"
+        : "bg-zinc-800 hover:bg-blue-500"
     }`}
   >
     All
@@ -69,8 +80,8 @@ function Workers({ setSelectedWorker }) {
     onClick={() => setFilter("ELECTRICIAN")}
     className={`px-5 py-2 rounded-xl ${
       filter === "ELECTRICIAN"
-        ? "bg-orange-500"
-        : "bg-zinc-800 hover:bg-orange-500"
+        ? "bg-blue-500"
+        : "bg-zinc-800 hover:bg-blue-500"
     }`}
   >
     Electrician
@@ -80,8 +91,8 @@ function Workers({ setSelectedWorker }) {
     onClick={() => setFilter("PLUMBER")}
     className={`px-5 py-2 rounded-xl ${
       filter === "PLUMBER"
-        ? "bg-orange-500"
-        : "bg-zinc-800 hover:bg-orange-500"
+        ? "bg-blue-500"
+        : "bg-zinc-800 hover:bg-blue-500"
     }`}
   >
     Plumber
@@ -91,8 +102,8 @@ function Workers({ setSelectedWorker }) {
     onClick={() => setFilter("CARPENTER")}
     className={`px-5 py-2 rounded-xl ${
       filter === "CARPENTER"
-        ? "bg-orange-500"
-        : "bg-zinc-800 hover:bg-orange-500"
+        ? "bg-blue-500"
+        : "bg-zinc-800 hover:bg-blue-500"
     }`}
   >
     Carpenter
@@ -102,8 +113,8 @@ function Workers({ setSelectedWorker }) {
     onClick={() => setFilter("COOK")}
     className={`px-5 py-2 rounded-xl ${
       filter === "COOK"
-        ? "bg-orange-500"
-        : "bg-zinc-800 hover:bg-orange-500"
+        ? "bg-blue-500"
+        : "bg-zinc-800 hover:bg-blue-500"
     }`}
   >
     Cook
@@ -116,16 +127,20 @@ function Workers({ setSelectedWorker }) {
 
         {
           workers
-            .filter(worker =>
-              filter === "All"
-                ? true
-                : worker.service.toLowerCase() === filter.toLowerCase()
-            )
-            .map((worker, index) => (
+  .filter(worker =>
+    filter === "All"
+      ? true
+      : worker.service?.toLowerCase() === filter.toLowerCase()
+  )
+  .filter(worker =>
+    worker.name?.toLowerCase().includes(search.toLowerCase()) ||
+    worker.service?.toLowerCase().includes(search.toLowerCase())
+  )
+  .map((worker, index) => (
 
               <div
                 key={index}
-                className="bg-black p-6 rounded-3xl border border-zinc-800 hover:border-orange-500 transition duration-300 hover:scale-105"
+                className="bg-[#111111] p-6 rounded-3xl border border-zinc-800 hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] transition duration-300 hover:scale-105"
               >
 
                 <img
@@ -136,35 +151,35 @@ function Workers({ setSelectedWorker }) {
                     e.target.src =
                       "https://via.placeholder.com/150"
                   }}
-                  className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-orange-500"
+                  className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-blue-500"
                 />
 
-                <h3 className="text-2xl font-bold text-center mt-5">
+                <h3 className="text-2xl font-bold text-center mt-5 text-slate-200">
                   {worker.name}
                 </h3>
 
-                <p className="text-center text-orange-500 mt-2">
+                <p className="text-center text-blue-500 mt-2">
                   {worker.service}
                 </p>
 
-                <p className="text-center mt-3">
-                  ⭐ {worker.rating}
-                </p>
+                <p className="text-center mt-3 text-yellow-400 font-semibold">
+  ⭐ {worker.rating}/5
+</p>
                 <div className="text-center mt-3">
 
   {worker.status?.trim() === "Available" ? (
 
-    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm">
-      🟢 Available
-    </span>
+  <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+    🟢 Available
+  </span>
 
-  ) : (
+) : (
 
-    <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-      🔴 Busy
-    </span>
+  <span className="bg-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+    🔴 Busy
+  </span>
 
-  )}
+)}
 
 </div>
 
@@ -189,7 +204,7 @@ function Workers({ setSelectedWorker }) {
   className={`w-full mt-5 py-3 rounded-xl transition duration-300 ${
     worker.status?.trim() === "Busy"
       ? "bg-gray-600 cursor-not-allowed"
-      : "bg-orange-500 hover:bg-orange-600"
+      : "bg-blue-600 hover:bg-blue-700 font-bold"
   }`}
 >
   {worker.status?.trim() === "Busy"

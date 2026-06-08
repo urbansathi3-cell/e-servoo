@@ -59,7 +59,7 @@ function Register({
 
       <div className="bg-zinc-900 p-8 rounded-3xl w-full max-w-md">
 
-        <h2 className="text-4xl font-bold text-orange-500 text-center mb-8">
+        <h2 className="text-4xl font-bold text-blue-500 text-center mb-8">
           Create Account
         </h2>
 
@@ -106,7 +106,7 @@ function Register({
 
           <button
             type="submit"
-            className="bg-orange-500 py-4 rounded-xl font-bold hover:bg-orange-600"
+            className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-blue-600"
           >
             Create Account
           </button>
@@ -127,7 +127,7 @@ function Register({
               setShowLogin(true)
 
             }}
-            className="text-orange-500 mt-2 font-bold hover:underline"
+            className="text-blue-500 mt-2 font-bold hover:underline"
           >
             Login
           </button>

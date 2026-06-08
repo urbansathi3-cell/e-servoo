@@ -25,7 +25,7 @@ function MyBookings() {
 
     <section className="bg-black text-white py-20 px-5">
 
-      <h2 className="text-4xl font-bold text-orange-500 text-center mb-10">
+      <h2 className="text-4xl font-bold text-blue-500 text-center mb-10">
         My Bookings
       </h2>
 
@@ -60,7 +60,7 @@ function MyBookings() {
 
 <div className="mt-3">
 
-  <span className="bg-orange-500 px-3 py-1 rounded-full text-sm">
+  <span className="bg-blue-500 px-3 py-1 rounded-full text-sm">
     {booking.Status}
   </span>
 

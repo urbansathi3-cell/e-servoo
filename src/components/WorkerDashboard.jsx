@@ -49,9 +49,9 @@ return (
 
   <div className="max-w-5xl mx-auto">
 
-    <div className="bg-zinc-900 p-8 rounded-3xl border border-orange-500">
+    <div className="bg-zinc-900 p-8 rounded-3xl border border-blue-500">
 
-      <h2 className="text-4xl font-bold text-orange-500 mb-8">
+      <h2 className="text-4xl font-bold text-blue-500 mb-8">
         Worker Dashboard
       </h2>
 
@@ -90,7 +90,7 @@ return (
 
       <div className="mt-12">
 
-        <h3 className="text-3xl font-bold text-orange-500 mb-6">
+        <h3 className="text-3xl font-bold text-blue-500 mb-6">
           Assigned Jobs
         </h3>
 

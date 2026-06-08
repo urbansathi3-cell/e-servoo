@@ -80,7 +80,7 @@ return (
           Worker: {formData.worker}
         </p>
 
-        <p className="mt-2 text-orange-500 text-lg">
+        <p className="mt-2 text-Blue-500 text-lg">
           Service: {formData.service}
         </p>
 
@@ -103,7 +103,7 @@ return (
     })
 
   }}
-  className="bg-orange-500 px-6 py-3 rounded-xl mt-6 hover:bg-orange-600"
+  className="bg-blue-500 px-6 py-3 rounded-xl mt-6 hover:bg-blue-600"
 >
   Close
 </button>
@@ -118,7 +118,7 @@ return (
 
     <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 px-5">
 
-      <div className="bg-zinc-900 w-full max-w-md rounded-3xl p-8 relative border border-orange-500">
+      <div className="bg-zinc-900 w-full max-w-md rounded-3xl p-8 relative border border-blue-500">
 
         <button
           onClick={() => setSelectedWorker(null)}
@@ -130,14 +130,14 @@ return (
         <img
           src={selectedWorker.image}
           alt={selectedWorker.name}
-          className="w-28 h-28 rounded-full object-cover mx-auto border-4 border-orange-500"
+          className="w-28 h-28 rounded-full object-cover mx-auto border-4 border-blue-500"
         />
 
         <h2 className="text-3xl font-bold text-center text-white mt-5">
           {selectedWorker.name}
         </h2>
 
-        <p className="text-center text-orange-500 mt-2">
+        <p className="text-center text-blue-500 mt-2">
           {selectedWorker.service}
         </p>
 
@@ -178,7 +178,7 @@ return (
 
           <button
             type="submit"
-            className="bg-orange-500 py-4 rounded-xl text-lg font-bold hover:bg-orange-600 transition duration-300"
+            className="bg-blue-500 py-4 rounded-xl text-lg font-bold hover:bg-blue-600 transition duration-300"
           >
             Confirm Booking
           </button>

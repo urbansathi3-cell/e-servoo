@@ -29,7 +29,7 @@ function CustomerDashboard() {
 
       <div className="max-w-4xl mx-auto bg-zinc-900 p-8 rounded-3xl">
 
-        <h2 className="text-4xl font-bold text-orange-500 mb-8">
+        <h2 className="text-4xl font-bold text-blue-500 mb-8">
           Customer Dashboard
         </h2>
 

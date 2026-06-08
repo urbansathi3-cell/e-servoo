@@ -13,10 +13,13 @@ import Footer from "./components/Footer"
 import WhatsappButton from "./components/WhatsappButton"
 import Login from "./components/Login"
 import Register from "./components/Register"
+import Welcome from "./components/Welcome"
 
 function App() {
 
   const [selectedWorker, setSelectedWorker] = useState(null)
+
+  const [showWelcome, setShowWelcome] = useState(true)
 
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("user")
@@ -29,9 +32,19 @@ function App() {
   const [showLogin, setShowLogin] = useState(true)
   const [showRegister, setShowRegister] = useState(false)
 
+  if (showWelcome) {
+
+  return (
+    <Welcome
+      setShowWelcome={setShowWelcome}
+    />
+  )
+
+}
+
   return (
 
-    <div className="bg-zinc-950 min-h-screen">
+    <div className="bg-black min-h-screen">
 
       {!isLoggedIn ? (
 

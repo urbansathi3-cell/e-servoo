@@ -47,7 +47,7 @@ function ReviewForm({ worker }) {
       className="bg-zinc-900 p-6 rounded-2xl mt-6"
     >
 
-      <h3 className="text-2xl font-bold text-orange-500">
+      <h3 className="text-2xl font-bold text-blue-500">
         Rate Worker
       </h3>
 
@@ -72,7 +72,7 @@ function ReviewForm({ worker }) {
 
       <button
         type="submit"
-        className="bg-orange-500 px-6 py-3 rounded-xl mt-4"
+        className="bg-blue-500 px-6 py-3 rounded-xl mt-4"
       >
         Submit Review
       </button>
