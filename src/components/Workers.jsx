@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
 
-function Workers({ setSelectedWorker }) {
+function Workers({
+  setSelectedWorker,
+  selectedService
+}) {
 
   const [workers, setWorkers] = useState([])
   const [filter, setFilter] = useState("All")
@@ -56,81 +59,23 @@ const [search, setSearch] = useState("")
 
   <input
     type="text"
-    placeholder="Search worker or service..."
+    placeholder="🔍 Search Workers"
     value={search}
     onChange={(e) => setSearch(e.target.value)}
     className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white focus:border-blue-500 outline-none"
   />
 
 </div>
-      <div className="flex justify-center gap-4 mb-12 flex-wrap">
-
-  <button
-    onClick={() => setFilter("All")}
-    className={`px-5 py-2 rounded-xl ${
-      filter === "All"
-        ? "bg-blue-500"
-        : "bg-zinc-800 hover:bg-blue-500"
-    }`}
-  >
-    All
-  </button>
-
-  <button
-    onClick={() => setFilter("ELECTRICIAN")}
-    className={`px-5 py-2 rounded-xl ${
-      filter === "ELECTRICIAN"
-        ? "bg-blue-500"
-        : "bg-zinc-800 hover:bg-blue-500"
-    }`}
-  >
-    Electrician
-  </button>
-
-  <button
-    onClick={() => setFilter("PLUMBER")}
-    className={`px-5 py-2 rounded-xl ${
-      filter === "PLUMBER"
-        ? "bg-blue-500"
-        : "bg-zinc-800 hover:bg-blue-500"
-    }`}
-  >
-    Plumber
-  </button>
-
-  <button
-    onClick={() => setFilter("CARPENTER")}
-    className={`px-5 py-2 rounded-xl ${
-      filter === "CARPENTER"
-        ? "bg-blue-500"
-        : "bg-zinc-800 hover:bg-blue-500"
-    }`}
-  >
-    Carpenter
-  </button>
-
-  <button
-    onClick={() => setFilter("COOK")}
-    className={`px-5 py-2 rounded-xl ${
-      filter === "COOK"
-        ? "bg-blue-500"
-        : "bg-zinc-800 hover:bg-blue-500"
-    }`}
-  >
-    Cook
-  </button>
-
-</div>
-
+      
 
       <div className="grid md:grid-cols-3 gap-8">
 
         {
           workers
   .filter(worker =>
-    filter === "All"
+    selectedService === "All"
       ? true
-      : worker.service?.toLowerCase() === filter.toLowerCase()
+      : worker.service?.toLowerCase() === selectedService.toLowerCase()
   )
   .filter(worker =>
     worker.name?.toLowerCase().includes(search.toLowerCase()) ||

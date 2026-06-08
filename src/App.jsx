@@ -17,6 +17,8 @@ import Welcome from "./components/Welcome"
 
 function App() {
 
+  const [selectedService, setSelectedService] = useState("All")
+  
   const [selectedWorker, setSelectedWorker] = useState(null)
 
   const [showWelcome, setShowWelcome] = useState(true)
@@ -84,10 +86,11 @@ function App() {
 
           <Hero />
 
-<Services />
+<Services setSelectedService={setSelectedService} />
 
 <Workers
   setSelectedWorker={setSelectedWorker}
+  selectedService={selectedService}
 />
 
 <BookingForm

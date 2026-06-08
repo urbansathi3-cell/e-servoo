@@ -1,5 +1,5 @@
-function Services() {
-
+function Services({ setSelectedService }) {
+ 
   const services = [
     "Electrician",
     "Plumber",
@@ -29,9 +29,18 @@ function Services() {
         {services.map((service, index) => (
 
           <div
-            key={index}
-            className="bg-[#111111] p-8 rounded-3xl border border-zinc-800 hover:border-blue-500 hover:-translate-y-2 transition duration-300"
-          >
+  key={index}
+  onClick={() => {
+    setSelectedService(service)
+
+    document
+      .getElementById("workers")
+      ?.scrollIntoView({
+        behavior: "smooth"
+      })
+  }}
+  className="bg-[#111111] p-8 rounded-3xl border border-zinc-800 hover:border-blue-500 hover:-translate-y-2 transition duration-300 cursor-pointer"
+>
 
             <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 text-2xl">
               ⚡
