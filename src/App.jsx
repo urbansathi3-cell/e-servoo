@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar"
 import Hero from "./components/Hero"
 import Services from "./components/Services"
 import Workers from "./components/Workers"
-import BookingPage from "./components/BookingPage"
+import BookingForm from "./components/BookingForm"
 import CustomerDashboard from "./components/CustomerDashboard"
 import WorkerDashboard from "./components/WorkerDashboard"
 import WorkerLogin from "./components/WorkerLogin"
@@ -84,7 +84,7 @@ function App() {
 
           {selectedWorker ? (
 
-            <BookingPage
+            <BookingForm
               worker={selectedWorker}
               setSelectedWorker={setSelectedWorker}
             />
