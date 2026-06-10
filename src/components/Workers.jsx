@@ -1,176 +1,176 @@
 import { useEffect, useState } from "react"
 
 function Workers({
-  setSelectedWorker,
-  selectedService
+setSelectedWorker,
+selectedService
 }) {
 
-  const [workers, setWorkers] = useState([])
-  const [filter, setFilter] = useState("All")
+const [workers, setWorkers] = useState([])
 const [search, setSearch] = useState("")
-  
-  useEffect(() => {
 
-  const fetchWorkers = () => {
+useEffect(() => {
 
-    fetch(
-      "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec"
-    )
-      .then((res) => res.json())
-      .then((data) => {
 
-  console.log("Workers Data:", data)
+const fetchWorkers = () => {
 
-  if (Array.isArray(data)) {
-    setWorkers(data)
-  } else {
-    setWorkers([])
-  }
+  fetch(
+    "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec"
+  )
+    .then((res) => res.json())
+    .then((data) => {
 
-})
-      .catch((error) => {
-        console.log(error)
-      })
+      console.log("Workers Data:", data)
 
-  }
+      if (Array.isArray(data)) {
+        setWorkers(data)
+      } else {
+        setWorkers([])
+      }
 
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
+}
+
+fetchWorkers()
+
+const interval = setInterval(() => {
   fetchWorkers()
+}, 3000)
 
-  const interval = setInterval(() => {
-    fetchWorkers()
-  }, 3000)
+return () => clearInterval(interval)
 
-  return () => clearInterval(interval)
 
 }, [])
 
-  return (
+return (
 
-    <section
+
+<section
   id="workers"
   className="bg-black text-white py-24 px-5"
 >
 
-      <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">
-        Our Workers
-      </h2>
+  <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">
+    Our Workers
+  </h2>
 
-    <div className="max-w-xl mx-auto mb-8">
+  <div className="max-w-xl mx-auto mb-8">
 
-  <input
-    type="text"
-    placeholder="🔍 Search Workers"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white focus:border-blue-500 outline-none"
-  />
+    <input
+      type="text"
+      placeholder="Search Workers"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white focus:border-blue-500 outline-none"
+    />
 
-</div>
-      
+  </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
+  <div className="max-w-7xl mx-auto space-y-6">
 
-        {
-          workers
-  .filter(worker =>
-    selectedService === "All"
-      ? true
-      : worker.service?.toLowerCase() === selectedService.toLowerCase()
-  )
-  .filter(worker =>
-    worker.name?.toLowerCase().includes(search.toLowerCase()) ||
-    worker.service?.toLowerCase().includes(search.toLowerCase())
-  )
-  .map((worker, index) => (
+    {
+      workers
+        .filter(worker =>
+          selectedService === "All"
+            ? true
+            : worker.service?.toLowerCase() === selectedService.toLowerCase()
+        )
+        .filter(worker =>
+          worker.name?.toLowerCase().includes(search.toLowerCase()) ||
+          worker.service?.toLowerCase().includes(search.toLowerCase())
+        )
+        .map((worker, index) => (
 
-              <div
-                key={index}
-                className="bg-[#111111] p-6 rounded-3xl border border-zinc-800 hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] transition duration-300 hover:scale-105"
-              >
+          <div
+            key={index}
+            onClick={() => setSelectedWorker(worker)}
+            className="bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between hover:border-blue-500 transition cursor-pointer"
+          >
 
-                <img
-                  src={worker.image}
-                  alt={worker.name}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/150"
-                  }}
-                  className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-blue-500"
-                />
+            <div className="flex items-center gap-4">
 
-                <h3 className="text-2xl font-bold text-center mt-5 text-slate-200">
+              <img
+                src={worker.image}
+                alt={worker.name}
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.target.src =
+                    "https://via.placeholder.com/150"
+                }}
+                className="w-16 h-16 rounded-2xl object-cover"
+              />
+
+              <div>
+
+                <h3 className="font-bold text-xl text-white">
                   {worker.name}
                 </h3>
 
-                <p className="text-center text-blue-500 mt-2">
+                <p className="text-blue-400">
                   {worker.service}
                 </p>
 
-                <p className="text-center mt-3 text-yellow-400 font-semibold">
-  ⭐ {worker.rating}/5
-</p>
+                <div className="flex gap-4 mt-2 text-sm">
 
-<p className="text-center mt-2 text-green-400 font-bold text-lg">
-  ₹{worker.fare}
-</p>
-                <div className="text-center mt-3">
+                  <span className="text-yellow-400">
+                    ⭐ {worker.rating}
+                  </span>
 
-  {worker.status?.trim() === "Available" ? (
+                  <span className="text-zinc-400">
+                    📍 {worker.location}
+                  </span>
 
-  <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-    🟢 Available
-  </span>
-
-) : (
-
-  <span className="bg-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-    🔴 Busy
-  </span>
-
-)}
-
-</div>
-
-                <p className="text-center text-zinc-400 mt-2">
-                  {worker.location}
-                </p>
-
-                <p className="text-center text-zinc-500 mt-2">
-                  {worker.experience}
-                </p>
-
-
-                <button
-  disabled={worker.status?.trim() === "Busy"}
-  onClick={() => {
-
-    if (worker.status?.trim() !== "Busy") {
-      setSelectedWorker(worker)
-    }
-
-  }}
-  className={`w-full mt-5 py-3 rounded-xl transition duration-300 ${
-    worker.status?.trim() === "Busy"
-      ? "bg-gray-600 cursor-not-allowed"
-      : "bg-blue-600 hover:bg-blue-700 font-bold"
-  }`}
->
-  {worker.status?.trim() === "Busy"
-    ? "Worker Busy"
-    : "Book Worker"}
-</button>
+                </div>
 
               </div>
 
-            ))
-        }
+            </div>
 
-      </div>
+            <div className="text-right">
 
-    </section>
+              <h3 className="text-3xl font-bold text-white">
+                ₹{worker.fare}
+              </h3>
 
-  )
+              <p className="text-zinc-400 text-sm">
+                visiting cost
+              </p>
+
+              <div className="mt-2">
+
+                {worker.status?.trim() === "Available" ? (
+
+                  <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm">
+                    Available
+                  </span>
+
+                ) : (
+
+                  <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm">
+                    Busy
+                  </span>
+
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        ))
+    }
+
+  </div>
+
+</section>
+
+
+)
+
 }
 
 export default Workers

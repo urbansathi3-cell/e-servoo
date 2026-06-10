@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar"
 import Hero from "./components/Hero"
 import Services from "./components/Services"
 import Workers from "./components/Workers"
-import BookingForm from "./components/BookingForm"
+import BookingPage from "./components/BookingPage"
 import CustomerDashboard from "./components/CustomerDashboard"
 import WorkerDashboard from "./components/WorkerDashboard"
 import WorkerLogin from "./components/WorkerLogin"
@@ -18,7 +18,7 @@ import Welcome from "./components/Welcome"
 function App() {
 
   const [selectedService, setSelectedService] = useState("All")
-  
+
   const [selectedWorker, setSelectedWorker] = useState(null)
 
   const [showWelcome, setShowWelcome] = useState(true)
@@ -35,14 +35,12 @@ function App() {
   const [showRegister, setShowRegister] = useState(false)
 
   if (showWelcome) {
-
-  return (
-    <Welcome
-      setShowWelcome={setShowWelcome}
-    />
-  )
-
-}
+    return (
+      <Welcome
+        setShowWelcome={setShowWelcome}
+      />
+    )
+  }
 
   return (
 
@@ -68,15 +66,15 @@ function App() {
 
           {!workerLoggedIn ? (
 
-  <WorkerLogin
-    setWorkerLoggedIn={setWorkerLoggedIn}
-  />
+            <WorkerLogin
+              setWorkerLoggedIn={setWorkerLoggedIn}
+            />
 
-) : (
+          ) : (
 
-  <WorkerDashboard />
+            <WorkerDashboard />
 
-)}
+          )}
         </>
 
       ) : (
@@ -84,27 +82,38 @@ function App() {
         <>
           <Navbar />
 
-          <Hero />
+          {selectedWorker ? (
 
-<Services setSelectedService={setSelectedService} />
+            <BookingPage
+              worker={selectedWorker}
+              setSelectedWorker={setSelectedWorker}
+            />
 
-<Workers
-  setSelectedWorker={setSelectedWorker}
-  selectedService={selectedService}
-/>
+          ) : (
 
-<BookingForm
-  selectedWorker={selectedWorker}
-  setSelectedWorker={setSelectedWorker}
-/>
+            <>
+              <Hero />
 
-<CustomerDashboard />
+              <Services
+                setSelectedService={setSelectedService}
+              />
 
-<MyBookings />
+              <Workers
+                setSelectedWorker={setSelectedWorker}
+                selectedService={selectedService}
+              />
 
-<Footer />
+              <CustomerDashboard />
 
-<WhatsappButton />
+              <MyBookings />
+
+              <Footer />
+
+              <WhatsappButton />
+            </>
+
+          )}
+
         </>
 
       )}
