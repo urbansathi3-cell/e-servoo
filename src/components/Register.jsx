@@ -73,7 +73,7 @@ function Register({
             placeholder="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="p-4 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-black text-white"
             required
           />
 
@@ -82,7 +82,7 @@ function Register({
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="p-4 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-black text-white"
             required
           />
 
@@ -91,7 +91,7 @@ function Register({
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="p-4 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-black text-white"
             required
           />
 
@@ -100,7 +100,7 @@ function Register({
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="p-4 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-black text-white"
             required
           />
 

@@ -119,9 +119,9 @@ function BookingForm({
 
       )}
 
-      <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 px-5">
+      <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 px-3 overflow-hidden">
 
-        <div className="bg-zinc-900 w-full max-w-md rounded-3xl p-8 relative border border-blue-500">
+        <div className="bg-zinc-900 w-full max-w-md mx-auto rounded-3xl p-5 relative border border-blue-500 overflow-y-auto max-h-[90vh]">
 
           <button
             onClick={() => setSelectedWorker(null)}
@@ -133,7 +133,7 @@ function BookingForm({
           <img
             src={selectedWorker.image}
             alt={selectedWorker.name}
-            className="w-28 h-28 rounded-full object-cover mx-auto border-4 border-blue-500"
+            className="w-20 h-20 md:w-28 md:h-28 rounded-full object-cover mx-auto border-4 border-blue-500"
           />
 
           <h2 className="text-3xl font-bold text-center text-white mt-5">
@@ -159,7 +159,7 @@ function BookingForm({
               placeholder="Your Name"
               value={formData.name}
               onChange={handleChange}
-              className="p-4 rounded-xl bg-black text-white"
+              className="w-full p-3 rounded-xl bg-black text-white"
               required
             />
 
@@ -169,7 +169,7 @@ function BookingForm({
               placeholder="Phone Number"
               value={formData.phone}
               onChange={handleChange}
-              className="p-4 rounded-xl bg-black text-white"
+              className="w-full p-3 rounded-xl bg-black text-white"
               required
             />
 
@@ -179,7 +179,7 @@ function BookingForm({
               placeholder="Address"
               value={formData.address}
               onChange={handleChange}
-              className="p-4 rounded-xl bg-black text-white"
+              className="w-full p-3 rounded-xl bg-black text-white"
               required
             />
 

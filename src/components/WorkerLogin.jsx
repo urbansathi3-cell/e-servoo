@@ -62,7 +62,7 @@ function WorkerLogin({ setWorkerLoggedIn }) {
             placeholder="Worker Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="p-4 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-black text-white"
             required
           />
 
@@ -71,7 +71,7 @@ function WorkerLogin({ setWorkerLoggedIn }) {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="p-4 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-black text-white"
             required
           />
 
