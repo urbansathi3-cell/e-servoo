@@ -85,9 +85,9 @@ function App() {
           {selectedWorker ? (
 
             <BookingForm
-              worker={selectedWorker}
-              setSelectedWorker={setSelectedWorker}
-            />
+  selectedWorker={selectedWorker}
+  setSelectedWorker={setSelectedWorker}
+/>
 
           ) : (
 

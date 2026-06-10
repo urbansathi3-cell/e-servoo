@@ -20,6 +20,7 @@ const fetchWorkers = () => {
     .then((data) => {
 
       console.log("Workers Data:", data)
+      console.log("First Worker:", data[0])
 
       if (Array.isArray(data)) {
         setWorkers(data)
