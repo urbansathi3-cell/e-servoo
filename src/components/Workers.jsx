@@ -9,8 +9,6 @@ const [workers, setWorkers] = useState([])
 const [search, setSearch] = useState("")
 
 useEffect(() => {
-
-
 const fetchWorkers = () => {
 
   fetch(
@@ -18,9 +16,6 @@ const fetchWorkers = () => {
   )
     .then((res) => res.json())
     .then((data) => {
-
-      console.log("Workers Data:", data)
-      console.log("First Worker:", data[0])
 
       if (Array.isArray(data)) {
         setWorkers(data)
