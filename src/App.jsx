@@ -13,6 +13,11 @@ import WhatsappButton from "./components/WhatsappButton";
 import Profile from "./components/Profile";
 import Contact from "./components/Contact";
 import Terms from "./components/Terms";
+import Welcome from "./components/Welcome";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import WorkerLogin from "./components/WorkerLogin";
+import WorkerDashboard from "./components/WorkerDashboard";
 
 function HomePage({
   selectedService,
@@ -45,7 +50,7 @@ function HomePage({
           <WhatsappButton />
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white">
+          <div className="fixed bottom-0 left-0 right-0 w-full max-w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white overflow-hidden">
             <a href="#">🏠 Home</a>
             <a href="#services">🛠 Services</a>
             <a href="#workers">👷 Workers</a>
@@ -64,8 +69,58 @@ function App() {
   const [selectedWorker, setSelectedWorker] =
     useState(null);
 
+    const [showWelcome, setShowWelcome] = useState(true);
+
+const [isLoggedIn, setIsLoggedIn] = useState(
+  !!localStorage.getItem("user")
+);
+
+const [workerLoggedIn, setWorkerLoggedIn] = useState(
+  !!localStorage.getItem("worker")
+);
+
+const [showLogin, setShowLogin] = useState(true);
+
+const [showRegister, setShowRegister] = useState(false);
+
+ if (showWelcome) {
   return (
-    <div className="bg-black min-h-screen pb-20">
+    <Welcome
+      setShowWelcome={setShowWelcome}
+    />
+  );
+}
+
+if (!isLoggedIn) {
+  return (
+    <>
+      {showLogin && (
+        <Login
+          setIsLoggedIn={setIsLoggedIn}
+          setShowLogin={setShowLogin}
+          setShowRegister={setShowRegister}
+        />
+      )}
+
+      {showRegister && (
+        <Register
+          setShowRegister={setShowRegister}
+          setShowLogin={setShowLogin}
+        />
+      )}
+
+      {!workerLoggedIn ? (
+        <WorkerLogin
+          setWorkerLoggedIn={setWorkerLoggedIn}
+        />
+      ) : (
+        <WorkerDashboard />
+      )}
+    </>
+  );
+}
+return (
+    <div className="bg-black min-h-screen pb-20 overflow-x-hidden">
 
       <Routes>
 

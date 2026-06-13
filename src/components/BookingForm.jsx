@@ -119,9 +119,9 @@ function BookingForm({
 
       )}
 
-      <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 px-3 overflow-hidden">
+      <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center">
 
-        <div className="bg-zinc-900 w-full max-w-md mx-auto rounded-3xl p-5 relative border border-blue-500 overflow-y-auto max-h-[90vh]">
+        <div className="bg-zinc-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 border border-blue-500 max-h-[95vh] overflow-y-auto relative">
 
           <button
             onClick={() => setSelectedWorker(null)}
