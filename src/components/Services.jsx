@@ -24,7 +24,7 @@ function Services({ setSelectedService }) {
         Trusted Professionals For Every Home Need
       </p>
 
-      <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
 
         {services.map((service, index) => (
 
@@ -39,16 +39,16 @@ function Services({ setSelectedService }) {
         behavior: "smooth"
       })
   }}
-  className="bg-[#111111] p-8 rounded-3xl border border-zinc-800 hover:border-blue-500 hover:-translate-y-2 transition duration-300 cursor-pointer"
+  className="bg-[#111111] p-5 rounded-2xl border border-zinc-800 hover:border-blue-500 hover:-translate-y-1 transition duration-300 cursor-pointer"
 >
 
-            <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mb-3 text-lg">
               ⚡
             </div>
 
-            <h3 className="text-2xl font-bold text-slate-200">
-              {service}
-            </h3>
+            <h3 className="text-lg font-bold text-slate-200">  
+          {service}  
+        </h3>  
 
           </div>
 
