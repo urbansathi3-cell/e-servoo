@@ -9,6 +9,7 @@ const [workers, setWorkers] = useState([])
 const [search, setSearch] = useState("")
 
 useEffect(() => {
+
 const fetchWorkers = () => {
 
   fetch(
@@ -38,11 +39,9 @@ const interval = setInterval(() => {
 
 return () => clearInterval(interval)
 
-
 }, [])
 
 return (
-
 
 <section
   id="workers"
@@ -101,25 +100,31 @@ return (
 
               <div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
 
-  <h3 className="font-bold text-xl text-white">
-    {worker.name}
-  </h3>
+                  <h3 className="font-bold text-xl text-white">
+                    {worker.name}
+                  </h3>
 
-  {worker.Verified === "Yes" && (
-    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-      ✓ Verified
-    </span>
-  )}
+                  {worker.Verified === "Yes" && (
+                    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                      ✓ Verified
+                    </span>
+                  )}
 
-</div>
+                  {Number(worker.rating) >= 4.8 && (
+                    <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold">
+                      🏆 Elite Worker
+                    </span>
+                  )}
+
+                </div>
 
                 <p className="text-blue-400">
                   {worker.service}
                 </p>
 
-                <div className="flex gap-4 mt-2 text-sm">
+                <div className="flex flex-wrap gap-3 mt-2 text-sm">
 
                   <span className="text-yellow-400">
                     ⭐ {worker.rating}
@@ -127,6 +132,10 @@ return (
 
                   <span className="text-zinc-400">
                     📍 {worker.location}
+                  </span>
+
+                  <span className="text-green-400 font-semibold">
+                    🛡 {worker.TrustScore || "90"}% Trust
                   </span>
 
                 </div>
@@ -173,7 +182,6 @@ return (
   </div>
 
 </section>
-
 
 )
 
