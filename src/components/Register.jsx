@@ -21,12 +21,11 @@ function Register({
         {
           method: "POST",
           body: JSON.stringify({
-            action: "register",
-            name,
-            phone,
-            email,
-            create password
-          })
+  name,
+  email,
+  phone,
+  "create password": password
+})
         }
       )
 
