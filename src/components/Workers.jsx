@@ -101,9 +101,19 @@ return (
 
               <div>
 
-                <h3 className="font-bold text-xl text-white">
-                  {worker.name}
-                </h3>
+                <div className="flex items-center gap-2">
+
+  <h3 className="font-bold text-xl text-white">
+    {worker.name}
+  </h3>
+
+  {worker.Verified === "Yes" && (
+    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+      ✓ Verified
+    </span>
+  )}
+
+</div>
 
                 <p className="text-blue-400">
                   {worker.service}
