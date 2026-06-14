@@ -96,7 +96,7 @@ function Register({
 
           <input
             type="password"
-            placeholder="create Password"
+            placeholder="Create Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-xl bg-black text-white"
