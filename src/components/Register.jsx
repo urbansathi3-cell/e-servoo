@@ -8,7 +8,7 @@ function Register({
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [createpassword, setPassword] = useState("")
 
   const handleRegister = async (e) => {
 
@@ -25,7 +25,7 @@ function Register({
             name,
             phone,
             email,
-            password
+            create password
           })
         }
       )
@@ -97,7 +97,7 @@ function Register({
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="create Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-xl bg-black text-white"
