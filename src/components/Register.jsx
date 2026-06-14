@@ -8,7 +8,7 @@ function Register({
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [createpassword, setPassword] = useState("")
+  const [password, setPassword] = useState("")
 
   const handleRegister = async (e) => {
 
@@ -24,7 +24,7 @@ function Register({
   name,
   email,
   phone,
-  "create password": password
+  password,
 })
         }
       )
