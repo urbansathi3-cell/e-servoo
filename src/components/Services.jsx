@@ -4,7 +4,7 @@ function Services({ setSelectedService }) {
     "Electrician",
     "Plumber",
     "Carpenter",
-    "AC Repair",
+    "Appliance Repair",
     "Cook",
     "Cleaner"
   ]
@@ -49,10 +49,6 @@ function Services({ setSelectedService }) {
             <h3 className="text-2xl font-bold text-slate-200">
               {service}
             </h3>
-
-            <p className="mt-4 text-zinc-400">
-              Professional and verified {service.toLowerCase()} services available at your doorstep.
-            </p>
 
           </div>
 
