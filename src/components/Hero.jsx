@@ -6,7 +6,7 @@ function Hero() {
       <img
         src="/logo.png"
         alt="E-SERVOO"
-        className="w-32 mb-8"
+        className="w-32 mb-4"
       />
 
       <h1 className="text-5xl md:text-7xl font-bold text-slate-200">
