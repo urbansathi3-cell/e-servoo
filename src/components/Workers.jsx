@@ -107,11 +107,22 @@ return (
                   </h3>
 
                   {Number(worker.rating) >= 4.8 && (
-                    <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold">
-                      🏆 Elite Worker
-                    </span>
-                  )}
-
+  <span className="flex items-center gap-1 text-orange-400 text-xs font-semibold">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="w-4 h-4"
+    >
+      <path
+        fillRule="evenodd"
+        d="M12 2.25c-5.376 0-9.75 4.374-9.75 9.75S6.624 21.75 12 21.75 21.75 17.376 21.75 12 17.376 2.25 12 2.25zm4.28 8.47a.75.75 0 00-1.06-1.06l-4.97 4.97-1.97-1.97a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.06 0l5.5-5.5z"
+        clipRule="evenodd"
+      />
+    </svg>
+    Verified
+  </span>
+)}
                 </div>
 
                 <p className="text-blue-400">
