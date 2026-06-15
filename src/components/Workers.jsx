@@ -100,8 +100,13 @@ function Workers({
 
                   <div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div>
 
+  <pre className="text-red-400 text-xs">
+    {JSON.stringify(worker, null, 2)}
+  </pre>
+
+  <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-bold text-xl text-white">
                         {worker.name}
                       </h3>
