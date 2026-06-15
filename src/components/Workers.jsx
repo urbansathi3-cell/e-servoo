@@ -116,8 +116,8 @@ return (
 )}
 
                   {Number(worker.rating) >= 4.8 && (
-                    <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold">
-                      🏆 Elite Worker
+                    <span className="bg-blue-500 text-black text-xs px-2 py-1 rounded-full font-semibold">
+                      ✓
                     </span>
                   )}
 
