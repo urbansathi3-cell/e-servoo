@@ -107,7 +107,7 @@ function Workers({
                       </h3>
 
 <h3 className="font-bold text-xl text-white">
-  {worker.name}
+  {worker.Verified}
 </h3>
 
                       {String(worker.Verified).trim().toLowerCase() === "yes" && (
