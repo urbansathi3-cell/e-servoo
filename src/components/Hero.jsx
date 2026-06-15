@@ -1,7 +1,7 @@
 function Hero() {
   return (
 
-    <section className="bg-gradient-to-b from-black to-zinc-950 text-white min-h-screen flex flex-col items-center justify-center text-center px-5">
+    <section className="bg-gradient-to-b from-black to-zinc-950 text-white min-h-[calc(100vh-80px)] flex flex-col items-center justify-center text-center px-5 pt-2">
 
       <img
         src="/logo.png"
