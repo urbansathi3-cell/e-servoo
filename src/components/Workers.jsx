@@ -107,10 +107,13 @@ return (
                   </h3>
 
                   {worker.Verified === "Yes" && (
-                    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
-                      ✓ Verified
-                    </span>
-                  )}
+  <span
+    title="Verified Worker"
+    className="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+  >
+    ✓
+  </span>
+)}
 
                   {Number(worker.rating) >= 4.8 && (
                     <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-semibold">
