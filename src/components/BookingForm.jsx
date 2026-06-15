@@ -9,12 +9,14 @@ function BookingForm({
   console.log("BookingForm Render:", selectedWorker)
 
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    service: "",
-    worker: ""
-  })
+  name: "",
+  phone: "",
+  address: "",
+  issueDescription: "",
+  urgency: "Normal",
+  service: "",
+  worker: ""
+})
 
   const [success, setSuccess] = useState(false)
 
@@ -23,12 +25,14 @@ function BookingForm({
     if (!selectedWorker) return
 
     setFormData({
-      name: "",
-      phone: "",
-      address: "",
-      service: selectedWorker.service || "",
-      worker: selectedWorker.name || ""
-    })
+  name: "",
+  phone: "",
+  address: "",
+  issueDescription: "",
+  urgency: "Normal",
+  service: "",
+  worker: ""
+})
 
   }, [selectedWorker])
 
@@ -43,9 +47,14 @@ function BookingForm({
 
   const handleSubmit = async (e) => {
 
-    e.preventDefault()
+  e.preventDefault()
 
-    try {
+  if (formData.phone.length < 10) {
+    alert("Enter Valid Phone Number")
+    return
+  }
+
+  try {
 
       await fetch(
         "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
@@ -84,6 +93,14 @@ function BookingForm({
             <p className="mt-5 text-white text-lg">
               Worker: {formData.worker}
             </p>
+
+<p className="mt-2 text-yellow-400">
+  Priority: {formData.urgency}
+</p>
+
+<p className="mt-2 text-zinc-300">
+  Issue: {formData.issueDescription}
+</p>
 
             <p className="mt-2 text-blue-500 text-lg">
               Service: {formData.service}
@@ -147,6 +164,19 @@ function BookingForm({
           <p className="text-center text-green-400 font-bold mt-2 text-xl">
             Service Charge: ₹{selectedWorker.fare || "Not Available"}
           </p>
+<div className="mt-4 bg-black rounded-xl p-3 text-center">
+  <p className="text-zinc-400 text-sm">
+    Booking With
+  </p>
+
+  <p className="text-white font-bold">
+    {selectedWorker.name}
+  </p>
+
+  <p className="text-blue-400">
+    {selectedWorker.service}
+  </p>
+</div>
 
           <form
             onSubmit={handleSubmit}
@@ -182,6 +212,27 @@ function BookingForm({
               className="w-full p-3 rounded-xl bg-black text-white"
               required
             />
+
+<textarea
+  name="issueDescription"
+  placeholder="Describe your issue..."
+  value={formData.issueDescription}
+  onChange={handleChange}
+  className="w-full p-3 rounded-xl bg-black text-white"
+  rows="4"
+  required
+/>
+
+<select
+  name="urgency"
+  value={formData.urgency}
+  onChange={handleChange}
+  className="w-full p-3 rounded-xl bg-black text-white"
+>
+  <option value="Normal">Normal</option>
+  <option value="Urgent">Urgent</option>
+  <option value="Emergency">Emergency</option>
+</select>
 
             <button
               type="submit"
