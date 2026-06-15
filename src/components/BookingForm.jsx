@@ -162,7 +162,7 @@ function BookingForm({
           </p>
 
           <p className="text-center text-green-400 font-bold mt-2 text-xl">
-            Service Charge: ₹{selectedWorker.fare || "Not Available"}
+            visiting Charge: ₹{selectedWorker.fare || "Not Available"}
           </p>
 <div className="mt-4 bg-black rounded-xl p-3 text-center">
   <p className="text-zinc-400 text-sm">
