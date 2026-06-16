@@ -20,14 +20,13 @@ function Register({
         "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
         {
           method: "POST",
-          body: JSON.stringify({
+         body: JSON.stringify({
+  action: "register",
   name,
   email,
   phone,
   password,
 })
-        }
-      )
 
       const data = await res.json()
 
