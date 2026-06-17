@@ -8,7 +8,7 @@ const services = [
 { name: "Carpenter", icon: "🔨" },
 { name: "Appliance Repair", icon: "🛠️" },
 { name: "Cook", icon: "👨‍🍳" },
-{ name: "Cleaner", icon: "🧹" }
+{ name: "washer", icon: "🧹" }
 ]
 
 return (
