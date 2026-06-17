@@ -26,7 +26,7 @@ export default function IssueDescription({ setIssueData }) {
       <label><b>Describe your issue</b></label>
       
       <textarea
-        placeholder="Example: Tap leaking in kitchen, water dripping continuously..."
+        placeholder="Example: Tap leaking in kitchen, water dripping continuously"
         value={issue}
         onChange={(e) => handleChange(e.target.value)}
         rows={4}

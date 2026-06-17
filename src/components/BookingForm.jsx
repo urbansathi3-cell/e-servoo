@@ -1,91 +1,73 @@
-import { useState, useEffect } from "react"
-import { FaTimes } from "react-icons/fa"
+import { useState, useEffect } from "react";
+import { FaTimes } from "react-icons/fa";
 
-function BookingForm({
-  selectedWorker,
-  setSelectedWorker
-}) {
-
-  console.log("BookingForm Render:", selectedWorker)
-
+function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [formData, setFormData] = useState({
-  name: "",
-  phone: "",
-  address: "",
-  issueDescription: "",
-  urgency: "Normal",
-  service: "",
-  worker: ""
-})
+    name: "",
+    phone: "",
+    address: "",
+    issueDescription: "",
+    urgency: "Normal",
+    service: "",
+    worker: "",
+  });
 
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-
-    if (!selectedWorker) return
+    if (!selectedWorker) return;
 
     setFormData({
-  name: "",
-  phone: "",
-  address: "",
-  issueDescription: "",
-  urgency: "Normal",
-  service: "",
-  worker: ""
-})
-
-  }, [selectedWorker])
+      name: "",
+      phone: "",
+      address: "",
+      issueDescription: "",
+      urgency: "Normal",
+      service: selectedWorker.service || "",
+      worker: selectedWorker.name || "",
+    });
+  }, [selectedWorker]);
 
   const handleChange = (e) => {
-
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    })
-
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  e.preventDefault()
+    if (formData.phone.length < 10) {
+      alert("Enter Valid Phone Number");
+      return;
+    }
 
-  if (formData.phone.length < 10) {
-    alert("Enter Valid Phone Number")
-    return
-  }
-
-  try {
-
+    try {
       await fetch(
         "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
         {
           method: "POST",
-          body: JSON.stringify(formData)
+          body: JSON.stringify(formData),
         }
-      )
+      );
 
-      setSuccess(true)
-
+      setSuccess(true);
     } catch (error) {
-
-      alert("Booking Failed")
-
+      console.error(error);
+      alert("Booking Failed");
     }
-
-  }
+  };
 
   if (!selectedWorker) {
-    return null
+    return null;
   }
 
   return (
     <>
       {success && (
-
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-[100] px-5">
-
           <div className="bg-zinc-900 p-8 rounded-3xl border border-green-500 text-center max-w-md w-full">
-
             <h2 className="text-3xl font-bold text-green-500">
               ✅ Booking Successful
             </h2>
@@ -94,16 +76,16 @@ function BookingForm({
               Worker: {formData.worker}
             </p>
 
-<p className="mt-2 text-yellow-400">
-  Priority: {formData.urgency}
-</p>
-
-<p className="mt-2 text-zinc-300">
-  Issue: {formData.issueDescription}
-</p>
-
             <p className="mt-2 text-blue-500 text-lg">
               Service: {formData.service}
+            </p>
+
+            <p className="mt-2 text-yellow-400">
+              Priority: {formData.urgency}
+            </p>
+
+            <p className="mt-2 text-zinc-300">
+              Issue: {formData.issueDescription}
             </p>
 
             <p className="mt-4 text-zinc-400">
@@ -112,34 +94,29 @@ function BookingForm({
 
             <button
               onClick={() => {
-
-                setSuccess(false)
-                setSelectedWorker(null)
+                setSuccess(false);
+                setSelectedWorker(null);
 
                 setFormData({
                   name: "",
                   phone: "",
                   address: "",
+                  issueDescription: "",
+                  urgency: "Normal",
                   service: "",
-                  worker: ""
-                })
-
+                  worker: "",
+                });
               }}
               className="bg-blue-500 px-6 py-3 rounded-xl mt-6 hover:bg-blue-600"
             >
               Close
             </button>
-
           </div>
-
         </div>
-
       )}
 
       <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center">
-
         <div className="bg-zinc-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 border border-blue-500 max-h-[95vh] overflow-y-auto relative">
-
           <button
             onClick={() => setSelectedWorker(null)}
             className="absolute top-5 right-5 text-white text-xl"
@@ -162,27 +139,25 @@ function BookingForm({
           </p>
 
           <p className="text-center text-green-400 font-bold mt-2 text-xl">
-            visiting Charge: ₹{selectedWorker.fare || "Not Available"}
+            Visiting Charge: ₹{selectedWorker.fare || "Not Available"}
           </p>
-<div className="mt-4 bg-black rounded-xl p-3 text-center">
-  <p className="text-zinc-400 text-sm">
-    Booking With
-  </p>
 
-  <p className="text-white font-bold">
-    {selectedWorker.name}
-  </p>
+          <div className="mt-4 bg-black rounded-xl p-3 text-center">
+            <p className="text-zinc-400 text-sm">Booking With</p>
 
-  <p className="text-blue-400">
-    {selectedWorker.service}
-  </p>
-</div>
+            <p className="text-white font-bold">
+              {selectedWorker.name}
+            </p>
+
+            <p className="text-blue-400">
+              {selectedWorker.service}
+            </p>
+          </div>
 
           <form
             onSubmit={handleSubmit}
             className="flex flex-col gap-4 mt-8"
           >
-
             <input
               type="text"
               name="name"
@@ -213,26 +188,26 @@ function BookingForm({
               required
             />
 
-<textarea
-  name="issueDescription"
-  placeholder="Describe your issue..."
-  value={formData.issueDescription}
-  onChange={handleChange}
-  className="w-full p-3 rounded-xl bg-black text-white"
-  rows="4"
-  required
-/>
+            <textarea
+              name="issueDescription"
+              placeholder="Describe your issue..."
+              value={formData.issueDescription}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl bg-black text-white"
+              rows="4"
+              required
+            />
 
-<select
-  name="urgency"
-  value={formData.urgency}
-  onChange={handleChange}
-  className="w-full p-3 rounded-xl bg-black text-white"
->
-  <option value="Normal">Normal</option>
-  <option value="Urgent">Urgent</option>
-  <option value="Emergency">Emergency</option>
-</select>
+            <select
+              name="urgency"
+              value={formData.urgency}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl bg-black text-white"
+            >
+              <option value="Normal">Normal</option>
+              <option value="Urgent">Urgent</option>
+              <option value="Emergency">Emergency</option>
+            </select>
 
             <button
               type="submit"
@@ -240,15 +215,11 @@ function BookingForm({
             >
               Confirm Booking
             </button>
-
           </form>
-
         </div>
-
       </div>
     </>
-  )
-
+  );
 }
 
-export default BookingForm
+export default BookingForm;
