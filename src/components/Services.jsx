@@ -4,7 +4,7 @@ function Services({ setSelectedService }) {
 
 const services = [
 { name: "Electrician", icon: "⚡" },
-{ name: "Plumber", icon: "🔧" },
+{ name: "Plumbers", icon: "🔧" },
 { name: "Carpenter", icon: "🔨" },
 { name: "Appliance Repair", icon: "🛠️" },
 { name: "Cook", icon: "👨‍🍳" },
