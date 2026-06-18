@@ -128,6 +128,19 @@ return (
                 <p className="text-blue-400">
                   {worker.service}
                 </p>
+{worker.CertificateImage && (
+  <a
+    href={worker.CertificateImage}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <img
+      src={worker.CertificateImage}
+      alt="Certificate"
+      className="w-40 h-24 object-cover rounded-xl border border-green-500 hover:scale-105 transition"
+    />
+  </a>
+)}
 
                 <div className="flex flex-wrap gap-3 mt-2 text-sm">
 
