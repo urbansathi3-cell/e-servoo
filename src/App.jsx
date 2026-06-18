@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
+import TopRatedWorkers from "./components/TopRatedWorkers";
 import BookingForm from "./components/BookingForm";
 import CustomerDashboard from "./components/CustomerDashboard";
 import MyBookings from "./components/MyBookings";

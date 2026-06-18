@@ -41,6 +41,17 @@ return () => clearInterval(interval)
 
 }, [])
 
+const topWorkers = [...workers]
+  .sort(
+    (a, b) =>
+      (Number(b.rating || 0) * 0.7 +
+        Number(b.TrustScore || 0) * 0.3)
+      -
+      (Number(a.rating || 0) * 0.7 +
+        Number(a.TrustScore || 0) * 0.3)
+  )
+  .slice(0, 5)
+
 return (
 
 <section
@@ -51,6 +62,58 @@ return (
   <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">
     Our Workers
   </h2>
+
+  <div className="max-w-7xl mx-auto mb-12">
+
+  <h3 className="text-3xl font-bold text-yellow-400 mb-6">
+    ⭐ Top Rated Workers
+  </h3>
+
+  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+    {topWorkers.map((worker, index) => (
+
+      <div
+        key={index}
+        onClick={() => setSelectedWorker(worker)}
+        className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500 rounded-3xl p-5 cursor-pointer hover:scale-105 transition"
+      >
+
+        <img
+          src={worker.image}
+          alt={worker.name}
+          className="w-20 h-20 rounded-full mx-auto object-cover"
+        />
+
+        <h4 className="text-center text-xl font-bold mt-3">
+          {worker.name}
+        </h4>
+
+        <p className="text-center text-blue-400">
+          {worker.service}
+        </p>
+
+        <div className="text-center mt-2">
+          <p className="text-yellow-400">
+            ⭐ {worker.rating}
+          </p>
+
+          <p className="text-green-400">
+            🛡️ {worker.TrustScore}% Trust
+          </p>
+
+          <p className="text-white">
+            ₹{worker.fare}
+          </p>
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
 
   <div className="max-w-xl mx-auto mb-8">
 
@@ -106,7 +169,7 @@ return (
                     {worker.name}
                   </h3>
 
-                  {Number(worker.rating) >= 4.8 && (
+                  {worker.Verified === "Yes" && (
   <span className="flex items-center gap-1 text-orange-400 text-xs font-semibold">
     <svg
       xmlns="http://www.w3.org/2000/svg"
