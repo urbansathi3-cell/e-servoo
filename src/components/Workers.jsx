@@ -136,7 +136,7 @@ className={`bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md
   ${worker.status?.trim() === "Available"
     ? "hover:border-blue-500 cursor-pointer"
     : "opacity-50 cursor-not-allowed"
-  }`}
+  }}
 
     <div className="flex items-center gap-4">    
 
