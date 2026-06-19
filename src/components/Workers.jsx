@@ -62,7 +62,7 @@ return (
   </h2>    <div className="max-w-7xl mx-auto mb-12">
 
   <h3 className="text-3xl font-bold text-yellow-400 mb-6">
-    ⭐ Top Rated Workers
+    ⭐ Top 5 Rated Workers
   </h3>
 
   {topWorkers.length === 0 && (
