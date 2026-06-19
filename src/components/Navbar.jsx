@@ -5,7 +5,7 @@ function Navbar() {
         <img
           src="/logo.png"
           alt="logo"
-          className="h-30 w-30"
+          className="h-25 w-30"
         />
 
         <h1 className="text-4xl font-bold text-white">
