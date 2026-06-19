@@ -1,150 +1,147 @@
 import { useState } from "react"
 
 function Register({
-  setShowRegister,
-  setShowLogin
+setShowRegister,
+setShowLogin
 }) {
 
-  const [name, setName] = useState("")
-  const [phone, setPhone] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+const [name, setName] = useState("")
+const [phone, setPhone] = useState("")
+const [email, setEmail] = useState("")
+const [password, setPassword] = useState("")
 
-  const handleRegister = async (e) => {
+const handleRegister = async (e) => {
 
+```
 e.preventDefault()
 
 try {
 
-```
-const res = await fetch(
-  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
-  {
-    method: "POST",
-    body: JSON.stringify({
-      action: "register",
-      name,
-      email,
-      phone,
-      password,
-    }),
+  const res = await fetch(
+    "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        action: "register",
+        name,
+        phone,
+        email,
+        password
+      })
+    }
+  )
+
+  const data = await res.json()
+
+  if (data.success) {
+
+    alert("Account Created Successfully")
+
+    setShowRegister(false)
+    setShowLogin(true)
+
+  } else {
+
+    alert(data.message || "Registration Failed")
+
   }
-)
 
-const data = await res.json()
+} catch (error) {
 
-if (data.success) {
-
-  alert("Account Created Successfully")
-
-  setShowRegister(false)
-  setShowLogin(true)
-
-} else {
-
+  console.log(error)
   alert("Registration Failed")
 
 }
 ```
 
-} catch (error) {
-
-```
-console.log(error)
-alert("Registration Failed")
-```
-
 }
 
-}
+return (
 
+```
+<section className="bg-black text-white min-h-screen flex justify-center items-center px-5">
 
-  return (
+  <div className="bg-zinc-900 p-8 rounded-3xl w-full max-w-md">
 
-    <section className="bg-black text-white min-h-screen flex justify-center items-center px-5">
+    <h2 className="text-4xl font-bold text-blue-500 text-center mb-8">
+      Create Account
+    </h2>
 
-      <div className="bg-zinc-900 p-8 rounded-3xl w-full max-w-md">
+    <form
+      onSubmit={handleRegister}
+      className="flex flex-col gap-4"
+    >
 
-        <h2 className="text-4xl font-bold text-blue-500 text-center mb-8">
-          Create Account
-        </h2>
+      <input
+        type="text"
+        placeholder="Full Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        required
+      />
 
-        <form
-          onSubmit={handleRegister}
-          className="flex flex-col gap-4"
-        >
+      <input
+        type="text"
+        placeholder="Phone Number"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        required
+      />
 
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 rounded-xl bg-black text-white"
-            required
-          />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        required
+      />
 
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-3 rounded-xl bg-black text-white"
-            required
-          />
+      <input
+        type="password"
+        placeholder="Create Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        required
+      />
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-xl bg-black text-white"
-            required
-          />
+      <button
+        type="submit"
+        className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-blue-600 transition"
+      >
+        Create Account
+      </button>
 
-          <input
-            type="password"
-            placeholder="Create Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-xl bg-black text-white"
-            required
-          />
+    </form>
 
-          <button
-            type="submit"
-            className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-blue-600"
-          >
-            Create Account
-          </button>
+    <div className="text-center mt-6">
 
-        </form>
+      <p className="text-zinc-400">
+        Already have an account?
+      </p>
 
-        <div className="text-center mt-6">
+      <button
+        type="button"
+        onClick={() => {
+          setShowRegister(false)
+          setShowLogin(true)
+        }}
+        className="text-blue-500 mt-2 font-bold hover:underline"
+      >
+        Login
+      </button>
 
-          <p className="text-zinc-400">
-            Already have an account?
-          </p>
+    </div>
 
-          <button
-            type="button"
-            onClick={() => {
+  </div>
 
-              setShowRegister(false)
-              setShowLogin(true)
+</section>
+```
 
-            }}
-            className="text-blue-500 mt-2 font-bold hover:underline"
-          >
-            Login
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  )
+)
 
 }
 
