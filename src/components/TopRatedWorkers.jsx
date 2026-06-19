@@ -1,8 +1,18 @@
 function TopRatedWorkers({ workers, setSelectedWorker }) {
 
   const topWorkers = [...workers]
-    .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
-    .slice(0, 5);
+  .filter(worker =>
+    (Number(worker.rating || 0) * 0.7 +
+     Number(worker.TrustScore || 0) * 0.3) >= 4.5
+  )
+  .sort((a, b) =>
+    (Number(b.rating || 0) * 0.7 +
+     Number(b.TrustScore || 0) * 0.3)
+    -
+    (Number(a.rating || 0) * 0.7 +
+     Number(a.TrustScore || 0) * 0.3)
+  )
+  .slice(0, 10);
 
   return (
     <div className="px-4 mt-8">
@@ -12,6 +22,13 @@ function TopRatedWorkers({ workers, setSelectedWorker }) {
       </h2>
 
       <div className="grid gap-4">
+
+  {topWorkers.length === 0 && (
+    <p className="text-gray-400">
+      No top rated workers available yet
+    </p>
+  )}
+  
 
         {topWorkers.map((worker) => (
 
