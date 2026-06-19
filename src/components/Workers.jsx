@@ -191,23 +191,18 @@ return (
                 <p className="text-blue-400">
                   {worker.service}
                 </p>
-{worker.CertificateImage && (
+                
+{worker.CertificateLink && (
   <a
-    href={worker.CertificateImage}
+    href={worker.CertificateLink}
     target="_blank"
     rel="noreferrer"
+    onClick={(e) => {
+      e.stopPropagation()
+    }}
+    className="text-orange-400 text-xs font-semibold hover:underline"
   >
-    <div className="mt-3">
-      <p className="text-orange-400 text-xs mb-1">
-        ✔ Skill Certified
-      </p>
-
-      <img
-        src={worker.CertificateImage}
-        alt="Certificate"
-        className="w-40 h-24 object-cover rounded-xl border border-orange-500 hover:scale-105 transition"
-      />
-    </div>
+    📜 Verified Skill Certificate
   </a>
 )}
 
