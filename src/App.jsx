@@ -153,16 +153,6 @@ const changeLanguage = (lang) => {
   setLanguage(lang);
   localStorage.setItem("lang", lang);
 };
-const [language, setLanguage] = useState(
-  localStorage.getItem("lang") || "en"
-);
-
-const t = translations[language];
-
-const changeLanguage = (lang) => {
-  setLanguage(lang);
-  localStorage.setItem("lang", lang);
-};
 
 return (
    <div className="bg-black min-h-screen pb-20 overflow-x-hidden">
