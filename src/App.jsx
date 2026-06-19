@@ -4,7 +4,9 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
+import SmartRecommendation from "./components/SmartRecommendation";
 import Workers from "./components/Workers";
+import SmartRecommendation from "./components/SmartRecommendation";
 import TopRatedWorkers from "./components/TopRatedWorkers";
 import BookingForm from "./components/BookingForm";
 import CustomerDashboard from "./components/CustomerDashboard";
@@ -94,14 +96,18 @@ return (
     <>
       <Hero />
 
-      <Services
-        setSelectedService={setSelectedService}
-      />
+<Services
+  setSelectedService={setSelectedService}
+/>
 
-      <Workers
-        setSelectedWorker={setSelectedWorker}
-        selectedService={selectedService}
-      />
+<SmartRecommendation
+  setSelectedService={setSelectedService}
+/>
+
+<Workers
+  setSelectedWorker={setSelectedWorker}
+  selectedService={selectedService}
+/>
 
       <WhatsappButton />
 

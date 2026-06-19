@@ -12,7 +12,7 @@ const [password, setPassword] = useState("")
 
 const handleRegister = async (e) => {
 
-```
+
 e.preventDefault()
 
 try {
@@ -52,13 +52,13 @@ try {
   alert("Registration Failed")
 
 }
-```
+
 
 }
 
 return (
 
-```
+
 <section className="bg-black text-white min-h-screen flex justify-center items-center px-5">
 
   <div className="bg-zinc-900 p-8 rounded-3xl w-full max-w-md">
@@ -139,7 +139,7 @@ return (
   </div>
 
 </section>
-```
+
 
 )
 
