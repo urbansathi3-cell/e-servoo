@@ -42,17 +42,14 @@ return () => clearInterval(interval)
 }, [])
 
 const topWorkers = [...workers]
-  .sort((a, b) => {
-    const scoreA =
-      (Number(a.rating || 0) * 0.7 +
-       Number(a.TrustScore || 0) * 0.3);
-
-    const scoreB =
+  .sort(
+    (a, b) =>
       (Number(b.rating || 0) * 0.7 +
-       Number(b.TrustScore || 0) * 0.3);
-
-    return scoreB - scoreA;
-  })
+       Number(b.TrustScore || 0) * 0.3)
+      -
+      (Number(a.rating || 0) * 0.7 +
+       Number(a.TrustScore || 0) * 0.3)
+  )
   .slice(0, 5);
 
 return (
