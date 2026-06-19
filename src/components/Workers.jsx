@@ -136,7 +136,8 @@ className={`bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md
   ${worker.status?.trim() === "Available"
     ? "hover:border-blue-500 cursor-pointer"
     : "opacity-50 cursor-not-allowed"
-  }'}
+  }
+`}
 
     <div className="flex items-center gap-4">    
 
@@ -196,7 +197,7 @@ className="text-orange-400 text-xs font-semibold hover:underline"
 
     <div className="text-right">    
 
-      <h3 className="text-3x0.5 font-bold text-white">    
+      <h3 className="text-3x1 font-bold text-white">    
         ₹{worker.fare}    
       </h3>    
 
