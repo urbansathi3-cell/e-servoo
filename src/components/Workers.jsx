@@ -59,45 +59,59 @@ return (
   className="bg-black text-white py-24 px-5"  
 >    <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">  
     Our Workers  
-  </h2>    <div className="max-w-7xl mx-auto mb-12">    <h3 className="text-3xl font-bold text-yellow-400 mb-6">  
-    ⭐ Top Rated Workers  
-  </h3>    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">  {topWorkers.map((worker, index) => (  
+  </h2>    <div className="max-w-7xl mx-auto mb-12">
 
-  <div  
-    key={index}  
-    onClick={() => setSelectedWorker(worker)}  
-    className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500 rounded-3xl p-5 cursor-pointer hover:scale-105 transition"  
-  >  
+  <h3 className="text-3xl font-bold text-yellow-400 mb-6">
+    ⭐ Top Rated Workers
+  </h3>
 
-    <img  
-      src={worker.image}  
-      alt={worker.name}  
-      className="w-20 h-20 rounded-full mx-auto object-cover"  
-    />  
+  {topWorkers.length === 0 && (
+    <p className="text-gray-400 text-center">
+      No top rated workers available
+    </p>
+  )}
 
-    <h4 className="text-center text-xl font-bold mt-3">  
-      {worker.name}  
-    </h4>  
+  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-    <p className="text-center text-blue-400">  
-      {worker.service}  
-    </p>  
+    {topWorkers.map((worker) => (
+      <div
+        key={worker.id}
+        onClick={() => setSelectedWorker(worker)}
+        className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500 rounded-3xl p-5 cursor-pointer hover:scale-105 transition"
+      >
 
-    <div className="text-center mt-2">  
-      <p className="text-yellow-400">  
-        ⭐ {worker.rating}  
-      </p>  
+        {/* LOGO - SQUARE */}
+        <img
+          src={worker.image}
+          alt={worker.name}
+          className="w-20 h-20 rounded-xl object-cover mx-auto border border-yellow-400"
+        />
 
-      <p className="text-green-400">  
-        🛡️ {worker.TrustScore}% Trust  
-      </p>  
+        <h4 className="text-center text-xl font-bold mt-3 text-white">
+          {worker.name}
+        </h4>
 
-      <p className="text-white">  
-        ₹{worker.fare}  
-      </p>  
-    </div>  
+        <p className="text-center text-blue-400">
+          {worker.service}
+        </p>
 
-  </div>  
+        <div className="text-center mt-2">
+
+          <p className="text-yellow-400">
+            ⭐ {worker.rating}
+          </p>
+
+          <p className="text-green-400">
+            🛡️ {worker.TrustScore}% Trust
+          </p>
+
+          <p className="text-white font-semibold">
+            ₹{worker.fare}
+          </p>
+
+        </div>
+
+      </div>  
 
 ))}
 
