@@ -197,11 +197,17 @@ return (
     target="_blank"
     rel="noreferrer"
   >
-    <img
-      src={worker.CertificateImage}
-      alt="Certificate"
-      className="w-40 h-24 object-cover rounded-xl border border-green-500 hover:scale-105 transition"
-    />
+    <div className="mt-3">
+      <p className="text-orange-400 text-xs mb-1">
+        ✔ Skill Certified
+      </p>
+
+      <img
+        src={worker.CertificateImage}
+        alt="Certificate"
+        className="w-40 h-24 object-cover rounded-xl border border-orange-500 hover:scale-105 transition"
+      />
+    </div>
   </a>
 )}
 

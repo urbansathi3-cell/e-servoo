@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { translations } from "./translations";
+
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
-import SmartRecommendation from "./components/SmartRecommendation";
 import Workers from "./components/Workers";
-import SmartRecommendation from "./components/SmartRecommendation";
-import TopRatedWorkers from "./components/TopRatedWorkers";
 import BookingForm from "./components/BookingForm";
 import CustomerDashboard from "./components/CustomerDashboard";
 import MyBookings from "./components/MyBookings";
@@ -96,18 +95,14 @@ return (
     <>
       <Hero />
 
-<Services
-  setSelectedService={setSelectedService}
-/>
+      <Services
+        setSelectedService={setSelectedService}
+      />
 
-<SmartRecommendation
-  setSelectedService={setSelectedService}
-/>
-
-<Workers
-  setSelectedWorker={setSelectedWorker}
-  selectedService={selectedService}
-/>
+      <Workers
+        setSelectedWorker={setSelectedWorker}
+        selectedService={selectedService}
+      />
 
       <WhatsappButton />
 
@@ -148,7 +143,29 @@ useState(true);
 const [showRegister, setShowRegister] =
 useState(false);
 
-return ( <div className="bg-black min-h-screen pb-20 overflow-x-hidden">
+const [language, setLanguage] = useState(
+  localStorage.getItem("lang") || "en"
+);
+
+const t = translations[language];
+
+const changeLanguage = (lang) => {
+  setLanguage(lang);
+  localStorage.setItem("lang", lang);
+};
+const [language, setLanguage] = useState(
+  localStorage.getItem("lang") || "en"
+);
+
+const t = translations[language];
+
+const changeLanguage = (lang) => {
+  setLanguage(lang);
+  localStorage.setItem("lang", lang);
+};
+
+return (
+   <div className="bg-black min-h-screen pb-20 overflow-x-hidden">
 
 
   <Routes>
