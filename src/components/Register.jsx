@@ -12,44 +12,52 @@ function Register({
 
   const handleRegister = async (e) => {
 
-    e.preventDefault()
+e.preventDefault()
 
-    try {
+try {
 
-      const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
-        {
-          method: "POST",
-         body: JSON.stringify({
-  action: "register",
-  name,
-  email,
-  phone,
-  password,
-})
-
-      const data = await res.json()
-
-      if (data.success) {
-
-        alert("Account Created Successfully")
-
-        setShowRegister(false)
-        setShowLogin(true)
-
-      } else {
-
-        alert("Registration Failed")
-
-      }
-
-    } catch (error) {
-
-      alert("Registration Failed")
-
-    }
-
+```
+const res = await fetch(
+  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
+  {
+    method: "POST",
+    body: JSON.stringify({
+      action: "register",
+      name,
+      email,
+      phone,
+      password,
+    }),
   }
+)
+
+const data = await res.json()
+
+if (data.success) {
+
+  alert("Account Created Successfully")
+
+  setShowRegister(false)
+  setShowLogin(true)
+
+} else {
+
+  alert("Registration Failed")
+
+}
+```
+
+} catch (error) {
+
+```
+console.log(error)
+alert("Registration Failed")
+```
+
+}
+
+}
+
 
   return (
 
