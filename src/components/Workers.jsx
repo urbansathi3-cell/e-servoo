@@ -42,13 +42,13 @@ return () => clearInterval(interval)
 }, [])
 
 const topWorkers = [...workers]
-  .sort(
-    (a, b) =>
-      (Number(b.rating || 0) * 0.7 +
-       Number(b.TrustScore || 0) * 0.3)
-      -
-      (Number(a.rating || 0) * 0.7 +
-       Number(a.TrustScore || 0) * 0.3)
+  .filter(w => w && w.name && w.image)
+  .sort((a, b) =>
+    (Number(b.rating || 0) * 0.7 +
+     Number(b.TrustScore || 0) * 0.3)
+    -
+    (Number(a.rating || 0) * 0.7 +
+     Number(a.TrustScore || 0) * 0.3)
   )
   .slice(0, 5);
 
@@ -74,12 +74,14 @@ No top rated workers available
     className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500 rounded-3xl p-5 cursor-pointer hover:scale-105 transition"  
   >  
 
-    {/* LOGO - SQUARE */}  
-    <img  
-      src={worker.image}  
-      alt={worker.name}  
-      className="w-20 h-20 rounded-xl object-cover mx-auto border border-yellow-400"  
-    />  
+    <img
+  src={worker.image || "https://via.placeholder.com/150"}
+  alt={worker.name}
+  className="w-16 h-16 rounded-2xl object-cover"
+  onError={(e) => {
+    e.target.src = "https://via.placeholder.com/150";
+  }}
+/>
 
     <h4 className="text-center text-xl font-bold mt-3 text-white">  
       {worker.name}  
@@ -129,9 +131,14 @@ No top rated workers available
     .map((worker, index) => (    <div
   key={index}
   onClick={() => {
-    if (worker.status?.trim() !== "Available") return;
-    setSelectedWorker(worker);
-  }}
+  if (worker.status?.trim() !== "Available") return;
+  if (!worker.image) return;
+
+  setSelectedWorker({
+    ...worker,
+    status: worker.status
+  });
+}}
   className={`bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
     ${worker.status?.trim() === "Available"
       ? "hover:border-blue-500 cursor-pointer"
@@ -141,16 +148,15 @@ No top rated workers available
 
     <div className="flex items-center gap-4">    
 
-      <img    
-        src={worker.image}    
-        alt={worker.name}    
-        referrerPolicy="no-referrer"    
-        onError={(e) => {    
-          e.target.src =    
-            "https://via.placeholder.com/150"    
-        }}    
-        className="w-16 h-16 rounded-2xl object-cover"    
-      />    
+      <img
+  src={worker.image || "https://via.placeholder.com/150"}
+  alt={worker.name}
+  referrerPolicy="no-referrer"
+  onError={(e) => {
+    e.target.src = "https://via.placeholder.com/150";
+  }}
+  className="w-16 h-16 rounded-2xl object-cover"
+/>
 
       <div>    
 
