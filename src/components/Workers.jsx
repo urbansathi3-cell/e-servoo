@@ -45,12 +45,11 @@ const topWorkers = [...workers]
 .sort(
 (a, b) =>
 (Number(b.rating || 0) * 0.7 +
-Number(b.TrustScore || 0) * 0.3)
-
+ Number(b.TrustScore || 0) * 0.3)
+-
 (Number(a.rating || 0) * 0.7 +
-Number(a.TrustScore || 0) * 0.3)
+ Number(a.TrustScore || 0) * 0.3)
 )
-.slice(0, 5)
 
 return (
 
@@ -126,17 +125,18 @@ No top rated workers available
       worker.name?.toLowerCase().includes(search.toLowerCase()) ||    
       worker.service?.toLowerCase().includes(search.toLowerCase())    
     )    
-    .map((worker, index) => (    <div    
-    key={index}    
-    onClick={() => {
-  if (worker.status?.trim() !== "Available") return;
-  setSelectedWorker(worker);
-}}
-className={bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
-  ${worker.status?.trim() === "Available"
-    ? "hover:border-blue-500 cursor-pointer"
-    : "opacity-50 cursor-not-allowed"
+    .map((worker, index) => (    <div
+  key={index}
+  onClick={() => {
+    if (worker.status?.trim() !== "Available") return;
+    setSelectedWorker(worker);
   }}
+  className={`bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
+    ${worker.status?.trim() === "Available"
+      ? "hover:border-blue-500 cursor-pointer"
+      : "opacity-50 cursor-not-allowed"
+    }`}
+>
 
     <div className="flex items-center gap-4">    
 
@@ -196,7 +196,7 @@ className="text-orange-400 text-xs font-semibold hover:underline"
 
     <div className="text-right">    
 
-      <h3 className="text-3x1 font-bold text-white">    
+      <h3 className="text-3xl font-bold text-white">    
         ₹{worker.fare}    
       </h3>    
 
