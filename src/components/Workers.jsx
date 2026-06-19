@@ -132,12 +132,11 @@ No top rated workers available
   if (worker.status?.trim() !== "Available") return;
   setSelectedWorker(worker);
 }}
-className={`bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
+className={bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
   ${worker.status?.trim() === "Available"
     ? "hover:border-blue-500 cursor-pointer"
     : "opacity-50 cursor-not-allowed"
   }
-`}
 
     <div className="flex items-center gap-4">    
 
