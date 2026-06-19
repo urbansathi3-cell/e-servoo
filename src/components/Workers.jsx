@@ -41,16 +41,20 @@ return () => clearInterval(interval)
 
 }, [])
 
-const topWorkers = [...workers]
+const topWorkers = workers
+  .filter(w =>
+    (Number(w.rating || 0) * 0.7 +
+     Number(w.TrustScore || 0) * 0.3) >= 4.5
+  )
   .sort(
     (a, b) =>
       (Number(b.rating || 0) * 0.7 +
-        Number(b.TrustScore || 0) * 0.3)
+       Number(b.TrustScore || 0) * 0.3)
       -
       (Number(a.rating || 0) * 0.7 +
-        Number(a.TrustScore || 0) * 0.3)
+       Number(a.TrustScore || 0) * 0.3)
   )
-  .slice(0, 5)
+  .slice(0, 10)
 
 return (
 
@@ -62,6 +66,55 @@ return (
   <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">
     Our Workers
   </h2>
+
+<div className="max-w-7xl mx-auto mb-12">
+
+  <h3 className="text-3xl font-bold text-yellow-400 mb-6">
+    ⭐ Top Rated Workers
+  </h3>
+
+  {topWorkers.length === 0 && (
+    <p className="text-gray-400 text-center">
+      No top rated workers available
+    </p>
+  )}
+
+  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+    {topWorkers.map((worker) => (
+      <div
+        key={worker.id}
+        onClick={() => setSelectedWorker(worker)}
+        className="bg-[#111827] border border-yellow-500 rounded-2xl p-4 cursor-pointer"
+      >
+
+        {/* 🔥 LOGO FIX (SQUARE) */}
+        <img
+          src={worker.image}
+          className="w-20 h-20 rounded-xl object-cover mx-auto"
+        />
+
+        <h4 className="text-center text-white font-bold mt-2">
+          {worker.name}
+        </h4>
+
+        <p className="text-center text-blue-400">
+          {worker.service}
+        </p>
+
+        <p className="text-center text-yellow-400">
+          ⭐ {worker.rating}
+        </p>
+
+        <p className="text-center text-green-400">
+          🛡️ {worker.TrustScore}% Trust
+        </p>
+
+      </div>
+    ))}
+
+  </div>
+</div>
 
   <div className="max-w-7xl mx-auto mb-12">
 
