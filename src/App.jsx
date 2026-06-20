@@ -30,6 +30,9 @@ setSelectedService,
 selectedWorker,
 setSelectedWorker,
 
+language,
+changeLanguage,
+
 showWelcome,
 setShowWelcome,
 
@@ -85,8 +88,10 @@ return (
 }
 
 return (
-<> <Navbar />
-
+<> <Navbar
+  language={language}
+  changeLanguage={changeLanguage}
+/>
 
   {selectedWorker ? (
     <BookingForm
@@ -95,7 +100,7 @@ return (
     />
   ) : (
     <>
-      <Hero />
+      <Hero language={language} />
 
 <Services
   setSelectedService={setSelectedService}
@@ -172,26 +177,30 @@ return (
       path="/"
       element={
         <HomePage
-          selectedService={selectedService}
-          setSelectedService={setSelectedService}
-          selectedWorker={selectedWorker}
-          setSelectedWorker={setSelectedWorker}
+  selectedService={selectedService}
+  setSelectedService={setSelectedService}
 
-          showWelcome={showWelcome}
-          setShowWelcome={setShowWelcome}
+  selectedWorker={selectedWorker}
+  setSelectedWorker={setSelectedWorker}
 
-          isLoggedIn={isLoggedIn}
-          setIsLoggedIn={setIsLoggedIn}
+  language={language}
+  changeLanguage={changeLanguage}
 
-          workerLoggedIn={workerLoggedIn}
-          setWorkerLoggedIn={setWorkerLoggedIn}
+  showWelcome={showWelcome}
+  setShowWelcome={setShowWelcome}
 
-          showLogin={showLogin}
-          setShowLogin={setShowLogin}
+  isLoggedIn={isLoggedIn}
+  setIsLoggedIn={setIsLoggedIn}
 
-          showRegister={showRegister}
-          setShowRegister={setShowRegister}
-        />
+  workerLoggedIn={workerLoggedIn}
+  setWorkerLoggedIn={setWorkerLoggedIn}
+
+  showLogin={showLogin}
+  setShowLogin={setShowLogin}
+
+  showRegister={showRegister}
+  setShowRegister={setShowRegister}
+/>
       }
     />
 
