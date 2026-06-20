@@ -14,7 +14,7 @@ function Navbar({
             className="h-30 w-30"
           />
 
-          <h1 className="text-4xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-white">
             E-SERVOO
           </h1>
         </div>
