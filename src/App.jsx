@@ -8,6 +8,7 @@ import Hero from "./components/Hero";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
 import SmartRecommendation from "./components/SmartRecommendation";
+import AICostEstimator from "./components/AICostEstimator";
 import BookingForm from "./components/BookingForm";
 import CustomerDashboard from "./components/CustomerDashboard";
 import MyBookings from "./components/MyBookings";
@@ -103,6 +104,8 @@ return (
 <SmartRecommendation
   setSelectedService={setSelectedService}
 />
+
+<AICostEstimator />
 
 <Workers
   setSelectedWorker={setSelectedWorker}
