@@ -6,6 +6,7 @@ selectedService
 }) {
 
 const [workers, setWorkers] = useState([])
+const [sortBy, setSortBy] = useState("");
 const [search, setSearch] = useState("")
 
 useEffect(() => {
@@ -51,6 +52,34 @@ const topWorkers = [...workers]
      Number(a.TrustScore || 0) * 0.3)
   )
   .slice(0, 5);
+
+  let filteredWorkers = [...workers];
+
+if (sortBy === "rating") {
+  filteredWorkers.sort(
+    (a, b) => Number(b.rating || 0) - Number(a.rating || 0)
+  );
+}
+
+if (sortBy === "priceLow") {
+  filteredWorkers.sort(
+    (a, b) => Number(a.fare || 0) - Number(b.fare || 0)
+  );
+}
+
+if (sortBy === "priceHigh") {
+  filteredWorkers.sort(
+    (a, b) => Number(b.fare || 0) - Number(a.fare || 0)
+  );
+}
+
+if (sortBy === "available") {
+  filteredWorkers = filteredWorkers.filter(
+    worker =>
+      worker.status?.trim().toLowerCase() ===
+      "available"
+  );
+}
 
 return (
 
@@ -117,8 +146,37 @@ No top rated workers available
   value={search}    
   onChange={(e) => setSearch(e.target.value)}    
   className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white focus:border-blue-500 outline-none"    
-/>    </div>    <div className="max-w-7xl mx-auto space-y-6">  {    
-  workers    
+/>    </div>   
+
+<div className="max-w-xl mx-auto mb-8">
+  <select
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+    className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white"
+  >
+    <option value="">Sort Workers</option>
+
+    <option value="rating">
+      Rating High → Low
+    </option>
+
+    <option value="priceLow">
+      Price Low → High
+    </option>
+
+    <option value="priceHigh">
+      Price High → Low
+    </option>
+
+    <option value="available">
+      Available Only
+    </option>
+
+  </select>
+</div>
+
+ <div className="max-w-7xl mx-auto space-y-6">  {    
+  filteredWorkers
     .filter(worker =>    
       selectedService === "All"    
         ? true    
