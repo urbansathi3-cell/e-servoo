@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { translations } from "./translations";
 
-
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
@@ -23,7 +22,6 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import WorkerLogin from "./components/WorkerLogin";
 import WorkerDashboard from "./components/WorkerDashboard";
-import LanguageSelection from "./components/LanguageSelection";
 
 function HomePage({
 selectedService,
@@ -33,9 +31,6 @@ setSelectedWorker,
 
 language,
 changeLanguage,
-
-languageSelected,
-setLanguageSelected,
 
 showWelcome,
 setShowWelcome,
@@ -54,97 +49,82 @@ setShowRegister,
 }) {
 
 if (showWelcome) {
-return ( <Welcome
-     setShowWelcome={setShowWelcome}
-   />
+return ( <Welcome  
+setShowWelcome={setShowWelcome}  
+/>
 );
 }
-
 
 if (!isLoggedIn) {
 return (
 <>
-{showLogin && ( <Login
-         setIsLoggedIn={setIsLoggedIn}
-         setShowLogin={setShowLogin}
-         setShowRegister={setShowRegister}
-       />
+{showLogin && ( <Login  
+setIsLoggedIn={setIsLoggedIn}  
+setShowLogin={setShowLogin}  
+setShowRegister={setShowRegister}  
+/>
 )}
 
+{showRegister && (  
+  <Register  
+    setShowRegister={setShowRegister}  
+    setShowLogin={setShowLogin}  
+  />  
+)}  
 
-    {showRegister && (
-      <Register
-        setShowRegister={setShowRegister}
-        setShowLogin={setShowLogin}
-      />
-    )}
+{!workerLoggedIn ? (  
+  <WorkerLogin  
+    setWorkerLoggedIn={setWorkerLoggedIn}  
+  />  
+) : (  
+  <WorkerDashboard />  
+)}
 
-    {!workerLoggedIn ? (
-      <WorkerLogin
-        setWorkerLoggedIn={setWorkerLoggedIn}
-      />
-    ) : (
-      <WorkerDashboard />
-    )}
-  </>
+</>
 );
-
-
-}
-
-if (!languageSelected) {
-
-  return (
-    <LanguageSelection
-      changeLanguage={changeLanguage}
-      setLanguageSelected={setLanguageSelected}
-    />
-  )
 
 }
 
 return (
-<>
-<Navbar />
+<> <Navbar  
+language={language}  
+changeLanguage={changeLanguage}  
+/>
 
+{selectedWorker ? (
+<BookingForm  
+selectedWorker={selectedWorker}  
+setSelectedWorker={setSelectedWorker}  
+/>
+) : (
+<>
 <Hero language={language} />
 
-  {selectedWorker ? (
-    <BookingForm
-      selectedWorker={selectedWorker}
-      setSelectedWorker={setSelectedWorker}
-    />
-  ) : (
-    <>
-      
-
-<Services
-  setSelectedService={setSelectedService}
+<Services  
+setSelectedService={setSelectedService}  
 />
 
-<SmartRecommendation
-  setSelectedService={setSelectedService}
+<SmartRecommendation  
+setSelectedService={setSelectedService}  
 />
 
-<AICostEstimator />
-
-<Workers
-  setSelectedWorker={setSelectedWorker}
-  selectedService={selectedService}
+<AICostEstimator />  <Workers  
+setSelectedWorker={setSelectedWorker}  
+selectedService={selectedService}  
 />
 
-      <WhatsappButton />
+<WhatsappButton />  
 
-      <div className="fixed bottom-0 left-0 right-0 w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white">
-        <a href="/">🏠 Home</a>
-        <a href="#services">🛠 Services</a>
-        <a href="#workers">👷 Workers</a>
-        <a href="/profile">👤 Profile</a>
-      </div>
-    </>
-  )}
+  <div className="fixed bottom-0 left-0 right-0 w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white">  
+    <a href="/">🏠 Home</a>  
+    <a href="#services">🛠 Services</a>  
+    <a href="#workers">👷 Workers</a>  
+    <a href="/profile">👤 Profile</a>  
+  </div>  
 </>
 
+)}
+</>
 
 );
 }
@@ -172,91 +152,77 @@ useState(true);
 const [showRegister, setShowRegister] =
 useState(false);
 
-const [languageSelected, setLanguageSelected] =
-useState(!!localStorage.getItem("lang"));
-
 const [language, setLanguage] = useState(
-  localStorage.getItem("lang") || "en"
+localStorage.getItem("lang") || "en"
 );
 
 const t = translations[language];
 
 const changeLanguage = (lang) => {
-  setLanguage(lang);
-  localStorage.setItem("lang", lang);
+setLanguage(lang);
+localStorage.setItem("lang", lang);
 };
 
 return (
-   <div className="bg-black min-h-screen pb-20 overflow-x-hidden">
 
+   <div className="bg-black min-h-screen pb-20 overflow-x-hidden">    <Routes>  <Route  
+  path="/"  
+  element={  
+    <HomePage
 
-  <Routes>
+selectedService={selectedService}
+setSelectedService={setSelectedService}
 
-    <Route
-      path="/"
-      element={
-        <HomePage
-  selectedService={selectedService}
-  setSelectedService={setSelectedService}
+selectedWorker={selectedWorker}
+setSelectedWorker={setSelectedWorker}
 
-languageSelected={languageSelected}
-setLanguageSelected={setLanguageSelected}
+language={language}
+changeLanguage={changeLanguage}
 
-  selectedWorker={selectedWorker}
-  setSelectedWorker={setSelectedWorker}
+showWelcome={showWelcome}
+setShowWelcome={setShowWelcome}
 
-  language={language}
-  changeLanguage={changeLanguage}
+isLoggedIn={isLoggedIn}
+setIsLoggedIn={setIsLoggedIn}
 
-  showWelcome={showWelcome}
-  setShowWelcome={setShowWelcome}
+workerLoggedIn={workerLoggedIn}
+setWorkerLoggedIn={setWorkerLoggedIn}
 
-  isLoggedIn={isLoggedIn}
-  setIsLoggedIn={setIsLoggedIn}
+showLogin={showLogin}
+setShowLogin={setShowLogin}
 
-  workerLoggedIn={workerLoggedIn}
-  setWorkerLoggedIn={setWorkerLoggedIn}
-
-  showLogin={showLogin}
-  setShowLogin={setShowLogin}
-
-  showRegister={showRegister}
-  setShowRegister={setShowRegister}
+showRegister={showRegister}
+setShowRegister={setShowRegister}
 />
-      }
-    />
+}
+/>
 
-    <Route
-      path="/profile"
-      element={<Profile />}
-    />
+<Route  
+  path="/profile"  
+  element={<Profile />}  
+/>  
 
-    <Route
-      path="/contact"
-      element={<Contact />}
-    />
+<Route  
+  path="/contact"  
+  element={<Contact />}  
+/>  
 
-    <Route
-      path="/terms"
-      element={<Terms />}
-    />
+<Route  
+  path="/terms"  
+  element={<Terms />}  
+/>  
 
-    <Route
-      path="/dashboard"
-      element={<CustomerDashboard />}
-    />
+<Route  
+  path="/dashboard"  
+  element={<CustomerDashboard />}  
+/>  
 
-    <Route
-      path="/bookings"
-      element={<MyBookings />}
-    />
+<Route  
+  path="/bookings"  
+  element={<MyBookings />}  
+/>
 
-  </Routes>
-
-</div>
-
-
-);
+  </Routes>  </div>  );
 }
 
 export default App;
