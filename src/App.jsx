@@ -92,16 +92,20 @@ return (
 
 }
 
+if (!languageSelected) {
+
+  return (
+    <LanguageSelection
+      changeLanguage={changeLanguage}
+      setLanguageSelected={setLanguageSelected}
+    />
+  )
+
+}
+
 return (
 <>
 <Navbar />
-
-{!languageSelected && (
-  <LanguageSelection
-    changeLanguage={changeLanguage}
-    setLanguageSelected={setLanguageSelected}
-  />
-)}
 
 <Hero language={language} />
 
@@ -195,14 +199,14 @@ return (
   selectedService={selectedService}
   setSelectedService={setSelectedService}
 
+languageSelected={languageSelected}
+setLanguageSelected={setLanguageSelected}
+
   selectedWorker={selectedWorker}
   setSelectedWorker={setSelectedWorker}
 
   language={language}
   changeLanguage={changeLanguage}
-
-  languageSelected={languageSelected}
-  setLanguageSelected={setLanguageSelected}
 
   showWelcome={showWelcome}
   setShowWelcome={setShowWelcome}
