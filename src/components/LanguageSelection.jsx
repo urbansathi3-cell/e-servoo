@@ -1,14 +1,10 @@
 function LanguageSelection({ setLanguageSelected, changeLanguage }) {
 
-  const selectLanguage = (lang) => {
-
-  changeLanguage(lang)
-
-  localStorage.setItem("lang", lang)
-
-  setLanguageSelected(true)
-
-}
+  const changeLanguage = (lang) => {
+  setLanguage(lang);
+  localStorage.setItem("lang", lang);
+  setLanguageSelected(true);
+};
 
   return (
     <div className="bg-black min-h-screen flex flex-col justify-center items-center text-white">
