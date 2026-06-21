@@ -106,9 +106,6 @@ return (
 <> <Navbar
   language={language}
   changeLanguage={changeLanguage}
-
-languageSelected={languageSelected}
-setLanguageSelected={setLanguageSelected}
 />
 
   {selectedWorker ? (
