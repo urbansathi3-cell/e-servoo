@@ -60,16 +60,6 @@ return ( <Welcome
 );
 }
 
-if (isLoggedIn && !languageSelected) {
-
-  return (
-    <LanguageSelection
-      changeLanguage={changeLanguage}
-      setLanguageSelected={setLanguageSelected}
-    />
-  )
-
-}
 
 if (!isLoggedIn) {
 return (
@@ -103,10 +93,17 @@ return (
 }
 
 return (
-<> <Navbar
-  language={language}
-  changeLanguage={changeLanguage}
-/>
+<>
+<Navbar />
+
+{!languageSelected && (
+  <LanguageSelection
+    changeLanguage={changeLanguage}
+    setLanguageSelected={setLanguageSelected}
+  />
+)}
+
+<Hero language={language} />
 
   {selectedWorker ? (
     <BookingForm
@@ -115,7 +112,7 @@ return (
     />
   ) : (
     <>
-      <Hero language={language} />
+      
 
 <Services
   setSelectedService={setSelectedService}
