@@ -86,10 +86,7 @@ setShowRegister={setShowRegister}
 }
 
 return (
-<> <Navbar  
-language={language}  
-changeLanguage={changeLanguage}  
-/>
+<> <Navbar />
 
 {selectedWorker ? (
 <BookingForm  
@@ -98,7 +95,53 @@ setSelectedWorker={setSelectedWorker}
 />
 ) : (
 <>
-<Hero language={language} />
+
+  <div className="py-4 text-center">
+
+    <p className="text-gray-300 text-sm mb-3">
+      🌐 Choose Language
+    </p>
+
+    <div className="flex justify-center gap-3">
+
+      <button
+        onClick={() => changeLanguage("en")}
+        className={`px-4 py-2 rounded-lg ${
+          language === "en"
+            ? "bg-blue-600 text-white"
+            : "bg-gray-700 text-white"
+        }`}
+      >
+        EN
+      </button>
+
+      <button
+        onClick={() => changeLanguage("hi")}
+        className={`px-4 py-2 rounded-lg ${
+          language === "hi"
+            ? "bg-blue-600 text-white"
+            : "bg-gray-700 text-white"
+        }`}
+      >
+        HI
+      </button>
+
+      <button
+        onClick={() => changeLanguage("od")}
+        className={`px-4 py-2 rounded-lg ${
+          language === "od"
+            ? "bg-blue-600 text-white"
+            : "bg-gray-700 text-white"
+        }`}
+      >
+        OD
+      </button>
+
+    </div>
+
+  </div>
+
+  <Hero language={language} />
 
 <Services  
 setSelectedService={setSelectedService}  
