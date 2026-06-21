@@ -8,7 +8,7 @@ function Navbar() {
           <img
             src="/logo.png"
             alt="logo"
-            className="h-20 w-20"
+            className="h-3p w-30"
           />
 
           <h1 className="text-4xl font-bold text-white">
