@@ -23,6 +23,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import WorkerLogin from "./components/WorkerLogin";
 import WorkerDashboard from "./components/WorkerDashboard";
+import LanguageSelection from "./components/LanguageSelection";
 
 function HomePage({
 selectedService,
@@ -32,6 +33,9 @@ setSelectedWorker,
 
 language,
 changeLanguage,
+
+languageSelected,
+setLanguageSelected,
 
 showWelcome,
 setShowWelcome,
@@ -54,6 +58,17 @@ return ( <Welcome
      setShowWelcome={setShowWelcome}
    />
 );
+}
+
+if (isLoggedIn && !languageSelected) {
+
+  return (
+    <LanguageSelection
+      changeLanguage={changeLanguage}
+      setLanguageSelected={setLanguageSelected}
+    />
+  )
+
 }
 
 if (!isLoggedIn) {
@@ -91,6 +106,9 @@ return (
 <> <Navbar
   language={language}
   changeLanguage={changeLanguage}
+
+languageSelected={languageSelected}
+setLanguageSelected={setLanguageSelected}
 />
 
   {selectedWorker ? (
@@ -155,6 +173,9 @@ useState(true);
 
 const [showRegister, setShowRegister] =
 useState(false);
+
+const [languageSelected, setLanguageSelected] =
+useState(!!localStorage.getItem("lang"));
 
 const [language, setLanguage] = useState(
   localStorage.getItem("lang") || "en"
