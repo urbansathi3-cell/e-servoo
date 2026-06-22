@@ -24,6 +24,10 @@ import WorkerLogin from "./components/WorkerLogin";
 import WorkerDashboard from "./components/WorkerDashboard";
 
 function HomePage({
+
+seniorMode,
+setSeniorMode,
+
 selectedService,
 setSelectedService,
 selectedWorker,
@@ -86,6 +90,7 @@ setShowRegister={setShowRegister}
 }
 
 return (
+
 <> <Navbar />
 
 {selectedWorker ? (
@@ -146,6 +151,20 @@ setSelectedWorker={setSelectedWorker}
 <Services  
 setSelectedService={setSelectedService}  
 />
+<Hero language={language} />
+
+<div className="flex justify-end p-3">
+  <button
+    onClick={() => setSeniorMode(!seniorMode)}
+    className="bg-yellow-500 text-black px-4 py-2 rounded font-bold"
+  >
+    👴 Senior Mode
+  </button>
+</div>
+
+<Services
+  setSelectedService={setSelectedService}
+/>
 
 <SmartRecommendation  
 setSelectedService={setSelectedService}  
@@ -195,6 +214,10 @@ useState(true);
 const [showRegister, setShowRegister] =
 useState(false);
 
+const [seniorMode, setSeniorMode] =
+useState(false);
+
+
 const [language, setLanguage] = useState(
 localStorage.getItem("lang") || "en"
 );
@@ -207,65 +230,46 @@ localStorage.setItem("lang", lang);
 };
 
 return (
+  <div
+    className={`bg-black min-h-screen pb-20 overflow-x-hidden ${
+      seniorMode ? "text-xl" : "text-base"
+    }`}
+  >
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <HomePage
+            seniorMode={seniorMode}
+            setSeniorMode={setSeniorMode}
+            selectedService={selectedService}
+            setSelectedService={setSelectedService}
+            selectedWorker={selectedWorker}
+            setSelectedWorker={setSelectedWorker}
+            language={language}
+            changeLanguage={changeLanguage}
+            showWelcome={showWelcome}
+            setShowWelcome={setShowWelcome}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+            workerLoggedIn={workerLoggedIn}
+            setWorkerLoggedIn={setWorkerLoggedIn}
+            showLogin={showLogin}
+            setShowLogin={setShowLogin}
+            showRegister={showRegister}
+            setShowRegister={setShowRegister}
+          />
+        }
+      />
 
-   <div className="bg-black min-h-screen pb-20 overflow-x-hidden">    <Routes>  <Route  
-  path="/"  
-  element={  
-    <HomePage
-
-selectedService={selectedService}
-setSelectedService={setSelectedService}
-
-selectedWorker={selectedWorker}
-setSelectedWorker={setSelectedWorker}
-
-language={language}
-changeLanguage={changeLanguage}
-
-showWelcome={showWelcome}
-setShowWelcome={setShowWelcome}
-
-isLoggedIn={isLoggedIn}
-setIsLoggedIn={setIsLoggedIn}
-
-workerLoggedIn={workerLoggedIn}
-setWorkerLoggedIn={setWorkerLoggedIn}
-
-showLogin={showLogin}
-setShowLogin={setShowLogin}
-
-showRegister={showRegister}
-setShowRegister={setShowRegister}
-/>
-}
-/>
-
-<Route  
-  path="/profile"  
-  element={<Profile />}  
-/>  
-
-<Route  
-  path="/contact"  
-  element={<Contact />}  
-/>  
-
-<Route  
-  path="/terms"  
-  element={<Terms />}  
-/>  
-
-<Route  
-  path="/dashboard"  
-  element={<CustomerDashboard />}  
-/>  
-
-<Route  
-  path="/bookings"  
-  element={<MyBookings />}  
-/>
-
-  </Routes>  </div>  );
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/dashboard" element={<CustomerDashboard />} />
+      <Route path="/bookings" element={<MyBookings />} />
+    </Routes>
+  </div>
+);
 }
 
 export default App;
