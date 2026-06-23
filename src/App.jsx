@@ -161,10 +161,6 @@ setSelectedService={setSelectedService}
   </button>
 </div>
 
-<Services
-  setSelectedService={setSelectedService}
-/>
-
 <SmartRecommendation  
 setSelectedService={setSelectedService}  
 />
