@@ -4,6 +4,7 @@ import { translations } from "./translations";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import Stats from "./components/Stats";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
 import SmartRecommendation from "./components/SmartRecommendation";
@@ -148,8 +149,10 @@ setSelectedWorker={setSelectedWorker}
 
   <Hero language={language} />
 
-<Services  
-setSelectedService={setSelectedService}  
+<Stats />
+
+<Services
+setSelectedService={setSelectedService}
 />
 
 <div className="flex justify-end p-3">
