@@ -12,9 +12,13 @@ function Stats() {
 
   useEffect(() => {
 
-    fetch("https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec")
+   fetch(
+"https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec?action=stats&nocache=" + Date.now()
+)
       .then(res => res.json())
       .then(data => {
+
+        console.log("Stats Data:", data);
 
         setStats({
           workers: data.workers || 0,
