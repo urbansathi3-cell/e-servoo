@@ -59,6 +59,8 @@ setShowWelcome={setShowWelcome}
 />
 );
 }
+console.log("showWelcome =", showWelcome);
+console.log("user =", localStorage.getItem("user"));
 
 if (!isLoggedIn) {
 return (
@@ -198,7 +200,7 @@ const [selectedWorker, setSelectedWorker] =
 useState(null);
 
 const [showWelcome, setShowWelcome] =
-useState(true);
+useState(!localStorage.getItem("user"));
 
 const [isLoggedIn, setIsLoggedIn] =
 useState(!!localStorage.getItem("user"));
