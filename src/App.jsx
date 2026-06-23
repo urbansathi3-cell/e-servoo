@@ -165,19 +165,23 @@ setSelectedService={setSelectedService}
 setSelectedService={setSelectedService}  
 />
 
-<AICostEstimator />  <Workers  
-setSelectedWorker={setSelectedWorker}  
-selectedService={selectedService}  
-/>
+<AICostEstimator />  
 
 <WhatsappButton />  
 
-  <div className="fixed bottom-0 left-0 right-0 w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white">  
-    <a href="/">🏠 Home</a>  
-    <a href="#services">🛠 Services</a>  
-    <a href="#workers">👷 Workers</a>  
-    <a href="/profile">👤 Profile</a>  
-  </div>  
+  <div className="fixed bottom-0 left-0 right-0 w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white">
+
+  <a href="/">🏠 Home</a>
+
+  <a href="/services">
+    🛠 Services
+  </a>
+
+  <a href="/profile">
+    👤 Profile
+  </a>
+
+</div>
 </>
 
 )}
@@ -262,6 +266,15 @@ return (
       <Route path="/terms" element={<Terms />} />
       <Route path="/dashboard" element={<CustomerDashboard />} />
       <Route path="/bookings" element={<MyBookings />} />
+      <Route
+  path="/services"
+  element={
+    <Workers
+      setSelectedWorker={setSelectedWorker}
+      selectedService="All"
+    />
+  }
+/>
     </Routes>
   </div>
 );
