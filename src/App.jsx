@@ -4,6 +4,7 @@ import { translations } from "./translations";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import Stats from "./components/Stats";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
 import SmartRecommendation from "./components/SmartRecommendation";
@@ -58,6 +59,8 @@ setShowWelcome={setShowWelcome}
 />
 );
 }
+console.log("showWelcome =", showWelcome);
+console.log("user =", localStorage.getItem("user"));
 
 if (!isLoggedIn) {
 return (
@@ -148,8 +151,10 @@ setSelectedWorker={setSelectedWorker}
 
   <Hero language={language} />
 
-<Services  
-setSelectedService={setSelectedService}  
+<Stats />
+
+<Services
+setSelectedService={setSelectedService}
 />
 
 <div className="flex justify-end p-3">
@@ -199,7 +204,7 @@ const [selectedWorker, setSelectedWorker] =
 useState(null);
 
 const [showWelcome, setShowWelcome] =
-useState(true);
+useState(!localStorage.getItem("user"));
 
 const [isLoggedIn, setIsLoggedIn] =
 useState(!!localStorage.getItem("user"));
