@@ -190,7 +190,6 @@ No top rated workers available
   key={index}
   onClick={() => {
   if (worker.status?.trim() !== "Available") return;
-  if (!worker.image) return;
 
   setSelectedWorker({
     ...worker,

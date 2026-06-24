@@ -274,10 +274,17 @@ return (
       <Route
   path="/services"
   element={
-    <Workers
-      setSelectedWorker={setSelectedWorker}
-      selectedService="All"
-    />
+    selectedWorker ? (
+      <BookingForm
+        selectedWorker={selectedWorker}
+        setSelectedWorker={setSelectedWorker}
+      />
+    ) : (
+      <Workers
+        setSelectedWorker={setSelectedWorker}
+        selectedService="All"
+      />
+    )
   }
 />
     </Routes>
