@@ -88,59 +88,7 @@ return (
   className="bg-black text-white py-24 px-5"    
 >    <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">    
     Our Workers    
-  </h2>    <div className="max-w-7xl mx-auto mb-12">    <h3 className="text-3xl font-bold text-yellow-400 mb-6">  
-    ⭐ Top Rated 5 Workers  
-  </h3>  {topWorkers.length === 0 && (
-<p className="text-gray-400 text-center">
-No top rated workers available
-</p>
-)}
-
-  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">  {topWorkers.map((worker) => (  
-  <div  
-    key={worker.id}  
-    onClick={() => setSelectedWorker(worker)}  
-    className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500 rounded-3xl p-5 cursor-pointer hover:scale-105 transition"  
-  >  
-
-    <img
-  src={worker.image || "https://via.placeholder.com/150"}
-  alt={worker.name}
-  className="w-16 h-16 rounded-2xl object-cover"
-  onError={(e) => {
-    e.target.src = "https://via.placeholder.com/150";
-  }}
-/>
-
-    <h4 className="text-center text-xl font-bold mt-3 text-white">  
-      {worker.name}  
-    </h4>  
-
-    <p className="text-center text-blue-400">  
-      {worker.service}  
-    </p>  
-
-    <div className="text-center mt-2">  
-
-      <p className="text-yellow-400">  
-        ⭐ {worker.rating}  
-      </p>  
-
-      <p className="text-green-400">  
-        🛡️ {worker.TrustScore}% Trust  
-      </p>  
-
-      <p className="text-white font-semibold">  
-        ₹{worker.fare}  
-      </p>  
-
-    </div>  
-
-  </div>
-
-))}
-
-  </div>  </div>    <div className="max-w-xl mx-auto mb-8">  <input    
+  </h2>     <div className="max-w-xl mx-auto mb-8">  <input    
   type="text"    
   placeholder="Search Workers"    
   value={search}    
@@ -190,6 +138,7 @@ No top rated workers available
   key={index}
   onClick={() => {
   if (worker.status?.trim() !== "Available") return;
+
 
   setSelectedWorker({
     ...worker,
