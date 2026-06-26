@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Stats from "./components/Stats";
 import WorkerOfMonth from "./components/WorkerOfMonth";
+import TopWorkers from "./components/TopWorkers";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
 import SmartRecommendation from "./components/SmartRecommendation";
