@@ -156,6 +156,10 @@ setSelectedWorker={setSelectedWorker}
 
 <Stats />
 
+<TopRatedWorkers
+  setSelectedWorker={setSelectedWorker}
+/>
+
 <Services
 setSelectedService={setSelectedService}
 />
