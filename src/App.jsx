@@ -6,7 +6,6 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Stats from "./components/Stats";
 import WorkerOfMonth from "./components/WorkerOfMonth";
-import TopRatedWorkers from "./components/TopRatedWorkers";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
 import SmartRecommendation from "./components/SmartRecommendation";
@@ -153,10 +152,6 @@ setSelectedWorker={setSelectedWorker}
 
   <Hero language={language} />
   <WorkerOfMonth />
-
-<TopRatedWorkers
-  setSelectedWorker={setSelectedWorker}
-/>
 
 <Stats />
 
