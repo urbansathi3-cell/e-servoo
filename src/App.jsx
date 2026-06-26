@@ -154,11 +154,11 @@ setSelectedWorker={setSelectedWorker}
   <Hero language={language} />
   <WorkerOfMonth />
 
-<Stats />
-
 <TopRatedWorkers
   setSelectedWorker={setSelectedWorker}
 />
+
+<Stats />
 
 <Services
 setSelectedService={setSelectedService}
