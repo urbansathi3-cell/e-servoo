@@ -59,9 +59,9 @@ try {
 return (
 
 
-<section className="bg-black text-white min-h-screen flex justify-center items-center px-5">
+<section className="bg-[#B4DBDC] text-slate-900 min-h-screen flex justify-center items-center px-5">
 
-  <div className="bg-zinc-900 p-8 rounded-3xl w-full max-w-md">
+  <div className="bg-white shadow-xl p-8 rounded-3xl w-full max-w-md">
 
     <h2 className="text-4xl font-bold text-blue-500 text-center mb-8">
       Create Account
@@ -77,7 +77,7 @@ return (
         placeholder="Full Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        className="w-full p-3 rounded-xl bg-[#B4DBDC] border border-zinc-700 text-slate-900"
         required
       />
 
@@ -86,7 +86,7 @@ return (
         placeholder="Phone Number"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
-        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        className="w-full p-3 rounded-xl bg-[#B4DBDC] border border-zinc-700 text-slate-900"
         required
       />
 
@@ -95,7 +95,7 @@ return (
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        className="w-full p-3 rounded-xl bg-[#B4DBDC] border border-zinc-700 text-slate-900"
         required
       />
 
@@ -104,13 +104,13 @@ return (
         placeholder="Create Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        className="w-full p-3 rounded-xl bg-[#B4DBDC] border border-zinc-700 text-slate-900"
         required
       />
 
       <button
         type="submit"
-        className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-blue-600 transition"
+        className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-[#08566E] transition"
       >
         Create Account
       </button>

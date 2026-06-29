@@ -28,7 +28,7 @@ function Welcome({ setShowWelcome }) {
 
   <button
     onClick={() => setShowWelcome(false)}
-    className="mt-10 bg-blue-600 px-10 py-4 rounded-2xl text-white font-bold hover:bg-blue-700 transition duration-300"
+    className="mt-10 bg-[#08566E] px-10 py-4 rounded-2xl text-slate-900 font-bold hover:bg-blue-700 transition duration-300"
   >
     Get Started
   </button>

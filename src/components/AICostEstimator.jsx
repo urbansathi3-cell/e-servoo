@@ -43,7 +43,7 @@ setCost(
 
 };
 
-return ( <section className="bg-black text-white py-16 px-5">
+return ( <section className="bg-[#B4DBDC] text-slate-900 py-16 px-5">
 
 
   <div className="max-w-3xl mx-auto bg-[#111111] p-8 rounded-3xl border border-blue-800">
@@ -55,7 +55,7 @@ return ( <section className="bg-black text-white py-16 px-5">
     <select
   value={service}
   onChange={(e) => setService(e.target.value)}
-  className="w-full p-3 rounded-xl bg-black"
+  className="w-full p-3 rounded-xl bg-[#B4DBDC]"
 >
   <option value="">Select Service</option>
   <option>Electrician</option>
@@ -68,7 +68,7 @@ return ( <section className="bg-black text-white py-16 px-5">
 <select
   value={difficulty}
   onChange={(e) => setDifficulty(e.target.value)}
-  className="w-full p-3 rounded-xl bg-black mt-3"
+  className="w-full p-3 rounded-xl bg-[#B4DBDC] mt-3"
 >
   <option>Easy</option>
   <option>Medium</option>

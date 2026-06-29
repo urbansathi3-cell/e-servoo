@@ -46,9 +46,9 @@ function Login({
 
   return (
 
-    <section className="bg-black text-white min-h-screen flex justify-center items-center px-5">
+    <section className="bg-[#B4DBDC] text-slate-900 min-h-screen flex justify-center items-center px-5">
 
-      <div className="bg-zinc-900 p-8 rounded-3xl w-full max-w-md">
+      <div className="bg-white shadow-xl p-8 rounded-3xl w-full max-w-md">
 
         <h2 className="text-4xl font-bold text-blue-500 text-center mb-8">
           Customer Login
@@ -64,7 +64,7 @@ function Login({
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
             required
           />
 
@@ -73,13 +73,13 @@ function Login({
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-xl bg-black text-white"
+            className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
             required
           />
 
           <button
             type="submit"
-            className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-blue-600"
+            className="bg-blue-500 py-4 rounded-xl font-bold hover:bg-[#08566E]"
           >
             Login
           </button>

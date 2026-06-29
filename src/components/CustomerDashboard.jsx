@@ -25,9 +25,9 @@ function CustomerDashboard() {
 
   return (
 
-    <section className="bg-black text-white py-20 px-5">
+    <section className="bg-[#B4DBDC] text-slate-900 py-20 px-5">
 
-      <div className="max-w-4xl mx-auto bg-zinc-900 p-8 rounded-3xl">
+      <div className="max-w-4xl mx-auto bg-white shadow-xl p-8 rounded-3xl">
 
         <h2 className="text-4xl font-bold text-blue-500 mb-8">
           Customer Dashboard

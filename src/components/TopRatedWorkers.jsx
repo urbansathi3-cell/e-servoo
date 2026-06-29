@@ -17,7 +17,7 @@ function TopRatedWorkers({ workers, setSelectedWorker }) {
   return (
     <div className="px-4 mt-8">
 
-      <h2 className="text-2xl font-bold text-white mb-4">
+      <h2 className="text-2xl font-bold text-slate-900 mb-4">
         ⭐ Top Rated Workers
       </h2>
 
@@ -34,7 +34,7 @@ function TopRatedWorkers({ workers, setSelectedWorker }) {
 
           <div
             key={worker.id}
-            className="bg-zinc-900 border border-yellow-500 rounded-2xl p-4"
+            className="bg-white shadow-xl border border-yellow-500 rounded-2xl p-4"
           >
 
             <div className="flex items-center gap-3">
@@ -47,7 +47,7 @@ function TopRatedWorkers({ workers, setSelectedWorker }) {
 
               <div>
 
-                <h3 className="text-white font-bold">
+                <h3 className="text-slate-900 font-bold">
                   {worker.name}
                 </h3>
 

@@ -23,7 +23,7 @@ function MyBookings() {
 
   return (
 
-    <section className="bg-black text-white py-20 px-5">
+    <section className="bg-[#B4DBDC] text-slate-900 py-20 px-5">
 
       <h2 className="text-4xl font-bold text-blue-500 text-center mb-10">
         My Bookings
@@ -43,7 +43,7 @@ function MyBookings() {
 
             <div
               key={index}
-              className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800"
+              className="bg-white shadow-xl p-6 rounded-2xl border border-zinc-800"
             >
 
               <h3 className="text-xl font-bold">

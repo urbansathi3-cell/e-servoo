@@ -44,7 +44,7 @@ function ReviewForm({ worker }) {
 
     <form
       onSubmit={submitReview}
-      className="bg-zinc-900 p-6 rounded-2xl mt-6"
+      className="bg-white shadow-xl p-6 rounded-2xl mt-6"
     >
 
       <h3 className="text-2xl font-bold text-blue-500">
@@ -58,7 +58,7 @@ function ReviewForm({ worker }) {
         placeholder="Rating (1-5)"
         value={rating}
         onChange={(e) => setRating(e.target.value)}
-        className="w-full mt-4 p-3 rounded-xl bg-black text-white"
+        className="w-full mt-4 p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
         required
       />
 
@@ -66,7 +66,7 @@ function ReviewForm({ worker }) {
         placeholder="Write Review"
         value={review}
         onChange={(e) => setReview(e.target.value)}
-        className="w-full mt-4 p-3 rounded-xl bg-black text-white"
+        className="w-full mt-4 p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
         required
       />
 

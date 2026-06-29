@@ -85,7 +85,7 @@ return (
 
 <section    
   id="workers"    
-  className="bg-black text-white py-24 px-5"    
+  className="bg-[#B4DBDC] text-slate-900 py-24 px-5"    
 >    <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">    
     Our Workers    
   </h2>     <div className="max-w-xl mx-auto mb-8">  <input    
@@ -93,14 +93,14 @@ return (
   placeholder="Search Workers"    
   value={search}    
   onChange={(e) => setSearch(e.target.value)}    
-  className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white focus:border-blue-500 outline-none"    
+  className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-slate-900 focus:border-blue-500 outline-none"    
 />    </div>   
 
 <div className="max-w-xl mx-auto mb-8">
   <select
     value={sortBy}
     onChange={(e) => setSortBy(e.target.value)}
-    className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-white"
+    className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-slate-900"
   >
     <option value="">Sort Workers</option>
 
@@ -168,7 +168,7 @@ return (
 
         <div className="flex items-center gap-2 flex-wrap">    
 
-          <h3 className="font-bold text-xl text-white">    
+          <h3 className="font-bold text-xl text-slate-900">    
             {worker.name}    
           </h3>    
   
@@ -209,7 +209,7 @@ className="text-orange-400 text-xs font-semibold hover:underline"
 
     <div className="text-right">    
 
-      <h3 className="text-3xl font-bold text-white">    
+      <h3 className="text-3xl font-bold text-slate-900">    
         ₹{worker.fare}    
       </h3>    
 
@@ -221,13 +221,13 @@ className="text-orange-400 text-xs font-semibold hover:underline"
 
         {worker.status?.trim() === "Available" ? (    
 
-          <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm">    
+          <span className="bg-green-600 text-slate-900 px-3 py-1 rounded-full text-sm">    
             Available    
           </span>    
 
         ) : (    
 
-          <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm">    
+          <span className="bg-red-600 text-slate-900 px-3 py-1 rounded-full text-sm">    
             Busy    
           </span>    
 

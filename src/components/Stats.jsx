@@ -34,41 +34,41 @@ function Stats() {
 
   return (
 
-    <section className="py-12 bg-[#0d1117]">
+    <section className="py-12 bg-[#9ECFD0]">
 
       <div className="max-w-7xl mx-auto px-4">
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
 
-          <div className="bg-[#16233d] p-5 rounded-2xl text-center">
+          <div className="bg-[#6A9A9A] p-5 rounded-2xl text-center shadow-md">
             <h2 className="text-3xl font-bold text-blue-400">
               {stats.workers}
             </h2>
             <p>Workers</p>
           </div>
 
-          <div className="bg-[#16233d] p-5 rounded-2xl text-center">
+          <div className="bg-[#6A9A9A] p-5 rounded-2xl text-center shadow-md">
             <h2 className="text-3xl font-bold text-green-400">
               {stats.services}
             </h2>
             <p>Services</p>
           </div>
 
-          <div className="bg-[#16233d] p-5 rounded-2xl text-center">
+          <div className="bg-[#6A9A9A] p-5 rounded-2xl text-center shadow-md">
             <h2 className="text-3xl font-bold text-yellow-400">
               {stats.bookings}
             </h2>
             <p>Bookings</p>
           </div>
 
-          <div className="bg-[#16233d] p-5 rounded-2xl text-center">
+          <div className="bg-[#6A9A9A] p-5 rounded-2xl text-center shadow-md">
             <h2 className="text-3xl font-bold text-purple-400">
               {stats.completedJobs}
             </h2>
             <p>Completed Jobs</p>
           </div>
 
-          <div className="bg-[#16233d] p-5 rounded-2xl text-center">
+          <div className="bg-[#6A9A9A] p-5 rounded-2xl text-center shadow-md">
             <h2 className="text-3xl font-bold text-orange-400">
               {stats.satisfaction}
             </h2>

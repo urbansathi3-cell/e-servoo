@@ -40,9 +40,10 @@ function WorkerOfMonth() {
         className="
         animate-workerSlide
         bg-gradient-to-r
-        from-yellow-500
-        to-orange-500
-        text-black
+        from-[#08566E]
+        via-[#0A6F78]
+        to-[#08BF6F]
+        text-[#E1E9E5]
         rounded-3xl
         p-6
         w-[90%]
@@ -52,7 +53,7 @@ function WorkerOfMonth() {
         "
       >
 
-        <h2 className="text-3xl font-bold mb-4">
+        <h2 className="text-3xl font-bold mb-4 text-[#E1E9E5]">
           🏆 Worker of the Month
         </h2>
 
@@ -66,23 +67,23 @@ function WorkerOfMonth() {
           mx-auto
           object-cover
           border-4
-          border-white
+          border-[#E1E9E5]
           "
         />
 
-        <h3 className="text-2xl font-bold mt-4">
+        <h3 className="text-2xl font-bold mt-4 text-[#E1E9E5]">
           {worker.name}
         </h3>
 
-        <p className="font-semibold">
+        <p className="font-semibold text-[#D8ECE6]">
           {worker.service}
         </p>
 
-        <p className="mt-2">
+        <p className="mt-2 text-yellow-300 font-semibold">
           ⭐ {worker.rating}
         </p>
 
-        <p>
+        <p className="text-[#E1E9E5] font-semibold">
           🛡️ {worker.TrustScore}% Trust
         </p>
 

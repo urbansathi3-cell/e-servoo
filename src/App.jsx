@@ -107,7 +107,7 @@ setSelectedWorker={setSelectedWorker}
 
   <div className="py-4 text-center">
 
-    <p className="text-gray-300 text-sm mb-3">
+    <p className="text-[#08566E] text-sm mb-3">
       🌐 Choose Language
     </p>
 
@@ -117,8 +117,8 @@ setSelectedWorker={setSelectedWorker}
         onClick={() => changeLanguage("en")}
         className={`px-4 py-2 rounded-lg ${
           language === "en"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-700 text-white"
+            ? "bg-[#08566E] text-white"
+            : "bg-[#E1E9E5] text-[#08566E]"
         }`}
       >
         EN
@@ -128,8 +128,8 @@ setSelectedWorker={setSelectedWorker}
         onClick={() => changeLanguage("hi")}
         className={`px-4 py-2 rounded-lg ${
           language === "hi"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-700 text-white"
+            ? "bg-[#08566E] text-white"
+            : "bg-[#E1E9E5] text-[#08566E]"
         }`}
       >
         HI
@@ -139,8 +139,8 @@ setSelectedWorker={setSelectedWorker}
         onClick={() => changeLanguage("od")}
         className={`px-4 py-2 rounded-lg ${
           language === "od"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-700 text-white"
+            ? "bg-[#08566E] text-white"
+            : "bg-[#E1E9E5] text-[#08566E]"
         }`}
       >
         OD
@@ -151,9 +151,10 @@ setSelectedWorker={setSelectedWorker}
   </div>
 
   <Hero language={language} />
-  <WorkerOfMonth />
+  
+  <Stats />
 
-<Stats />
+  <WorkerOfMonth />
 
 <Services
 setSelectedService={setSelectedService}
@@ -162,7 +163,7 @@ setSelectedService={setSelectedService}
 <div className="flex justify-end p-3">
   <button
     onClick={() => setSeniorMode(!seniorMode)}
-    className="bg-yellow-500 text-black px-4 py-2 rounded font-bold"
+    className="bg-[#08566E] text-white px-4 py-2 rounded font-bold"
   >
     👴 Senior Mode
   </button>
@@ -176,7 +177,7 @@ setSelectedService={setSelectedService}
 
 <WhatsappButton />  
 
-  <div className="fixed bottom-0 left-0 right-0 w-full bg-slate-900 border-t border-slate-700 flex justify-around py-3 z-50 text-white">
+  <div className="fixed bottom-0 left-0 right-0 w-full bg-[#08566E] border-t border-[#06485C] flex justify-around py-3 z-50 text-white">
 
   <a href="/">🏠 Home</a>
 
@@ -237,7 +238,7 @@ localStorage.setItem("lang", lang);
 
 return (
   <div
-    className={`bg-black min-h-screen pb-20 overflow-x-hidden ${
+    className={`bg-[#B4DBDC] min-h-screen pb-20 overflow-x-hidden ${
       seniorMode ? "text-xl" : "text-base"
     }`}
   >

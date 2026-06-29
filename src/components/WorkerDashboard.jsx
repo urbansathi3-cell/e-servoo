@@ -45,11 +45,11 @@ if (!worker) return null
 
 return (
 
-<section className="bg-black text-white py-20 px-5">
+<section className="bg-[#B4DBDC] text-slate-900 py-20 px-5">
 
   <div className="max-w-5xl mx-auto">
 
-    <div className="bg-zinc-900 p-8 rounded-3xl border border-blue-500">
+    <div className="bg-white shadow-xl p-8 rounded-3xl border border-blue-500">
 
       <h2 className="text-4xl font-bold text-blue-500 mb-8">
         Worker Dashboard

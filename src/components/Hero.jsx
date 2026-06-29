@@ -5,45 +5,35 @@ function Hero({ language }) {
 
   return (
 
-    <section className="bg-gradient-to-b from-black to-zinc-950 text-white min-h-[85vh] flex flex-col items-center justify-center text-center px-5 pt-0">
+    <section className="bg-[#B4DBDC] min-h-[70vh] flex flex-col items-center justify-start text-center px-5 pt-20">
 
-      <img
-        src="/logo.png"
-        alt="E-SERVOO"
-        className="w-32 mb-4"
-      />
+  <p className="mt-6 text-2xl font-bold text-[#08566E]">
+    {t.heroTitle}
+  </p>
 
-      <h1 className="text-5xl md:text-7xl font-bold text-slate-200">
-        E-SERVOO
-      </h1>
+  <p className="mt-6 text-lg text-slate-700 max-w-2xl">
+    {t.heroDescription}
+  </p>
 
-      <p className="mt-6 text-2xl text-blue-500 font-semibold">
-  {t.heroTitle}
-</p>
+  <div className="flex flex-wrap justify-center gap-6 mt-10">
 
-      <p className="mt-6 text-lg text-zinc-400 max-w-3xl">
-  {t.heroDescription}
-</p>
+    <a
+      href="#workers"
+      className="bg-[#08566E] px-8 py-4 rounded-2xl text-white font-bold hover:bg-[#06485C] transition"
+    >
+      {t.bookProfessional}
+    </a>
 
-      <div className="flex flex-wrap gap-4 mt-10 justify-center">
+    <a
+      href="#services"
+      className="border-2 border-[#08566E] px-8 py-4 rounded-2xl text-[#08566E] font-bold hover:bg-[#08566E] hover:text-white transition"
+    >
+      {t.exploreServices}
+    </a>
 
-        <a
-          href="#workers"
-          className="bg-blue-600 px-8 py-4 rounded-2xl text-white font-bold hover:bg-blue-700 transition"
-        >
-          {t.bookProfessional}
-        </a>
+  </div>
 
-        <a
-  href="#services"
-  className="border-2 border-blue-500 px-8 py-4 rounded-2xl text-blue-500 font-bold hover:bg-blue-500 hover:text-white transition"
->
-  {t.exploreServices}
-</a>
-
-      </div>
-
-    </section>
+</section>
 
   )
 }

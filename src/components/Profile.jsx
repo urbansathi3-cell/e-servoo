@@ -10,7 +10,7 @@ function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
+    <div className="min-h-screen bg-[#B4DBDC] text-slate-900 p-4">
 
       <h1 className="text-3xl font-bold mb-6">
         My Profile

@@ -15,14 +15,14 @@ return (
 
 <section
   id="services"
-  className="bg-black text-white py-20 px-5"
+  className="bg-[#A4D1D2] text-slate-900 py-20 px-5"
 >
 
-  <h2 className="text-4xl md:text-5xl font-bold text-center text-slate-200 mb-4">
+  <h2 className="text-4xl md:text-5xl font-bold text-center text-[#08566E] mb-4">
     Our Services
   </h2>
 
-  <p className="text-center text-zinc-400 mb-10">
+  <p className="text-center text-[#4B6B73] mb-10">
     Trusted Professionals For Every Home Need
   </p>
 
@@ -41,14 +41,14 @@ return (
               behavior: "smooth"
             })
         }}
-        className="bg-[#111111] p-5 rounded-2xl border border-zinc-800 hover:border-blue-500 hover:-translate-y-1 transition duration-300 cursor-pointer"
+        className="bg-[#6FA8AE] p-5 rounded-2xl shadow-lg border border-[#5B979E] hover:bg-[#5E9AA1] hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer"
       >
 
-        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 text-xl">
+        <div className="w-12 h-12 bg-[#06495C] rounded-xl flex items-center justify-center mb-4 text-xl">
           {service.icon}
         </div>
 
-        <h3 className="text-lg md:text-xl font-bold text-slate-200">
+        <h3 className="text-lg md:text-xl font-bold text-[#E1E9E5]">
           {service.name}
         </h3>
 

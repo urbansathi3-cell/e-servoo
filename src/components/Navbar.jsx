@@ -1,6 +1,6 @@
 function Navbar() {
   return (
-    <nav className="bg-black border-b border-blue-500/20 px-4 py-3">
+    <nav className="bg-[#B4DBDC] border-b border-blue-500/20 px-4 py-3">
 
       <div className="flex justify-center">
 
@@ -8,10 +8,10 @@ function Navbar() {
           <img
             src="/logo.png"
             alt="logo"
-            className="h-3p w-30"
+            className="h-12 w-12"
           />
 
-          <h1 className="text-4xl font-bold text-white">
+          <h1 className="text-4xl font-bold text-slate-900">
             E-SERVOO
           </h1>
 

@@ -80,7 +80,7 @@ if (bestMatch) {
 
 };
 
-return ( <section className="bg-black text-white py-16 px-5"> <div className="max-w-3xl mx-auto bg-[#111111] rounded-3xl p-8 border border-blue-900">
+return ( <section className="bg-[#B4DBDC] text-slate-900 py-16 px-5"> <div className="max-w-3xl mx-auto bg-[#111111] rounded-3xl p-8 border border-blue-900">
 
 
     <h2 className="text-3xl font-bold text-blue-500 mb-4">
@@ -96,12 +96,12 @@ return ( <section className="bg-black text-white py-16 px-5"> <div className="ma
       placeholder="Example: My fan is not working"
       value={problem}
       onChange={(e) => setProblem(e.target.value)}
-      className="w-full p-4 rounded-xl bg-black border border-zinc-700"
+      className="w-full p-4 rounded-xl bg-[#B4DBDC] border border-zinc-700"
     />
 
     <button
       onClick={handleRecommend}
-      className="mt-4 bg-blue-500 px-6 py-3 rounded-xl font-semibold hover:bg-blue-600"
+      className="mt-4 bg-blue-500 px-6 py-3 rounded-xl font-semibold hover:bg-[#08566E]"
     >
       Get Recommendation
     </button>
