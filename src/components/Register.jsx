@@ -9,6 +9,7 @@ const [name, setName] = useState("")
 const [phone, setPhone] = useState("")
 const [email, setEmail] = useState("")
 const [password, setPassword] = useState("")
+const [address, setAddress] = useState("")
 
 const handleRegister = async (e) => {
 
@@ -26,7 +27,8 @@ try {
         name,
         phone,
         email,
-        password
+        password,
+        address
       })
     }
   )
@@ -107,6 +109,15 @@ return (
         className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
         required
       />
+
+      <input
+        type="text"
+        placeholder="Full Address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        className="w-full p-3 rounded-xl bg-black border border-zinc-700 text-white"
+        required
+/>
 
       <button
         type="submit"
