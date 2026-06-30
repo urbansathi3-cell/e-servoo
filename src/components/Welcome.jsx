@@ -14,7 +14,7 @@ function Welcome({ setShowWelcome }) {
     className="w-56 mx-auto mb-10"
   />
 
-  <h1 className="text-3xl md:text-7xl font-bold text-[#08566E] tracking-wider">
+  <h1 className="text-4xl md:text-7xl font-bold text-[#08566E] tracking-wider">
     E-SERVOO
   </h1>
 
