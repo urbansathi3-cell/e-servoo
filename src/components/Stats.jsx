@@ -77,7 +77,7 @@ function Stats() {
           </div>
 
           <div className="bg-[#6A9A9A] p-5 rounded-2xl text-center shadow-md">
-            <h2 className="text-3xl font-bold text-orange-400">
+            <h2 className="text-3xl font-bold text-[#7A3E00]">
               {stats.satisfaction}
             </h2>
             <p className="text-[#E1E9E5] font-medium">
