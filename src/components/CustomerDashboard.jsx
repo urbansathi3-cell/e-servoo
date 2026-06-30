@@ -27,40 +27,40 @@ function CustomerDashboard() {
 
     <section className="bg-[#B4DBDC] text-slate-900 py-20 px-5">
 
-      <div className="max-w-4xl mx-auto bg-white shadow-xl p-8 rounded-3xl">
+      <div className="max-w-4xl mx-auto bg-[#9ECFD0] shadow-xl p-8 rounded-3xl">
 
-        <h2 className="text-4xl font-bold text-blue-500 mb-8">
+        <h2 className="text-4xl font-bold text-[#08566E] mb-8">
           Customer Dashboard
         </h2>
 
         <div className="grid md:grid-cols-2 gap-6">
 
-          <div className="bg-zinc-800 p-6 rounded-2xl">
+          <div className="bg-[#6A9A9A] p-6 rounded-2xl shadow-md">
             <h3 className="text-xl font-bold">
               Name
             </h3>
-            <p>{user.name}</p>
+            <p className="text-[#E1E9E5]">{user.name}</p>
           </div>
 
-          <div className="bg-zinc-800 p-6 rounded-2xl">
+          <div className="bg-[#6A9A9A] p-6 rounded-2xl shadow-md">
             <h3 className="text-xl font-bold">
               Email
             </h3>
-            <p>{user.email}</p>
+           <p className="text-[#E1E9E5]">{user.email}</p>
           </div>
 
-          <div className="bg-zinc-800 p-6 rounded-2xl">
-            <h3 className="text-xl font-bold">
+          <div className="bg-[#6A9A9A] p-6 rounded-2xl shadow-md">
+            <h3 className="text-xl font-bold text-[#08566E]">
               Phone
             </h3>
-            <p>{user.phone}</p>
+            <p className="text-[#E1E9E5]">{user.phone}</p>
           </div>
 
-          <div className="bg-zinc-800 p-6 rounded-2xl">
+          <div className="bg-[#6A9A9A] p-6 rounded-2xl shadow-md">
             <h3 className="text-xl font-bold">
               Account Status
             </h3>
-            <p className="text-green-500">
+            <p className="text-[#E1E9E5] font-semibold">
               Active
             </p>
           </div>
@@ -69,7 +69,7 @@ function CustomerDashboard() {
 
         <button
           onClick={handleLogout}
-          className="mt-8 bg-red-500 px-6 py-3 rounded-xl"
+          className="mt-8 bg-[#08566E] text-[#E1E9E5] px-6 py-3 rounded-xl font-bold hover:bg-[#06485C] transition"
         >
           Logout
         </button>
