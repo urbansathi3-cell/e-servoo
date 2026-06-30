@@ -65,9 +65,20 @@ const logout = () => {
   return (
     <div className="min-h-screen bg-[#B4DBDC] text-slate-900 p-4">
 
-      <h1 className="text-3xl font-bold mb-6">
-        My Profile
-      </h1>
+      <div className="flex items-center gap-3 mb-6">
+
+  <button
+    onClick={() => navigate(-1)}
+    className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg"
+  >
+    ← Back
+  </button>
+
+  <h1 className="text-3xl font-bold">
+    My Profile
+  </h1>
+
+</div>
 
       <div className="space-y-4">
 
