@@ -69,19 +69,16 @@ const logout = () => {
 
   <button
     onClick={() => navigate(-1)}
-    className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg"
+    className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-4 py-2 rounded-lg"
   >
     ← Back
   </button>
 
-  <h1 className="text-3xl font-bold">
+  <h1 className="text-3xl font-bold text-[#08566E]">
     My Profile
   </h1>
 
 </div>
-      <h1 className="text-3xl font-bold text-[#08566E] mb-6">
-        My Profile
-      </h1>
 
       <div className="space-y-4">
 
