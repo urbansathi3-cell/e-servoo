@@ -1,11 +1,11 @@
 function Terms() {
   return (
     <div className="min-h-screen bg-[#B4DBDC] text-slate-900 p-6">
-      <h1 className="text-3xl font-bold text-blue-500 mb-6">
+      <h1 className="text-3xl font-bold text-[#08566E] mb-6">
         Terms & Conditions
       </h1>
 
-      <div className="space-y-6 text-slate-300">
+      <div className="space-y-6 text-[#2F4F4F]">
 
         <section>
           <p>
@@ -15,7 +15,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             Services
           </h2>
           <p>
@@ -31,7 +31,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             User Responsibilities
           </h2>
           <ul className="list-disc ml-6">
@@ -43,7 +43,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             Booking and Payments
           </h2>
           <ul className="list-disc ml-6">
@@ -56,7 +56,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             Prohibited Activities
           </h2>
           <ul className="list-disc ml-6">
@@ -68,7 +68,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             Limitation of Liability
           </h2>
           <ul className="list-disc ml-6">
@@ -80,7 +80,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             Termination
           </h2>
           <p>
@@ -90,7 +90,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#08566E] mb-2">
             Governing Law
           </h2>
           <p>
@@ -100,11 +100,11 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-blue-500 mb-3">
+          <h2 className="text-2xl font-bold text-[#08566E] mb-3">
             Privacy Policy
           </h2>
 
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-[#08566E]">
             Information We Collect
           </h3>
 
@@ -117,7 +117,7 @@ function Terms() {
             <li>Device & Usage Information</li>
           </ul>
 
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-[#08566E]">
             How We Use Information
           </h3>
 
@@ -128,7 +128,7 @@ function Terms() {
             <li>To communicate updates and support</li>
           </ul>
 
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-[#08566E]">
             Data Sharing
           </h3>
 
@@ -138,7 +138,7 @@ function Terms() {
             <li>Legal authorities when required by law</li>
           </ul>
 
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-[#08566E]">
             Data Security
           </h3>
 
@@ -146,7 +146,7 @@ function Terms() {
             We implement reasonable security measures to protect user information.
           </p>
 
-          <h3 className="text-lg font-semibold text-slate-900 mt-3">
+          <h3 className="text-lg font-semibold text-[#08566E] mt-3">
             User Rights
           </h3>
 
@@ -157,11 +157,11 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-blue-500 mb-3">
+          <h2 className="text-2xl font-bold text-[#08566E] mb-3">
             Refund & Cancellation Policy
           </h2>
 
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-[#08566E]">
             Customer Cancellation
           </h3>
 
@@ -170,7 +170,7 @@ function Terms() {
             Late cancellations may incur cancellation fees.
           </p>
 
-          <h3 className="text-lg font-semibold text-slate-900 mt-3">
+          <h3 className="text-lg font-semibold text-[#08566E] mt-3">
             Provider Cancellation
           </h3>
 
@@ -178,7 +178,7 @@ function Terms() {
             If a provider cancels, e-servoo will attempt to arrange a replacement provider.
           </p>
 
-          <h3 className="text-lg font-semibold text-slate-900 mt-3">
+          <h3 className="text-lg font-semibold text-[#08566E] mt-3">
             Refund Eligibility
           </h3>
 
@@ -188,7 +188,7 @@ function Terms() {
             <li>Provider fails to arrive.</li>
           </ul>
 
-          <h3 className="text-lg font-semibold text-slate-900 mt-3">
+          <h3 className="text-lg font-semibold text-[#08566E] mt-3">
             Non-Refundable Situations
           </h3>
 
@@ -204,7 +204,7 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-blue-500 mb-3">
+          <h2 className="text-2xl font-bold text-[#08566E] mb-3">
             Service Provider Agreement
           </h2>
 
@@ -220,12 +220,12 @@ function Terms() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-blue-500 mb-3">
+          <h2 className="text-2xl font-bold text-[#08566E] mb-3">
             Disclaimer
           </h2>
 
-          <div className="bg-slate-900 p-4 rounded-lg border border-slate-700">
-            <p>
+          <div className="bg-[#6A9A9A] p-4 rounded-lg border border-[#4D7A7A] shadow-md">
+            <p className="text-[#E1E9E5]">
               e-servoo is a technology platform that connects customers
               with independent service providers. Services are performed
               by third-party providers. e-servoo does not guarantee

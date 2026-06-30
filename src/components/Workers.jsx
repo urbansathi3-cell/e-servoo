@@ -86,21 +86,21 @@ return (
 <section    
   id="workers"    
   className="bg-[#B4DBDC] text-slate-900 py-24 px-5"    
->    <h2 className="text-5xl font-bold text-center text-blue-500 mb-12">    
+>    <h2 className="text-5xl font-bold text-center text-[#08566E] mb-12">    
     Our Workers    
   </h2>     <div className="max-w-xl mx-auto mb-8">  <input    
   type="text"    
   placeholder="Search Workers"    
   value={search}    
   onChange={(e) => setSearch(e.target.value)}    
-  className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-slate-900 focus:border-blue-500 outline-none"    
+  className="w-full p-4 rounded-xl bg-[#E1E9E5] border border-[#8FBDBE] text-slate-900 focus:border-blue-500 outline-none"    
 />    </div>   
 
 <div className="max-w-xl mx-auto mb-8">
   <select
     value={sortBy}
     onChange={(e) => setSortBy(e.target.value)}
-    className="w-full p-4 rounded-xl bg-[#111111] border border-zinc-700 text-slate-900"
+    className="w-full p-4 rounded-xl bg-[#E1E9E5] border border-[#8FBDBE] text-slate-900"
   >
     <option value="">Sort Workers</option>
 
@@ -145,7 +145,7 @@ return (
     status: worker.status
   });
 }}
-  className={`bg-[#16233d] border border-blue-900 rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
+  className={`bg-[#8FBDBE] border border-[#6FA6A8] rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
     ${worker.status?.trim() === "Available"
       ? "hover:border-blue-500 cursor-pointer"
       : "opacity-50 cursor-not-allowed"
@@ -168,11 +168,11 @@ return (
 
         <div className="flex items-center gap-2 flex-wrap">    
 
-          <h3 className="font-bold text-xl text-slate-900">    
+          <h3 className="font-bold text-xl text-[#08566E]">    
             {worker.name}    
           </h3>    
   
-                </div>  <p className="text-blue-400">    
+                </div>  <p className="text-[#0A5E75]">    
               {worker.service}    
             </p>  {worker.CertificateLink && (
 <a
@@ -182,7 +182,7 @@ rel="noreferrer"
 onClick={(e) => {
 e.stopPropagation()
 }}
-className="text-orange-400 text-xs font-semibold hover:underline"
+className="text-[#08566E] text-xs font-semibold hover:underline"
 
 > 
 
@@ -193,7 +193,7 @@ className="text-orange-400 text-xs font-semibold hover:underline"
             ⭐ {worker.rating || "4.8"}    
           </span>    
 
-          <span className="text-zinc-400">    
+          <span className="text-slate-700">    
             📍 {worker.location || "Local Area"}    
           </span>    
 
@@ -209,11 +209,11 @@ className="text-orange-400 text-xs font-semibold hover:underline"
 
     <div className="text-right">    
 
-      <h3 className="text-3xl font-bold text-slate-900">    
+      <h3 className="text-3xl font-bold text-[#08566E]">    
         ₹{worker.fare}    
       </h3>    
 
-      <p className="text-zinc-400 text-sm">    
+      <p className="text-slate-700 text-sm">    
         visiting cost    
       </p>    
 
@@ -221,13 +221,13 @@ className="text-orange-400 text-xs font-semibold hover:underline"
 
         {worker.status?.trim() === "Available" ? (    
 
-          <span className="bg-green-600 text-slate-900 px-3 py-1 rounded-full text-sm">    
+          <span className="bg-[#08566E] text-[#E1E9E5] px-3 py-1 rounded-full text-sm">    
             Available    
           </span>    
 
         ) : (    
 
-          <span className="bg-red-600 text-slate-900 px-3 py-1 rounded-full text-sm">    
+          <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">    
             Busy    
           </span>    
 
