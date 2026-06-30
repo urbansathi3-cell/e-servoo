@@ -12,7 +12,7 @@ function Navbar() {
           />
 
           <h1 className="text-4xl font-bold text-slate-900">
-            E-SERVOO
+            -SERVOO
           </h1>
 
         </div>
