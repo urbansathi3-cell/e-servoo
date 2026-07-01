@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function CustomerDashboard() {
 
-  const [user, setUser] = useState(null)
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
 
@@ -29,9 +32,20 @@ function CustomerDashboard() {
 
       <div className="max-w-4xl mx-auto bg-[#9ECFD0] shadow-xl p-8 rounded-3xl">
 
-        <h2 className="text-4xl font-bold text-[#08566E] mb-8">
-          Customer Dashboard
-        </h2>
+        <div className="flex items-center gap-3 mb-8">
+
+  <button
+    onClick={() => navigate(-1)}
+    className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-4 py-2 rounded-lg transition"
+  >
+    ← Back
+  </button>
+
+  <h2 className="text-4xl font-bold text-[#08566E]">
+    Customer Dashboard
+  </h2>
+
+</div>
 
         <div className="grid md:grid-cols-2 gap-6">
 
