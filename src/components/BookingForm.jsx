@@ -13,6 +13,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   });
 
   const [success, setSuccess] = useState(false);
+const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!selectedWorker) return;
@@ -37,11 +38,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+setLoading(true);
 
     if (formData.phone.length < 10) {
-      alert("Enter Valid Phone Number");
-      return;
-    }
+  setLoading(false);
+  alert("Enter Valid Phone Number");
+  return;
+}
 
     try {
       await fetch(
@@ -52,11 +55,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         }
       );
 
-      setSuccess(true);
+      setLoading(false);
+setSuccess(true);
     } catch (error) {
-      console.error(error);
-      alert("Booking Failed");
-    }
+  console.error(error);
+  setLoading(false);
+  alert("Booking Failed");
+}
   };
 
   if (!selectedWorker) {
@@ -212,11 +217,16 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
             </select>
 
             <button
-              type="submit"
-              className="bg-[#08566E] text-[#E1E9E5] py-4 rounded-xl text-lg font-bold hover:bg-[#06485C] transition duration-300"
-            >
-              Confirm Booking
-            </button>
+  type="submit"
+  disabled={loading}
+  className={`py-4 rounded-xl text-lg font-bold text-[#E1E9E5] transition duration-300 ${
+    loading
+      ? "bg-gray-500 cursor-not-allowed"
+      : "bg-[#08566E] hover:bg-[#06485C]"
+  }`}
+>
+  {loading ? "Booking..." : "Confirm Booking"}
+</button>
           </form>
         </div>
       </div>
