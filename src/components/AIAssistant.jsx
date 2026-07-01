@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { askGroq } from "../api/groq";
 import {
   FaRobot,
   FaPaperPlane,
@@ -37,7 +38,7 @@ function AIAssistant() {
 
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
 
     if (!input.trim()) return;
 
@@ -57,159 +58,35 @@ function AIAssistant() {
 
     setInput("");
 
-    setTimeout(() => {
+    try {
 
-      let reply = "";
+  const reply = await askGroq(userMessage);
 
-      if (
-        msg.includes("electrician")
-      ) {
+  setTyping(false);
 
-        reply =
-          "⚡ Electrician Available\n\nVisiting Charge : ₹199\n\nEstimated Arrival : 30 Minutes";
+  setMessages((prev) => [
+    ...prev,
+    {
+      sender: "ai",
+      text: reply,
+    },
+  ]);
 
-      }
+} catch (error) {
 
-      else if (
-        msg.includes("plumber")
-      ) {
+  console.error(error);
 
-        reply =
-          "🚿 Plumber Available\n\nVisiting Charge : ₹149";
+  setTyping(false);
 
-      }
+  setMessages((prev) => [
+    ...prev,
+    {
+      sender: "ai",
+      text: "⚠️ AI is currently unavailable. Please try again.",
+    },
+  ]);
 
-      else if (
-        msg.includes("cleaner")
-      ) {
-
-        reply =
-          "🧹 Cleaner Available Near You.";
-
-      }
-
-      else if (
-        msg.includes("cook")
-      ) {
-
-        reply =
-          "👨‍🍳 Professional Cook Available.";
-
-      }
-
-      else if (
-        msg.includes("fan")
-      ) {
-
-        reply =
-          "🌀 Fan Repair\n\nPossible Issues\n• Capacitor\n• Wiring\n• Motor\n\nEstimated Cost : ₹300 - ₹700";
-
-      }
-
-      else if (
-        msg.includes("switch")
-      ) {
-
-        reply =
-          "💡 Switch Repair\n\nEstimated Cost : ₹100 - ₹300";
-
-      }
-
-      else if (
-        msg.includes("pipe")
-      ) {
-
-        reply =
-          "🚿 Pipe Leakage\n\nEstimated Cost : ₹250 - ₹800";
-
-      }
-
-      else if (
-        msg.includes("tap")
-      ) {
-
-        reply =
-          "🚰 Tap Repair\n\nEstimated Cost : ₹150 - ₹500";
-
-      }
-
-      else if (
-        msg.includes("ac")
-      ) {
-
-        reply =
-          "❄️ AC Service\n\nEstimated Cost : ₹500 - ₹1500";
-
-      }
-
-      else if (
-        msg.includes("washing machine")
-      ) {
-
-        reply =
-          "🧺 Washing Machine Repair\n\nEstimated Cost : ₹400 - ₹2000";
-
-      }
-
-      else if (
-        msg.includes("price") ||
-        msg.includes("cost") ||
-        msg.includes("charge")
-      ) {
-
-        reply =
-          "💰 Estimated Charges\n\n⚡ Electrician : ₹199+\n🚿 Plumber : ₹149+\n🧹 Cleaner : ₹299+\n👨‍🍳 Cook : ₹499+\n\nFinal price depends on the actual work.";
-
-      }
-
-      else if (
-        msg.includes("booking") ||
-        msg.includes("book")
-      ) {
-
-        reply =
-          "📖 Booking Process\n\n1️⃣ Select Service\n2️⃣ Choose Worker\n3️⃣ Fill Booking Form\n4️⃣ Confirm Booking\n\nYour worker will contact you shortly.";
-
-      }
-
-      else if (
-        msg.includes("emergency") ||
-        msg.includes("urgent")
-      ) {
-
-        reply =
-          "🚨 Emergency Booking\n\nPlease choose 'Emergency' priority while booking.\nWe will try to assign the nearest available worker.";
-
-      }
-
-      else if (
-        msg.includes("hello") ||
-        msg.includes("hi")
-      ) {
-
-        reply =
-          "👋 Hello! Welcome to E-SERVOO.\nHow can I help you today?";
-
-      }
-
-      else {
-
-        reply =
-          "🤖 Sorry, I couldn't understand your question.\n\nTry asking about:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Price\n📖 Booking\n🚨 Emergency";
-
-      }
-
-      setTyping(false);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "ai",
-          text: reply,
-        },
-      ]);
-
-    }, 900);
+}
 
   };
 
