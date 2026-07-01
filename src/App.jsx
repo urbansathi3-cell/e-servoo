@@ -5,6 +5,7 @@ import { translations } from "./translations";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Stats from "./components/Stats";
+import AIAssistant from "./components/AIAssistant";
 import WorkerOfMonth from "./components/WorkerOfMonth";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
@@ -153,6 +154,8 @@ setSelectedWorker={setSelectedWorker}
   <Hero language={language} />
   
   <Stats />
+
+<AIAssistant />
 
   <WorkerOfMonth />
 
