@@ -52,9 +52,9 @@ function MyBookings() {
 
 <p className="mt-2 text-[#E1E9E5]">
   Worker: {booking.Worker}
-<p className="text-[#E1E9E5]">
+</p>
 
-<p>
+<p className="text-[#E1E9E5]">
   Date: {new Date(booking.Date).toLocaleDateString()}
 </p>
 
