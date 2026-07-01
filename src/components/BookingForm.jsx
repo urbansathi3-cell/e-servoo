@@ -67,28 +67,28 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     <>
       {success && (
         <div className="fixed inset-0 bg-[#B4DBDC]/80 flex justify-center items-center z-[100] px-5">
-          <div className="bg-white shadow-xl p-8 rounded-3xl border border-green-500 text-center max-w-md w-full">
-            <h2 className="text-3xl font-bold text-green-500">
+          <div className="bg-[#9ECFD0] shadow-xl p-8 rounded-3xl border border-[#5F9FA2] text-center max-w-md w-full">
+            <h2 className="text-3xl font-bold text-[#08566E]">
               ✅ Booking Successful
             </h2>
 
-            <p className="mt-5 text-slate-900 text-lg">
+            <p className="mt-5 text-[#08566E] text-lg font-semibold">
               Worker: {formData.worker}
             </p>
 
-            <p className="mt-2 text-blue-500 text-lg">
+            <p className="mt-2 text-[#08566E] text-lg">
               Service: {formData.service}
             </p>
 
-            <p className="mt-2 text-yellow-400">
+            <p className="mt-2 text-[#E1E9E5]">
               Priority: {formData.urgency}
             </p>
 
-            <p className="mt-2 text-zinc-300">
+            <p className="mt-2 text-[#2F4F4F]">
               Issue: {formData.issueDescription}
             </p>
 
-            <p className="mt-4 text-zinc-400">
+            <p className="mt-4 text-[#2F4F4F]">
               Our team will contact you shortly.
             </p>
 
@@ -107,7 +107,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   worker: "",
                 });
               }}
-              className="bg-blue-500 px-6 py-3 rounded-xl mt-6 hover:bg-[#08566E]"
+              className="bg-[#08566E] text-[#E1E9E5] px-6 py-3 rounded-xl mt-6 hover:bg-[#06485C] transition"
             >
               Close
             </button>
@@ -116,10 +116,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       )}
 
       <div className="fixed inset-0 bg-[#B4DBDC]/80 z-50 flex items-end sm:items-center justify-center">
-        <div className="bg-white shadow-xl w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 border border-blue-500 max-h-[95vh] overflow-y-auto relative">
+        <div className="bg-[#9ECFD0] shadow-xl w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 border border-[#5F9FA2]" max-h-[95vh] overflow-y-auto relative">
           <button
             onClick={() => setSelectedWorker(null)}
-            className="absolute top-5 right-5 text-slate-900 text-xl"
+            className="absolute top-5 right-5 text-[#08566E] text-xl"
           >
             <FaTimes />
           </button>
@@ -130,26 +130,26 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
             className="w-20 h-20 md:w-28 md:h-28 rounded-full object-cover mx-auto border-4 border-blue-500"
           />
 
-          <h2 className="text-3xl font-bold text-center text-slate-900 mt-5">
+          <h2 className="text-3xl font-bold text-center text-[#08566E] mt-5">
             {selectedWorker.name}
           </h2>
 
-          <p className="text-center text-blue-500 mt-2">
+          <p className="text-center text-[#08566E] mt-2">
             {selectedWorker.service}
           </p>
 
-          <p className="text-center text-green-400 font-bold mt-2 text-xl">
+          <p className="text-center text-[#08566E] font-bold mt-2 text-xl">
             Visiting Charge: ₹{selectedWorker.fare || "Not Available"}
           </p>
 
-          <div className="mt-4 bg-[#B4DBDC] rounded-xl p-3 text-center">
-            <p className="text-zinc-400 text-sm">Booking With</p>
+          <div className="mt-4 bg-[#6FA8AA] rounded-xl p-3 text-center">
+            <p className="text-[#E1E9E5] text-sm">Booking With</p>
 
-            <p className="text-slate-900 font-bold">
+            <p className="text-[#08566E] font-bold">
               {selectedWorker.name}
             </p>
 
-            <p className="text-blue-400">
+            <p className="text-[#E1E9E5]">
               {selectedWorker.service}
             </p>
           </div>
@@ -164,7 +164,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               placeholder="Your Name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
+              className="w-full p-3 rounded-xl bg-[#E1E9E5] text-[#08566E] border border-[#5F9FA2] focus:outline-none focus:border-[#08566E]"
               required
             />
 
@@ -174,7 +174,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               placeholder="Phone Number"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
+              className="w-full p-3 rounded-xl bg-[#E1E9E5] text-[#08566E] border border-[#5F9FA2] focus:outline-none focus:border-[#08566E]"
               required
             />
 
@@ -184,7 +184,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               placeholder="Address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
+              className="w-full p-3 rounded-xl bg-[#E1E9E5] text-[#08566E] border border-[#5F9FA2] focus:outline-none focus:border-[#08566E]"
               required
             />
 
@@ -193,7 +193,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               placeholder="Describe your issue..."
               value={formData.issueDescription}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
+              className="w-full p-3 rounded-xl bg-[#E1E9E5] text-[#08566E] border border-[#5F9FA2] focus:outline-none focus:border-[#08566E]"
               rows="4"
               required
             />
@@ -202,7 +202,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               name="urgency"
               value={formData.urgency}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-[#B4DBDC] text-slate-900"
+              className="w-full p-3 rounded-xl bg-[#E1E9E5] text-[#08566E] border border-[#5F9FA2] focus:outline-none focus:border-[#08566E]"
             >
               <option value="Normal">Normal</option>
               <option value="Urgent">Urgent</option>
@@ -211,7 +211,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
             <button
               type="submit"
-              className="bg-blue-500 py-4 rounded-xl text-lg font-bold hover:bg-[#08566E] transition duration-300"
+              className="bg-[#08566E] text-[#E1E9E5] py-4 rounded-xl text-lg font-bold hover:bg-[#06485C] transition duration-300"
             >
               Confirm Booking
             </button>
