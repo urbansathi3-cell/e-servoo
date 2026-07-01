@@ -1,9 +1,25 @@
+import { useNavigate } from "react-router-dom";
+
 function Terms() {
+
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#B4DBDC] text-slate-900 p-6">
-      <h1 className="text-3xl font-bold text-[#08566E] mb-6">
-        Terms & Conditions
-      </h1>
+
+  <div className="flex items-center gap-3 mb-6">
+
+    <button
+      onClick={() => navigate(-1)}
+      className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-4 py-2 rounded-lg transition"
+    >
+      ← Back
+    </button>
+
+    <h1 className="text-3xl font-bold text-[#08566E]">
+      Terms & Conditions
+    </h1>
+
+  </div>
 
       <div className="space-y-6 text-[#2F4F4F]">
 
