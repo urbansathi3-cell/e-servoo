@@ -25,13 +25,13 @@ function MyBookings() {
 
     <section className="bg-[#B4DBDC] text-slate-900 py-20 px-5">
 
-      <h2 className="text-4xl font-bold text-blue-500 text-center mb-10">
+      <h2 className="text-4xl font-bold text-[#08566E] text-center mb-10">
         My Bookings
       </h2>
 
       {bookings.length === 0 ? (
 
-        <p className="text-center text-zinc-400">
+        <p className="text-center text-[#5F6F72]">
           No Bookings Found
         </p>
 
@@ -43,16 +43,16 @@ function MyBookings() {
 
             <div
               key={index}
-              className="bg-white shadow-xl p-6 rounded-2xl border border-zinc-800"
+              className="bg-[#6FA8AA] shadow-lg p-6 rounded-2xl border border-[#5F9FA2]"
             >
 
-              <h3 className="text-xl font-bold">
+              <h3 className="text-xl font-bold text-[#E1E9E5]">
   {booking.Service}
 </h3>
 
-<p className="mt-2">
+<p className="mt-2 text-[#E1E9E5]">
   Worker: {booking.Worker}
-</p>
+<p className="text-[#E1E9E5]">
 
 <p>
   Date: {new Date(booking.Date).toLocaleDateString()}
@@ -60,7 +60,7 @@ function MyBookings() {
 
 <div className="mt-3">
 
-  <span className="bg-blue-500 px-3 py-1 rounded-full text-sm">
+  <span className="bg-[#08566E] text-[#E1E9E5] px-3 py-1 rounded-full text-sm font-semibold">
     {booking.Status}
   </span>
 
