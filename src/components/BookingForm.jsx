@@ -14,6 +14,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
   const [success, setSuccess] = useState(false);
 const [loading, setLoading] = useState(false);
+const [bookingId, setBookingId] = useState("");
 
   useEffect(() => {
     if (!selectedWorker) return;
@@ -47,15 +48,19 @@ setLoading(true);
 }
 
     try {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
-        {
-          method: "POST",
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(
+  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
+  {
+    method: "POST",
+    body: JSON.stringify(formData),
+  }
+);
 
-      setLoading(false);
+const data = await res.json();
+
+setBookingId(data.bookingId);
+
+setLoading(false);
 setSuccess(true);
     } catch (error) {
   console.error(error);
@@ -77,7 +82,11 @@ setSuccess(true);
               ✅ Booking Successful
             </h2>
 
-            <p className="mt-5 text-[#08566E] text-lg font-semibold">
+           <p className="mt-4 text-xl font-bold text-[#08566E]">
+  Booking ID: {bookingId}
+</p> 
+
+<p className="mt-5 text-[#08566E] text-lg font-semibold">
               Worker: {formData.worker}
             </p>
 
