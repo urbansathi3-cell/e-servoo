@@ -17,15 +17,27 @@ function Contact() {
           ← Back
         </button>
 
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-3xl font-bold text-[#08566E]">
           Contact Us
         </h1>
 
       </div>
 
-      <p>📞 +91 9583896129</p>
-      <p>📧 urbansathi7@gmail.com</p>
-      <p>📍 Rajgangpur, Odisha, India</p>
+      <div className="bg-[#6FA8AA] p-6 rounded-2xl shadow-md border border-[#5F9FA2] space-y-4">
+
+  <p className="text-[#E1E9E5] text-lg">
+    📞 +91 9583896129
+  </p>
+
+  <p className="text-[#E1E9E5] text-lg">
+    📧 urbansathi7@gmail.com
+  </p>
+
+  <p className="text-[#E1E9E5] text-lg">
+    📍 Rajgangpur, Odisha, India
+  </p>
+
+</div>
 
     </div>
 
