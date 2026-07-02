@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function MyBookings() {
@@ -7,24 +8,61 @@ function MyBookings() {
 
   const [bookings, setBookings] = useState([]);
 
-  useEffect(() => {
+  const [rating, setRating] = useState(5);
+const [review, setReview] = useState("");
+const [submitting, setSubmitting] = useState(false);
 
-    const user = JSON.parse(
-      localStorage.getItem("user")
-    );
+ useEffect(() => {
 
-    if (!user) return;
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
-    fetch(
-      `https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec?phone=${user.phone}`
-    )
-      .then(res => res.json())
-      .then(data => setBookings(data))
-      .catch(err => console.log(err));
+  if (!user) return;
 
-  }, []);
+  fetch(
+    `https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec?phone=${user.phone}`
+  )
+    .then(res => res.json())
+    .then(data => setBookings(data))
+    .catch(err => console.log(err));
 
-  return (
+}, []);
+
+
+
+const submitReview = async (worker) => {
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  setSubmitting(true);
+
+  await fetch(
+    "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        action: "review",
+        worker,
+        customer: user.name,
+        rating,
+        review
+      })
+    }
+  );
+
+  setSubmitting(false);
+
+  alert("Review Submitted Successfully");
+
+  setRating(5);
+  setReview("");
+
+};
+
+
+
+return (
 
     <section className="bg-[#B4DBDC] min-h-screen text-slate-900 py-20 px-5">
 
@@ -80,6 +118,53 @@ function MyBookings() {
                 </span>
 
               </div>
+
+              {booking.Status === "Completed" && (
+
+<div className="mt-6 border-t border-white/30 pt-4">
+
+  <h4 className="font-bold text-white mb-3">
+    ⭐ Rate This Worker
+  </h4>
+
+  <div className="flex gap-2 mb-4">
+
+    {[1,2,3,4,5].map((star)=>(
+
+      <FaStar
+        key={star}
+        size={28}
+        onClick={()=>setRating(star)}
+        className={`cursor-pointer ${
+          star<=rating
+            ? "text-yellow-400"
+            : "text-gray-300"
+        }`}
+      />
+
+    ))}
+
+  </div>
+
+  <textarea
+    value={review}
+    onChange={(e)=>setReview(e.target.value)}
+    placeholder="Write your review..."
+    className="w-full p-3 rounded-xl text-black"
+    rows={3}
+  />
+
+  <button
+    onClick={()=>submitReview(booking.Worker)}
+    disabled={submitting}
+    className="mt-4 bg-[#08566E] text-white px-5 py-3 rounded-xl w-full"
+  >
+    {submitting ? "Submitting..." : "Submit Review"}
+  </button>
+
+</div>
+
+)}
 
             </div>
 

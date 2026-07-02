@@ -17,18 +17,22 @@ const [loading, setLoading] = useState(false);
 const [bookingId, setBookingId] = useState("");
 
   useEffect(() => {
-    if (!selectedWorker) return;
 
-    setFormData({
-      name: "",
-      phone: "",
-      address: "",
-      issueDescription: "",
-      urgency: "Normal",
-      service: selectedWorker.service || "",
-      worker: selectedWorker.name || "",
-    });
-  }, [selectedWorker]);
+  if (!selectedWorker) return;
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  setFormData({
+    name: user?.name || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+    issueDescription: "",
+    urgency: "Normal",
+    service: selectedWorker.service || "",
+    worker: selectedWorker.name || "",
+  });
+
+}, [selectedWorker]);
 
   const handleChange = (e) => {
     setFormData({
@@ -177,6 +181,7 @@ setSuccess(true);
             <input
               type="text"
               name="name"
+              readOnly
               placeholder="Your Name"
               value={formData.name}
               onChange={handleChange}
@@ -187,6 +192,7 @@ setSuccess(true);
             <input
               type="text"
               name="phone"
+              readOnly
               placeholder="Phone Number"
               value={formData.phone}
               onChange={handleChange}
@@ -197,6 +203,7 @@ setSuccess(true);
             <input
               type="text"
               name="address"
+              readOnly
               placeholder="Address"
               value={formData.address}
               onChange={handleChange}
@@ -210,8 +217,7 @@ setSuccess(true);
               value={formData.issueDescription}
               onChange={handleChange}
               className="w-full p-3 rounded-xl bg-[#E1E9E5] text-[#08566E] border border-[#5F9FA2] focus:outline-none focus:border-[#08566E]"
-              rows="4"
-              required
+              rows="4" 
             />
 
             <select
@@ -234,7 +240,7 @@ setSuccess(true);
       : "bg-[#08566E] hover:bg-[#06485C]"
   }`}
 >
-  {loading ? "Booking..." : "Confirm Booking"}
+  {loading ? "Booking..." : "⚡ One Click Booking"}
 </button>
           </form>
         </div>
