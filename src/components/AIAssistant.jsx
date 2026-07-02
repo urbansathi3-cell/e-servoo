@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { askGroq } from "../api/groq";
+import { askGemini } from "../api/gemini";
 import {
   FaRobot,
   FaPaperPlane,
@@ -60,7 +60,7 @@ function AIAssistant() {
 
     try {
 
-  const reply = await askGroq(userMessage);
+  const reply = await askGemini(userMessage);
 
   setTyping(false);
 

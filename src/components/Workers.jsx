@@ -61,17 +61,7 @@ if (sortBy === "rating") {
   );
 }
 
-if (sortBy === "priceLow") {
-  filteredWorkers.sort(
-    (a, b) => Number(a.fare || 0) - Number(b.fare || 0)
-  );
-}
 
-if (sortBy === "priceHigh") {
-  filteredWorkers.sort(
-    (a, b) => Number(b.fare || 0) - Number(a.fare || 0)
-  );
-}
 
 if (sortBy === "available") {
   filteredWorkers = filteredWorkers.filter(
@@ -106,14 +96,6 @@ return (
 
     <option value="rating">
       Rating High → Low
-    </option>
-
-    <option value="priceLow">
-      Price Low → High
-    </option>
-
-    <option value="priceHigh">
-      Price High → Low
     </option>
 
     <option value="available">
@@ -207,17 +189,17 @@ className="text-[#08566E] text-xs font-semibold hover:underline"
 
     </div>    
 
-    <div className="text-right">    
+    <div className="text-right">
 
-      <h3 className="text-3xl font-bold text-[#08566E]">    
-        ₹{worker.fare}    
-      </h3>    
+  <h3 className="text-xl font-bold text-[#08566E]">
+    ✔ Verified Professional
+  </h3>
 
-      <p className="text-slate-700 text-sm">    
-        visiting cost    
-      </p>    
+ <p className="text-[#E1E9E5] text-sm font-medium">
+  Inspection Based Pricing
+</p>
 
-      <div className="mt-2">    
+  <div className="mt-2">    
 
         {worker.status?.trim() === "Available" ? (    
 
