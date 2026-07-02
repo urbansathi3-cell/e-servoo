@@ -155,8 +155,6 @@ setSelectedWorker={setSelectedWorker}
   
   <Stats />
 
-<AIAssistant />
-
   <WorkerOfMonth />
 
 <Services
@@ -209,6 +207,11 @@ useState("All");
 const [selectedWorker, setSelectedWorker] =
 useState(null);
 
+const [aiPosition, setAiPosition] = useState({
+  x: 20,
+  y: 200,
+});
+
 const [showWelcome, setShowWelcome] =
 useState(!localStorage.getItem("user"));
 
@@ -240,61 +243,71 @@ localStorage.setItem("lang", lang);
 };
 
 return (
-  <div
-    className={`bg-[#B4DBDC] min-h-screen pb-20 overflow-x-hidden ${
-      seniorMode ? "text-xl" : "text-base"
-    }`}
-  >
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <HomePage
-            seniorMode={seniorMode}
-            setSeniorMode={setSeniorMode}
-            selectedService={selectedService}
-            setSelectedService={setSelectedService}
-            selectedWorker={selectedWorker}
-            setSelectedWorker={setSelectedWorker}
-            language={language}
-            changeLanguage={changeLanguage}
-            showWelcome={showWelcome}
-            setShowWelcome={setShowWelcome}
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-            workerLoggedIn={workerLoggedIn}
-            setWorkerLoggedIn={setWorkerLoggedIn}
-            showLogin={showLogin}
-            setShowLogin={setShowLogin}
-            showRegister={showRegister}
-            setShowRegister={setShowRegister}
-          />
-        }
-      />
+  <>
+    {/* GLOBAL FLOATING AI */}
+    <AIAssistant
+      aiPosition={aiPosition}
+      setAiPosition={setAiPosition}
+    />
 
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/dashboard" element={<CustomerDashboard />} />
-      <Route path="/bookings" element={<MyBookings />} />
-      <Route
-  path="/services"
-  element={
-    selectedWorker ? (
-      <BookingForm
-        selectedWorker={selectedWorker}
-        setSelectedWorker={setSelectedWorker}
-      />
-    ) : (
-      <Workers
-        setSelectedWorker={setSelectedWorker}
-        selectedService="All"
-      />
-    )
-  }
-/>
-    </Routes>
-  </div>
+    {/* MAIN APP WRAPPER */}
+    <div
+      className={`bg-[#B4DBDC] min-h-screen pb-20 overflow-x-hidden ${
+        seniorMode ? "text-xl" : "text-base"
+      }`}
+    >
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              seniorMode={seniorMode}
+              setSeniorMode={setSeniorMode}
+              selectedService={selectedService}
+              setSelectedService={setSelectedService}
+              selectedWorker={selectedWorker}
+              setSelectedWorker={setSelectedWorker}
+              language={language}
+              changeLanguage={changeLanguage}
+              showWelcome={showWelcome}
+              setShowWelcome={setShowWelcome}
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              workerLoggedIn={workerLoggedIn}
+              setWorkerLoggedIn={setWorkerLoggedIn}
+              showLogin={showLogin}
+              setShowLogin={setShowLogin}
+              showRegister={showRegister}
+              setShowRegister={setShowRegister}
+            />
+          }
+        />
+
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/bookings" element={<MyBookings />} />
+
+        <Route
+          path="/services"
+          element={
+            selectedWorker ? (
+              <BookingForm
+                selectedWorker={selectedWorker}
+                setSelectedWorker={setSelectedWorker}
+              />
+            ) : (
+              <Workers
+                setSelectedWorker={setSelectedWorker}
+                selectedService="All"
+              />
+            )
+          }
+        />
+      </Routes>
+    </div>
+  </>
 );
 }
 
