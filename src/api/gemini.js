@@ -131,9 +131,6 @@ Possible Causes:
 Estimated Cost:
 ₹...
 
-Visiting Charge:
-₹...
-
 Estimated Arrival:
 30–45 Minutes
 
