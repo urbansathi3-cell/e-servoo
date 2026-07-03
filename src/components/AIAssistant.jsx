@@ -14,7 +14,11 @@ function AIAssistant() {
   const [typing, setTyping] = useState(false);
   const [minimized, setMinimized] = useState(false);
 
+  const [listening, setListening] = useState(false);
+  const [voiceReply, setVoiceReply] = useState(true);
+
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -28,7 +32,7 @@ function AIAssistant() {
     {
       sender: "ai",
       text:
-        "👋 Welcome to E-SERVOO AI.\n\nI can help you with:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency",
+        "👋 Welcome to E-SERVOO AI.\n\nI can help you with:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency\n\nYou can type or use the mic 🎤.",
     },
   ]);
 
@@ -36,85 +40,168 @@ function AIAssistant() {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages]);
+  }, [messages, typing]);
 
   const quickAsk = (text) => {
     setInput(text);
   };
 
-  const handleOptionClick = (option) => {
+  const speakText = (text) => {
+    if (!voiceReply) return;
 
-  setMessages((prev) => [
-    ...prev,
-    {
-      sender: "user",
-      text: option,
-    },
-  ]);
+    if (!window.speechSynthesis) {
+      console.log("Speech synthesis not supported");
+      return;
+    }
 
-  askAI(option);
+    window.speechSynthesis.cancel();
 
-};
+    const cleanText = text
+      .replace(/[*#_`]/g, "")
+      .replace(/₹/g, "rupees ")
+      .replace(/•/g, "")
+      .replace(/━━━━━━━━━━━━━━━━━━━━━━/g, "");
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+
+    utterance.lang = "en-IN";
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+
+    window.speechSynthesis.speak(utterance);
+  };
 
   const askAI = async (userMessage) => {
+    if (!userMessage.trim()) return;
 
-  if (!userMessage.trim()) return;
+    setTyping(true);
 
-  setTyping(true);
+    try {
+      const reply = await askGemini(userMessage);
 
-  try {
+      setTyping(false);
 
-    const reply = await askGemini(userMessage);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: reply,
+        },
+      ]);
 
-    setTyping(false);
+      speakText(reply);
+    } catch (error) {
+      console.error(error);
+
+      setTyping(false);
+
+      const errorMessage =
+        "⚠️ AI is currently unavailable. Please try again.";
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: errorMessage,
+        },
+      ]);
+
+      speakText(errorMessage);
+    }
+  };
+
+  const sendMessage = () => {
+    if (!input.trim()) return;
+
+    const text = input;
 
     setMessages((prev) => [
       ...prev,
       {
-        sender: "ai",
-        text: reply,
+        sender: "user",
+        text,
       },
     ]);
 
-  } catch (error) {
+    setInput("");
 
-    console.error(error);
+    askAI(text);
+  };
 
-    setTyping(false);
-
+  const handleOptionClick = (option) => {
     setMessages((prev) => [
       ...prev,
       {
-        sender: "ai",
-        text: "⚠️ AI is currently unavailable. Please try again.",
+        sender: "user",
+        text: option,
       },
     ]);
 
-  }
+    askAI(option);
+  };
 
-};
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-const sendMessage = () => {
+    if (!SpeechRecognition) {
+      console.log("Speech recognition not supported");
+      return;
+    }
 
-  if (!input.trim()) return;
+    const recognition = new SpeechRecognition();
 
-  const text = input;
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-  setMessages((prev) => [
-    ...prev,
-    {
-      sender: "user",
-      text,
-    },
-  ]);
+    recognition.onstart = () => {
+      setListening(true);
+    };
 
-  setInput("");
+    recognition.onend = () => {
+      setListening(false);
+    };
 
-  askAI(text);
+    recognition.onerror = (event) => {
+      console.log("Voice error:", event.error);
+      setListening(false);
+    };
 
-};
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
 
-  /* ================= DRAG (DESKTOP) ================= */
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "user",
+          text: transcript,
+        },
+      ]);
+
+      askAI(transcript);
+    };
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const startVoiceInput = () => {
+    if (!recognitionRef.current) {
+      alert("Voice input is not supported in this browser. Please use Chrome.");
+      return;
+    }
+
+    if (listening) return;
+
+    try {
+      recognitionRef.current.start();
+    } catch (error) {
+      console.log("Voice start error:", error);
+    }
+  };
+
+  /* ================= DRAG DESKTOP ================= */
+
   const handleMouseDown = (e) => {
     dragging.current = true;
 
@@ -137,9 +224,11 @@ const sendMessage = () => {
     dragging.current = false;
   };
 
-  /* ================= TOUCH (MOBILE) ================= */
+  /* ================= DRAG MOBILE ================= */
+
   const handleTouchStart = (e) => {
     const touch = e.touches[0];
+
     dragging.current = true;
 
     offset.current = {
@@ -165,7 +254,7 @@ const sendMessage = () => {
 
   return (
     <>
-      {/* FLOATING BUTTON (WHEN CLOSED OR MINIMIZED) */}
+      {/* FLOATING BUTTON */}
       {(!open || minimized) && (
         <button
           onClick={() => {
@@ -178,7 +267,7 @@ const sendMessage = () => {
             top: position.y,
             zIndex: 9999,
           }}
-          className="bg-[#08566E] text-white p-4 rounded-full shadow-xl"
+          className="bg-[#08566E] text-white p-4 rounded-full shadow-xl hover:bg-[#06485C]"
         >
           <FaRobot size={22} />
         </button>
@@ -196,7 +285,7 @@ const sendMessage = () => {
         >
           <div className="w-[350px] max-w-[95vw] h-[500px] bg-[#9ECFD0] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
 
-            {/* HEADER (DRAG AREA) */}
+            {/* HEADER */}
             <div
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -205,16 +294,25 @@ const sendMessage = () => {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="bg-[#08566E] text-white p-4 font-bold text-lg flex justify-between items-center cursor-grab"
+              className="bg-[#08566E] text-white p-4 font-bold text-lg flex justify-between items-center cursor-grab select-none"
             >
-              E-SERVOO AI
+              <span>E-SERVOO AI</span>
 
-              <div className="flex gap-3">
-                <button onClick={() => setMinimized(true)}>
+              <div className="flex gap-3 items-center">
+                <button
+                  onClick={() => setMinimized(true)}
+                  className="hover:scale-110 transition"
+                >
                   ➖
                 </button>
 
-                <button onClick={() => setOpen(false)}>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    window.speechSynthesis?.cancel();
+                  }}
+                  className="hover:scale-110 transition"
+                >
                   <FaTimes />
                 </button>
               </div>
@@ -222,75 +320,27 @@ const sendMessage = () => {
 
             {/* QUICK BUTTONS */}
             <div className="flex flex-wrap gap-2 p-3 bg-[#B4DBDC]">
-              <button onClick={() => quickAsk("Electrician")} className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm">Electrician</button>
-              <button onClick={() => quickAsk("Plumber")} className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm">Plumber</button>
-              <button onClick={() => quickAsk("Cleaner")} className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm">Cleaner</button>
-              <button onClick={() => quickAsk("Price")} className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm">Price</button>
-            </div>
-
-            {/* MESSAGES */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-3">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`max-w-[80%] whitespace-pre-line px-4 py-3 rounded-2xl ${
-                    msg.sender === "user"
-                      ? "ml-auto bg-[#08566E] text-white"
-                      : "bg-[#E1E9E5] text-[#08566E]"
-                  }`}
-                >
-                  {msg.text}
-                  {msg.options && (
-  <div className="flex flex-wrap gap-2 mt-3">
-    {msg.options.map((option, i) => (
-      <button
-        key={i}
-        onClick={() => handleOptionClick(option)}
-        className="bg-[#08566E] text-white px-3 py-2 rounded-full hover:bg-[#06485C] text-sm"
-      >
-        {option}
-      </button>
-    ))}
-  </div>
-)}
-                </div>
-              ))}
-
-              {typing && (
-                <div className="bg-[#E1E9E5] text-[#08566E] px-4 py-3 rounded-2xl w-fit">
-                  AI is typing...
-                </div>
-              )}
-
-              <div ref={messagesEndRef}></div>
-            </div>
-
-            {/* INPUT */}
-            <div className="flex p-3 gap-2 border-t border-[#6FA8AA]">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") sendMessage();
-                }}
-                placeholder="Ask anything..."
-                className="flex-1 rounded-xl px-4 py-2 outline-none bg-white text-[#08566E]"
-              />
+              <button
+                onClick={() => quickAsk("Electrician")}
+                className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
+              >
+                Electrician
+              </button>
 
               <button
-                onClick={sendMessage}
-                className="bg-[#08566E] text-white px-4 rounded-xl"
+                onClick={() => quickAsk("Plumber")}
+                className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
-                <FaPaperPlane />
+                Plumber
               </button>
-            </div>
 
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
+              <button
+                onClick={() => quickAsk("Cleaner")}
+                className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
+              >
+                Cleaner
+              </button>
 
-export default AIAssistant;
+              <button
+                onClick={() => quickAsk("Fan not working")}
+                className="bg
