@@ -36,42 +36,77 @@ function AIAssistant() {
     setInput(text);
   };
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  const handleOptionClick = (option) => {
 
-    const userMessage = input;
+  setMessages((prev) => [
+    ...prev,
+    {
+      sender: "user",
+      text: option,
+    },
+  ]);
+
+  askAI(option);
+
+};
+
+  const askAI = async (userMessage) => {
+
+  if (!userMessage.trim()) return;
+
+  setTyping(true);
+
+  try {
+
+    const reply = await askGemini(userMessage);
+
+    setTyping(false);
 
     setMessages((prev) => [
       ...prev,
-      { sender: "user", text: userMessage },
+      {
+        sender: "ai",
+        text: reply,
+      },
     ]);
 
-    setTyping(true);
-    setInput("");
+  } catch (error) {
 
-    try {
-      const reply = await askGemini(userMessage);
+    console.error(error);
 
-      setTyping(false);
+    setTyping(false);
 
-      setMessages((prev) => [
-        ...prev,
-        { sender: "ai", text: reply },
-      ]);
-    } catch (error) {
-      console.error(error);
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "ai",
+        text: "⚠️ AI is currently unavailable. Please try again.",
+      },
+    ]);
 
-      setTyping(false);
+  }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "ai",
-          text: "⚠️ AI is currently unavailable. Please try again.",
-        },
-      ]);
-    }
-  };
+};
+
+const sendMessage = () => {
+
+  if (!input.trim()) return;
+
+  const text = input;
+
+  setMessages((prev) => [
+    ...prev,
+    {
+      sender: "user",
+      text,
+    },
+  ]);
+
+  setInput("");
+
+  askAI(text);
+
+};
 
   /* ================= DRAG (DESKTOP) ================= */
   const handleMouseDown = (e) => {
@@ -199,6 +234,19 @@ function AIAssistant() {
                   }`}
                 >
                   {msg.text}
+                  {msg.options && (
+  <div className="flex flex-wrap gap-2 mt-3">
+    {msg.options.map((option, i) => (
+      <button
+        key={i}
+        onClick={() => handleOptionClick(option)}
+        className="bg-[#08566E] text-white px-3 py-2 rounded-full hover:bg-[#06485C] text-sm"
+      >
+        {option}
+      </button>
+    ))}
+  </div>
+)}
                 </div>
               ))}
 
