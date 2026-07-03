@@ -343,4 +343,108 @@ function AIAssistant() {
 
               <button
                 onClick={() => quickAsk("Fan not working")}
-                className="bg
+                className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
+              >
+                Fan Issue
+              </button>
+
+              <button
+                onClick={() => quickAsk("Price estimate")}
+                className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
+              >
+                Price
+              </button>
+
+              <button
+                onClick={() => setVoiceReply(!voiceReply)}
+                className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm flex items-center gap-1"
+              >
+                <FaVolumeUp />
+                {voiceReply ? "Voice On" : "Voice Off"}
+              </button>
+            </div>
+
+            {/* MESSAGES */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`max-w-[80%] whitespace-pre-line px-4 py-3 rounded-2xl ${
+                    msg.sender === "user"
+                      ? "ml-auto bg-[#08566E] text-white"
+                      : "bg-[#E1E9E5] text-[#08566E]"
+                  }`}
+                >
+                  {msg.text}
+
+                  {msg.options && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {msg.options.map((option, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleOptionClick(option)}
+                          className="bg-[#08566E] text-white px-3 py-2 rounded-full hover:bg-[#06485C] text-sm"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {typing && (
+                <div className="bg-[#E1E9E5] text-[#08566E] px-4 py-3 rounded-2xl w-fit">
+                  AI is typing...
+                </div>
+              )}
+
+              {listening && (
+                <div className="bg-red-100 text-red-700 px-4 py-3 rounded-2xl w-fit animate-pulse">
+                  🎤 Listening...
+                </div>
+              )}
+
+              <div ref={messagesEndRef}></div>
+            </div>
+
+            {/* INPUT */}
+            <div className="flex p-3 gap-2 border-t border-[#6FA8AA]">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") sendMessage();
+                }}
+                placeholder="Ask anything..."
+                className="flex-1 rounded-xl px-4 py-2 outline-none bg-white text-[#08566E]"
+              />
+
+              <button
+                onClick={startVoiceInput}
+                className={`px-4 rounded-xl text-white ${
+                  listening
+                    ? "bg-red-500 animate-pulse"
+                    : "bg-[#08566E] hover:bg-[#06485C]"
+                }`}
+              >
+                <FaMicrophone />
+              </button>
+
+              <button
+                onClick={sendMessage}
+                className="bg-[#08566E] hover:bg-[#06485C] text-white px-4 rounded-xl"
+              >
+                <FaPaperPlane />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export default AIAssistant;
