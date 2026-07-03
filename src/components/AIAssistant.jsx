@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { askGemini } from "../api/gemini";
-import { FaRobot, FaPaperPlane, FaTimes } from "react-icons/fa";
+import {
+  FaRobot,
+  FaPaperPlane,
+  FaTimes,
+  FaMicrophone,
+  FaVolumeUp,
+} from "react-icons/fa";
 
 function AIAssistant() {
   const [open, setOpen] = useState(false);
