@@ -9,8 +9,6 @@ import AIAssistant from "./components/AIAssistant";
 import WorkerOfMonth from "./components/WorkerOfMonth";
 import Services from "./components/Services";
 import Workers from "./components/Workers";
-import SmartRecommendation from "./components/SmartRecommendation";
-import AICostEstimator from "./components/AICostEstimator";
 import BookingForm from "./components/BookingForm";
 import CustomerDashboard from "./components/CustomerDashboard";
 import MyBookings from "./components/MyBookings";
@@ -170,12 +168,6 @@ setSelectedService={setSelectedService}
   </button>
 </div>
 
-<SmartRecommendation  
-setSelectedService={setSelectedService}  
-/>
-
-<AICostEstimator />  
-
 <WhatsappButton />  
 
   <div className="fixed bottom-0 left-0 right-0 w-full bg-[#08566E] border-t border-[#06485C] flex justify-around py-3 z-50 text-white">
@@ -207,11 +199,6 @@ useState("All");
 const [selectedWorker, setSelectedWorker] =
 useState(null);
 
-const [aiPosition, setAiPosition] = useState({
-  x: 20,
-  y: 200,
-});
-
 const [showWelcome, setShowWelcome] =
 useState(!localStorage.getItem("user"));
 
@@ -235,8 +222,6 @@ const [language, setLanguage] = useState(
 localStorage.getItem("lang") || "en"
 );
 
-const t = translations[language];
-
 const changeLanguage = (lang) => {
 setLanguage(lang);
 localStorage.setItem("lang", lang);
@@ -245,10 +230,7 @@ localStorage.setItem("lang", lang);
 return (
   <>
     {/* GLOBAL FLOATING AI */}
-    <AIAssistant
-      aiPosition={aiPosition}
-      setAiPosition={setAiPosition}
-    />
+    <AIAssistant />
 
     {/* MAIN APP WRAPPER */}
     <div
