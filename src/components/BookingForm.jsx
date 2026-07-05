@@ -18,6 +18,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [bookingId, setBookingId] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     if (!selectedWorker) return;
@@ -33,6 +34,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       service: selectedWorker.service || "",
       worker: selectedWorker.name || "",
     });
+
+    setAcceptedTerms(false);
   }, [selectedWorker]);
 
   const handleChange = (e) => {
@@ -45,6 +48,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const resetBooking = () => {
     setSuccess(false);
     setSelectedWorker(null);
+    setAcceptedTerms(false);
 
     setFormData({
       name: "",
@@ -59,13 +63,18 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (String(formData.phone).length < 10) {
-      setLoading(false);
       alert("Enter Valid Phone Number");
       return;
     }
+
+    if (!acceptedTerms) {
+      alert("Please accept Terms & Conditions before booking.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch(
@@ -114,6 +123,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               <p className="text-sm text-[#6FA8AA] font-bold">
                 Booking ID
               </p>
+
               <p className="text-2xl font-extrabold text-[#08566E]">
                 {bookingId}
               </p>
@@ -124,6 +134,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Worker
                 </p>
+
                 <p className="text-[#08566E] font-bold">
                   {formData.worker}
                 </p>
@@ -133,6 +144,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Service
                 </p>
+
                 <p className="text-[#08566E] font-bold">
                   {formData.service}
                 </p>
@@ -142,6 +154,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Priority
                 </p>
+
                 <p className="text-[#08566E] font-bold">
                   {formData.urgency}
                 </p>
@@ -151,6 +164,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Pricing
                 </p>
+
                 <p className="text-[#08566E] font-bold">
                   Inspection Based
                 </p>
@@ -161,6 +175,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               <p className="text-sm text-[#6FA8AA] font-bold">
                 Issue Description
               </p>
+
               <p className="text-[#08566E]">
                 {formData.issueDescription || "No issue description added"}
               </p>
@@ -225,6 +240,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Professional Status
                 </p>
+
                 <p className="text-[#08566E] text-xl font-extrabold">
                   ✔ Verified Professional
                 </p>
@@ -234,9 +250,11 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Pricing Model
                 </p>
+
                 <p className="text-[#08566E] text-xl font-extrabold">
                   Inspection Based Pricing
                 </p>
+
                 <p className="text-[#08566E]/80 text-sm mt-1">
                   Final price depends on on-site inspection and actual work.
                 </p>
@@ -247,6 +265,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   <p className="text-[#E1E9E5] text-sm">
                     Rating
                   </p>
+
                   <p className="text-[#08566E] text-xl font-extrabold">
                     ⭐ {selectedWorker.rating || "4.8"}
                   </p>
@@ -256,6 +275,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   <p className="text-[#E1E9E5] text-sm">
                     Trust
                   </p>
+
                   <p className="text-[#08566E] text-xl font-extrabold">
                     {selectedWorker.TrustScore || "90"}%
                   </p>
@@ -266,6 +286,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Location
                 </p>
+
                 <p className="text-[#08566E] font-bold">
                   📍 {selectedWorker.location || "Local Area"}
                 </p>
@@ -420,22 +441,54 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <p className="text-[#08566E] font-bold">
                   📌 Note
                 </p>
+
                 <p className="text-[#08566E]/80 text-sm mt-1">
                   Final price depends on worker inspection, issue complexity, spare parts and actual service work.
                 </p>
               </div>
 
+              {/* TERMS AND CONDITIONS CHECKBOX */}
+              <div className="md:col-span-2 bg-[#E1E9E5]/85 border border-[#6FA8AA] rounded-2xl p-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-1 w-5 h-5 accent-[#08566E] cursor-pointer"
+                  />
+
+                  <span className="text-[#08566E] text-sm leading-relaxed font-semibold">
+                    I agree to E-SERVOO&apos;s{" "}
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-extrabold underline hover:text-[#06485C]"
+                    >
+                      Terms & Conditions
+                    </a>
+                    . I understand that final pricing depends on inspection,
+                    issue complexity, spare parts, and actual service work.
+                  </span>
+                </label>
+              </div>
+
               <div className="md:col-span-2">
                 <button
                   type="submit"
-                  disabled={loading}
-                  className={`w-full py-4 rounded-2xl text-lg font-extrabold text-[#E1E9E5] transition duration-300 ${
-                    loading
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-[#08566E] hover:bg-[#06485C]"
+                  disabled={loading || !acceptedTerms}
+                  className={`w-full py-4 rounded-2xl text-lg font-extrabold transition duration-300 ${
+                    loading || !acceptedTerms
+                      ? "bg-gray-500 text-white cursor-not-allowed opacity-70"
+                      : "bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5]"
                   }`}
                 >
-                  {loading ? "Booking..." : "⚡ Confirm Booking"}
+                  {loading
+                    ? "Booking..."
+                    : acceptedTerms
+                      ? "⚡ Confirm Booking"
+                      : "Accept Terms to Continue"}
                 </button>
               </div>
             </form>
