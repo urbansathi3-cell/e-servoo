@@ -19,6 +19,7 @@ function AIAssistant() {
 
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
+  const bestVoiceRef = useRef(null);
 
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -42,9 +43,59 @@ function AIAssistant() {
     });
   }, [messages, typing]);
 
+  /* ================= BEST VOICE LOADER ================= */
+
+  useEffect(() => {
+    const loadBestVoice = () => {
+      if (!window.speechSynthesis) return;
+
+      const voices = window.speechSynthesis.getVoices();
+
+      const selectedVoice =
+        voices.find(
+          (voice) =>
+            voice.lang === "en-IN" &&
+            voice.name.toLowerCase().includes("google")
+        ) ||
+        voices.find((voice) => voice.lang === "en-IN") ||
+        voices.find(
+          (voice) =>
+            voice.lang.startsWith("en") &&
+            voice.name.toLowerCase().includes("natural")
+        ) ||
+        voices.find(
+          (voice) =>
+            voice.lang.startsWith("en") &&
+            voice.name.toLowerCase().includes("google")
+        ) ||
+        voices.find((voice) => voice.lang.startsWith("en"));
+
+      bestVoiceRef.current = selectedVoice || null;
+
+      console.log(
+        "Selected AI Voice:",
+        selectedVoice?.name || "Default voice"
+      );
+    };
+
+    loadBestVoice();
+
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadBestVoice;
+    }
+
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
+    };
+  }, []);
+
   const quickAsk = (text) => {
     setInput(text);
   };
+
+  /* ================= IMPROVED AI VOICE ================= */
 
   const speakText = (text) => {
     if (!voiceReply) return;
@@ -58,17 +109,56 @@ function AIAssistant() {
 
     const cleanText = text
       .replace(/[*#_`]/g, "")
-      .replace(/₹/g, "rupees ")
+      .replace(/₹/g, " rupees ")
       .replace(/•/g, "")
-      .replace(/━━━━━━━━━━━━━━━━━━━━━━/g, "");
+      .replace(
+        /🔧|🛠|💰|⏱|📌|⚠️|✅|❌|🚨|📖|👋|⚡|🚿|🧹|👨‍🍳|🎤/g,
+        ""
+      )
+      .replace(/━━━━━━━━━━━━━━━━━━━━━━/g, "")
+      .replace(/\n+/g, ". ")
+      .replace(/\s+/g, " ")
+      .trim();
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
+    if (!cleanText) return;
 
-    utterance.lang = "en-IN";
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
+    const sentences = cleanText.match(/[^.!?]+[.!?]*/g) || [cleanText];
 
-    window.speechSynthesis.speak(utterance);
+    let index = 0;
+
+    const speakNextSentence = () => {
+      if (index >= sentences.length) return;
+
+      const sentence = sentences[index].trim();
+
+      if (!sentence) {
+        index++;
+        speakNextSentence();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(sentence);
+
+      if (bestVoiceRef.current) {
+        utterance.voice = bestVoiceRef.current;
+        utterance.lang = bestVoiceRef.current.lang;
+      } else {
+        utterance.lang = "en-IN";
+      }
+
+      utterance.rate = 0.86;
+      utterance.pitch = 1.08;
+      utterance.volume = 1;
+
+      utterance.onend = () => {
+        index++;
+        setTimeout(speakNextSentence, 140);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    speakNextSentence();
   };
 
   const askAI = async (userMessage) => {
@@ -139,6 +229,8 @@ function AIAssistant() {
 
     askAI(option);
   };
+
+  /* ================= VOICE INPUT ================= */
 
   useEffect(() => {
     const SpeechRecognition =
@@ -300,7 +392,10 @@ function AIAssistant() {
 
               <div className="flex gap-3 items-center">
                 <button
-                  onClick={() => setMinimized(true)}
+                  onClick={() => {
+                    setMinimized(true);
+                    window.speechSynthesis?.cancel();
+                  }}
                   className="hover:scale-110 transition"
                 >
                   ➖
@@ -356,7 +451,10 @@ function AIAssistant() {
               </button>
 
               <button
-                onClick={() => setVoiceReply(!voiceReply)}
+                onClick={() => {
+                  setVoiceReply(!voiceReply);
+                  window.speechSynthesis?.cancel();
+                }}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm flex items-center gap-1"
               >
                 <FaVolumeUp />
