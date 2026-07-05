@@ -202,6 +202,11 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.name.trim()) {
+      alert("Please enter your name.");
+      return;
+    }
+
     if (String(formData.phone).length < 10) {
       alert("Enter Valid Phone Number");
       return;
@@ -273,6 +278,26 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-[#6FA8AA] font-bold">
+                  Customer Name
+                </p>
+
+                <p className="text-[#08566E] font-bold">
+                  {formData.name}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-[#6FA8AA] font-bold">
+                  Phone Number
+                </p>
+
+                <p className="text-[#08566E] font-bold">
+                  {formData.phone}
+                </p>
+              </div>
+
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
                   Worker
@@ -476,7 +501,6 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 <input
                   type="text"
                   name="name"
-                  readOnly
                   placeholder="Your Name"
                   value={formData.name}
                   onChange={handleChange}
@@ -491,9 +515,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 </label>
 
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
-                  readOnly
                   placeholder="Phone Number"
                   value={formData.phone}
                   onChange={handleChange}
