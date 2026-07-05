@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
+import { translations } from "../translations";
 import {
   FaArrowLeft,
   FaCheckCircle,
   FaMicrophone,
 } from "react-icons/fa";
 
-function BookingForm({ selectedWorker, setSelectedWorker }) {
+function BookingForm({
+  selectedWorker,
+  setSelectedWorker,
+  language = "en",
+}) {
+  const t = translations[language] || translations.en;
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -143,7 +150,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
     const recognition = new SpeechRecognition();
 
-    recognition.lang = "hi-IN";
+    recognition.lang =
+      language === "hi"
+        ? "hi-IN"
+        : language === "od"
+          ? "or-IN"
+          : "en-IN";
+
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -199,26 +212,33 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     });
   };
 
+  const getUrgencyText = (value) => {
+    if (value === "Normal") return t.normal;
+    if (value === "Urgent") return t.urgent;
+    if (value === "Emergency") return t.emergency;
+    return value;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
-      alert("Please enter your name.");
+      alert(t.enterName);
       return;
     }
 
     if (String(formData.phone).length < 10) {
-      alert("Enter Valid Phone Number");
+      alert(t.enterValidPhone);
       return;
     }
 
     if (!formData.address.trim()) {
-      alert("Please select or enter service address.");
+      alert(t.selectOrEnterAddress);
       return;
     }
 
     if (!acceptedTerms) {
-      alert("Please accept Terms & Conditions before booking.");
+      alert(t.acceptTermsAlert);
       return;
     }
 
@@ -241,7 +261,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     } catch (error) {
       console.error(error);
       setLoading(false);
-      alert("Booking Failed");
+      alert(t.bookingFailed);
     }
   };
 
@@ -259,17 +279,17 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
           </div>
 
           <h2 className="text-4xl font-extrabold text-[#E1E9E5]">
-            Booking Successful
+            {t.bookingSuccessful}
           </h2>
 
           <p className="mt-3 text-[#B4DBDC]">
-            Your service request has been received successfully.
+            {t.bookingSuccessMessage}
           </p>
 
           <div className="mt-8 bg-[#E1E9E5]/95 rounded-3xl p-6 text-left space-y-4">
             <div>
               <p className="text-sm text-[#6FA8AA] font-bold">
-                Booking ID
+                {t.bookingId}
               </p>
 
               <p className="text-2xl font-extrabold text-[#08566E]">
@@ -280,7 +300,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Customer Name
+                  {t.customerName}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
@@ -290,7 +310,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Phone Number
+                  {t.phoneNumber}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
@@ -300,7 +320,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Worker
+                  {t.worker}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
@@ -310,7 +330,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Service
+                  {t.service}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
@@ -320,28 +340,28 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Priority
+                  {t.priority}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
-                  {formData.urgency}
+                  {getUrgencyText(formData.urgency)}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Pricing
+                  {t.pricing}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
-                  Inspection Based
+                  {t.inspectionBased}
                 </p>
               </div>
             </div>
 
             <div>
               <p className="text-sm text-[#6FA8AA] font-bold">
-                Service Address
+                {t.serviceAddress}
               </p>
 
               <p className="text-[#08566E]">
@@ -351,24 +371,24 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
             <div>
               <p className="text-sm text-[#6FA8AA] font-bold">
-                Issue Description
+                {t.issueDescription}
               </p>
 
               <p className="text-[#08566E]">
-                {formData.issueDescription || "No issue description added"}
+                {formData.issueDescription || t.noIssueAdded}
               </p>
             </div>
           </div>
 
           <p className="mt-6 text-[#B4DBDC]">
-            Our team will contact you shortly.
+            {t.ourTeamContact}
           </p>
 
           <button
             onClick={resetBooking}
             className="mt-8 px-8 py-4 rounded-full bg-[#E1E9E5] text-[#08566E] font-extrabold hover:bg-[#B4DBDC] transition"
           >
-            Back to Services
+            {t.backToServices}
           </button>
         </div>
       </section>
@@ -385,12 +405,11 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
           className="mb-8 inline-flex items-center gap-2 bg-[#08566E] text-[#E1E9E5] px-5 py-3 rounded-full font-bold shadow-lg hover:bg-[#06485C] transition"
         >
           <FaArrowLeft />
-          Back
+          {t.back}
         </button>
 
         <div className="grid lg:grid-cols-[0.9fr_1.4fr] gap-8 items-start">
 
-          {/* WORKER SUMMARY CARD */}
           <div className="bg-[#08566E] rounded-[32px] shadow-2xl border border-[#6FA8AA]/70 p-7 lg:sticky lg:top-24">
 
             <div className="text-center">
@@ -416,25 +435,25 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
             <div className="mt-7 space-y-4">
               <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Professional Status
+                  {t.status}
                 </p>
 
                 <p className="text-[#08566E] text-xl font-extrabold">
-                  ✔ Verified Professional
+                  ✔ {t.verifiedProfessional}
                 </p>
               </div>
 
               <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Pricing Model
+                  {t.pricing}
                 </p>
 
                 <p className="text-[#08566E] text-xl font-extrabold">
-                  Inspection Based Pricing
+                  {t.inspectionBasedPricing}
                 </p>
 
                 <p className="text-[#08566E]/80 text-sm mt-1">
-                  Final price depends on on-site inspection and actual work.
+                  {t.bookingNote}
                 </p>
               </div>
 
@@ -451,7 +470,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                 <div className="bg-[#6FA8AA] rounded-2xl p-4 text-center">
                   <p className="text-[#E1E9E5] text-sm">
-                    Trust
+                    {t.trust}
                   </p>
 
                   <p className="text-[#08566E] text-xl font-extrabold">
@@ -462,30 +481,29 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Location
+                  {t.location}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
-                  📍 {selectedWorker.location || "Local Area"}
+                  📍 {selectedWorker.location || t.localArea}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* BOOKING FORM CARD */}
           <div className="bg-[#9ECFD0] rounded-[32px] shadow-2xl border border-[#6FA8AA]/70 p-6 md:p-8">
 
             <div className="mb-8">
               <p className="text-[#08566E] font-bold tracking-widest text-sm uppercase">
-                E-SERVOO Booking
+                {t.eServooBooking}
               </p>
 
               <h1 className="text-4xl md:text-5xl font-extrabold text-[#08566E] mt-2">
-                Book Service
+                {t.bookingTitle}
               </h1>
 
               <p className="text-[#08566E]/80 mt-3">
-                Confirm your details and describe the issue clearly for faster service assignment.
+                {t.bookingSubtitle}
               </p>
             </div>
 
@@ -495,13 +513,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
             >
               <div>
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Your Name
+                  {t.yourName}
                 </label>
 
                 <input
                   type="text"
                   name="name"
-                  placeholder="Your Name"
+                  placeholder={t.yourName}
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
@@ -511,13 +529,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Phone Number
+                  {t.phoneNumber}
                 </label>
 
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="Phone Number"
+                  placeholder={t.phoneNumber}
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
@@ -525,10 +543,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 />
               </div>
 
-              {/* ADDRESS SELECT SECTION */}
               <div className="md:col-span-2">
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Select Service Address
+                  {t.selectServiceAddress}
                 </label>
 
                 <select
@@ -546,12 +563,12 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                   {savedAddresses.length === 0 && profileAddress && (
                     <option value="profile">
-                      Profile Address: {profileAddress}
+                      {t.profile}: {profileAddress}
                     </option>
                   )}
 
                   <option value="custom">
-                    Custom Address - Type Manually
+                    {t.customAddress}
                   </option>
                 </select>
 
@@ -559,7 +576,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   <textarea
                     value={customAddress}
                     onChange={handleCustomAddressChange}
-                    placeholder="Enter custom service address..."
+                    placeholder={t.enterCustomAddress}
                     className="mt-4 w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
                     rows="4"
                     required
@@ -569,7 +586,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 {addressChoice !== "custom" && formData.address && (
                   <div className="mt-4 bg-[#E1E9E5]/85 border border-[#6FA8AA] rounded-2xl p-4">
                     <p className="text-[#08566E] font-bold">
-                      Selected Address
+                      {t.selectedAddress}
                     </p>
 
                     <p className="text-[#08566E]/80 mt-1">
@@ -581,7 +598,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Service
+                  {t.service}
                 </label>
 
                 <input
@@ -595,7 +612,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Worker
+                  {t.worker}
                 </label>
 
                 <input
@@ -609,7 +626,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div>
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Urgency
+                  {t.urgency}
                 </label>
 
                 <select
@@ -618,26 +635,26 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   onChange={handleChange}
                   className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
                 >
-                  <option value="Normal">Normal</option>
-                  <option value="Urgent">Urgent</option>
-                  <option value="Emergency">Emergency</option>
+                  <option value="Normal">{t.normal}</option>
+                  <option value="Urgent">{t.urgent}</option>
+                  <option value="Emergency">{t.emergency}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Booking Type
+                  {t.bookingType}
                 </label>
 
                 <div className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] font-bold">
-                  ⚡ One Click Booking
+                  ⚡ {t.oneClickBooking}
                 </div>
               </div>
 
               <div className="md:col-span-2">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
                   <label className="block text-[#08566E] font-bold">
-                    Issue Description
+                    {t.issueDescription}
                   </label>
 
                   <button
@@ -651,13 +668,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     }`}
                   >
                     <FaMicrophone />
-                    {listeningIssue ? "Listening..." : "Speak Issue"}
+                    {listeningIssue ? t.listening : t.speakIssue}
                   </button>
                 </div>
 
                 <textarea
                   name="issueDescription"
-                  placeholder="Describe your issue clearly or use voice..."
+                  placeholder={t.describeIssue}
                   value={formData.issueDescription}
                   onChange={handleChange}
                   className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
@@ -667,22 +684,22 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                 {listeningIssue && (
                   <p className="mt-2 text-sm font-bold text-red-600 animate-pulse">
-                    🎤 Listening... Please speak your issue now.
+                    🎤 {t.listening}
                   </p>
                 )}
 
                 <p className="mt-2 text-xs text-[#08566E]/70">
-                  Voice typing works best in Chrome. You can speak in Hindi or Hinglish.
+                  {t.voiceHelpText}
                 </p>
               </div>
 
               <div className="md:col-span-2 bg-[#08566E]/10 border border-[#08566E]/20 rounded-2xl p-4">
                 <p className="text-[#08566E] font-bold">
-                  📌 Note
+                  📌 {t.note}
                 </p>
 
                 <p className="text-[#08566E]/80 text-sm mt-1">
-                  Final price depends on worker inspection, issue complexity, spare parts and actual service work.
+                  {t.bookingNote}
                 </p>
               </div>
 
@@ -696,7 +713,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   />
 
                   <span className="text-[#08566E] text-sm leading-relaxed font-semibold">
-                    I agree to E-SERVOO&apos;s{" "}
+                    {t.acceptTermsText || "I agree to E-SERVOO's"}{" "}
                     <a
                       href="/terms"
                       target="_blank"
@@ -704,10 +721,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                       onClick={(e) => e.stopPropagation()}
                       className="font-extrabold underline hover:text-[#06485C]"
                     >
-                      Terms & Conditions
+                      {t.termsAndConditions}
                     </a>
-                    . I understand that final pricing depends on inspection,
-                    issue complexity, spare parts, and actual service work.
                   </span>
                 </label>
               </div>
@@ -723,10 +738,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   }`}
                 >
                   {loading
-                    ? "Booking..."
+                    ? t.bookingInProgress
                     : acceptedTerms
-                      ? "⚡ Confirm Booking"
-                      : "Accept Terms to Continue"}
+                      ? `⚡ ${t.confirmBooking}`
+                      : t.acceptTermsToContinue}
                 </button>
               </div>
             </form>
