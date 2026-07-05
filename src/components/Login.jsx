@@ -206,37 +206,37 @@ function Login({
         </div>
 
         {/* SLIDING TOGGLE PANEL */}
-        <div className="es-toggle-container">
-          <div className="es-toggle">
+<div className="es-toggle-container">
+  <div className="es-toggle">
 
-            <div className="es-toggle-panel es-toggle-left">
-              <h1>Welcome Back!</h1>
+    <div className="es-toggle-panel es-toggle-left">
+      <h1>Welcome!</h1>
 
-              <p>
-                Login again and continue booking verified electricians,
-                plumbers, cleaners, cooks and trusted local workers.
-              </p>
+      <p>
+        Create your E-SERVOO account and access smart local services
+        with verified professionals near you.
+      </p>
 
-              <div className="es-toggle-badge">
-                Trusted Home Services
-              </div>
-            </div>
+      <div className="es-toggle-badge">
+        Smart Local Services
+      </div>
+    </div>
 
-            <div className="es-toggle-panel es-toggle-right">
-              <h1>Welcome!</h1>
+    <div className="es-toggle-panel es-toggle-right">
+      <h1>Welcome Back!</h1>
 
-              <p>
-                Create your E-SERVOO account and access smart local services
-                with verified professionals near you.
-              </p>
+      <p>
+        Login again and continue booking verified electricians,
+        plumbers, cleaners, cooks and trusted local workers.
+      </p>
 
-              <div className="es-toggle-badge">
-                Smart Local Services
-              </div>
-            </div>
+      <div className="es-toggle-badge">
+        Trusted Home Services
+      </div>
+    </div>
 
-          </div>
-        </div>
+  </div>
+</div>
 
       </div>
     </section>
