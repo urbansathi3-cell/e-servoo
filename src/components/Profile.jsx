@@ -444,13 +444,6 @@ function Profile() {
             <div className="space-y-4">
 
               <button
-                onClick={() => navigate("/dashboard")}
-                className="w-full bg-[#6FA8AA] text-[#E1E9E5] p-4 rounded-2xl text-left hover:bg-[#5F9FA2] transition"
-              >
-                👤 Customer Dashboard
-              </button>
-
-              <button
                 onClick={() => navigate("/bookings")}
                 className="w-full bg-[#6FA8AA] text-[#E1E9E5] p-4 rounded-2xl text-left hover:bg-[#5F9FA2] transition"
               >
