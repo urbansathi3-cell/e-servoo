@@ -20,15 +20,55 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [bookingId, setBookingId] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [profileAddress, setProfileAddress] = useState("");
+  const [addressChoice, setAddressChoice] = useState("");
+  const [customAddress, setCustomAddress] = useState("");
+
+  const formatSavedAddress = (address) => {
+    if (!address) return "";
+
+    return `${address.label ? address.label + ": " : ""}${address.line1 || ""}${
+      address.line2 ? ", " + address.line2 : ""
+    }`;
+  };
+
   useEffect(() => {
     if (!selectedWorker) return;
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    const storedAddresses =
+      JSON.parse(localStorage.getItem("savedAddresses")) || [];
+
+    const defaultIndexRaw =
+      Number(localStorage.getItem("defaultAddressIndex")) || 0;
+
+    const validDefaultIndex = storedAddresses[defaultIndexRaw]
+      ? defaultIndexRaw
+      : 0;
+
+    let selectedAddress = "";
+    let selectedChoice = "custom";
+
+    if (storedAddresses.length > 0) {
+      selectedAddress = formatSavedAddress(
+        storedAddresses[validDefaultIndex]
+      );
+      selectedChoice = String(validDefaultIndex);
+    } else if (user?.address) {
+      selectedAddress = user.address;
+      selectedChoice = "profile";
+    }
+
+    setSavedAddresses(storedAddresses);
+    setProfileAddress(user?.address || "");
+    setAddressChoice(selectedChoice);
+    setCustomAddress("");
 
     setFormData({
       name: user?.name || "",
       phone: String(user?.phone || ""),
-      address: user?.address || "",
+      address: selectedAddress,
       issueDescription: "",
       urgency: "Normal",
       service: selectedWorker.service || "",
@@ -45,10 +85,54 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     });
   };
 
+  const handleAddressChoiceChange = (e) => {
+    const value = e.target.value;
+
+    setAddressChoice(value);
+
+    if (value === "custom") {
+      setFormData({
+        ...formData,
+        address: customAddress,
+      });
+
+      return;
+    }
+
+    if (value === "profile") {
+      setFormData({
+        ...formData,
+        address: profileAddress,
+      });
+
+      return;
+    }
+
+    const selectedAddress = savedAddresses[Number(value)];
+
+    setFormData({
+      ...formData,
+      address: formatSavedAddress(selectedAddress),
+    });
+  };
+
+  const handleCustomAddressChange = (e) => {
+    const value = e.target.value;
+
+    setCustomAddress(value);
+
+    setFormData({
+      ...formData,
+      address: value,
+    });
+  };
+
   const resetBooking = () => {
     setSuccess(false);
     setSelectedWorker(null);
     setAcceptedTerms(false);
+    setAddressChoice("");
+    setCustomAddress("");
 
     setFormData({
       name: "",
@@ -66,6 +150,11 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
     if (String(formData.phone).length < 10) {
       alert("Enter Valid Phone Number");
+      return;
+    }
+
+    if (!formData.address.trim()) {
+      alert("Please select or enter service address.");
       return;
     }
 
@@ -169,6 +258,16 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   Inspection Based
                 </p>
               </div>
+            </div>
+
+            <div>
+              <p className="text-sm text-[#6FA8AA] font-bold">
+                Service Address
+              </p>
+
+              <p className="text-[#08566E]">
+                {formData.address}
+              </p>
             </div>
 
             <div>
@@ -349,21 +448,58 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 />
               </div>
 
+              {/* ADDRESS SELECT SECTION */}
               <div className="md:col-span-2">
                 <label className="block text-[#08566E] font-bold mb-2">
-                  Address
+                  Select Service Address
                 </label>
 
-                <input
-                  type="text"
-                  name="address"
-                  readOnly
-                  placeholder="Address"
-                  value={formData.address}
-                  onChange={handleChange}
+                <select
+                  value={addressChoice}
+                  onChange={handleAddressChoiceChange}
                   className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
                   required
-                />
+                >
+                  {savedAddresses.length > 0 &&
+                    savedAddresses.map((address, index) => (
+                      <option key={index} value={String(index)}>
+                        {formatSavedAddress(address)}
+                      </option>
+                    ))}
+
+                  {savedAddresses.length === 0 && profileAddress && (
+                    <option value="profile">
+                      Profile Address: {profileAddress}
+                    </option>
+                  )}
+
+                  <option value="custom">
+                    Custom Address - Type Manually
+                  </option>
+                </select>
+
+                {addressChoice === "custom" && (
+                  <textarea
+                    value={customAddress}
+                    onChange={handleCustomAddressChange}
+                    placeholder="Enter custom service address..."
+                    className="mt-4 w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
+                    rows="4"
+                    required
+                  />
+                )}
+
+                {addressChoice !== "custom" && formData.address && (
+                  <div className="mt-4 bg-[#E1E9E5]/85 border border-[#6FA8AA] rounded-2xl p-4">
+                    <p className="text-[#08566E] font-bold">
+                      Selected Address
+                    </p>
+
+                    <p className="text-[#08566E]/80 mt-1">
+                      {formData.address}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -447,7 +583,6 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 </p>
               </div>
 
-              {/* TERMS AND CONDITIONS CHECKBOX */}
               <div className="md:col-span-2 bg-[#E1E9E5]/85 border border-[#6FA8AA] rounded-2xl p-4">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
