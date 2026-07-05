@@ -26,13 +26,13 @@ function Hero({ language }) {
 
           <div className="inline-flex items-center gap-2 bg-white/35 backdrop-blur-xl border border-white/50 px-5 py-2 rounded-full shadow-lg text-[#08566E] font-extrabold mb-6">
             <FaBolt className="text-[#08566E]" />
-            Smart Local Services Hub
+            {t.heroBadge}
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-[#08566E] leading-tight">
-            E-SERVOO
+            {t.heroBrand}
             <span className="block text-[#0A6F78]">
-              Services Near You
+              {t.heroBrandLine}
             </span>
           </h1>
 
@@ -48,17 +48,17 @@ function Hero({ language }) {
           <div className="flex flex-wrap justify-center lg:justify-start gap-3 mt-7">
             <div className="bg-white/35 backdrop-blur-xl border border-white/50 px-4 py-2 rounded-full text-[#08566E] font-bold flex items-center gap-2">
               <FaShieldAlt />
-              Verified Workers
+              {t.verifiedWorkers}
             </div>
 
             <div className="bg-white/35 backdrop-blur-xl border border-white/50 px-4 py-2 rounded-full text-[#08566E] font-bold flex items-center gap-2">
               <FaMapMarkerAlt />
-              Hyperlocal
+              {t.hyperlocal}
             </div>
 
             <div className="bg-white/35 backdrop-blur-xl border border-white/50 px-4 py-2 rounded-full text-[#08566E] font-bold flex items-center gap-2">
               <FaStar />
-              Trusted Service
+              {t.trustedService}
             </div>
           </div>
 
@@ -90,7 +90,7 @@ function Hero({ language }) {
                 40+
               </h3>
               <p className="text-sm font-bold text-[#08566E]/75">
-                Workers
+                {t.workers}
               </p>
             </div>
 
@@ -99,7 +99,7 @@ function Hero({ language }) {
                 12+
               </h3>
               <p className="text-sm font-bold text-[#08566E]/75">
-                Services
+                {t.services}
               </p>
             </div>
 
@@ -108,7 +108,7 @@ function Hero({ language }) {
                 24/7
               </h3>
               <p className="text-sm font-bold text-[#08566E]/75">
-                Support
+                {t.support}
               </p>
             </div>
           </div>
@@ -126,10 +126,10 @@ function Hero({ language }) {
 
               <div>
                 <p className="text-[#08566E] font-black">
-                  Verified Expert
+                  {t.verifiedExpert}
                 </p>
                 <p className="text-[#08566E]/70 text-sm font-bold">
-                  Assigned instantly
+                  {t.assignedInstantly}
                 </p>
               </div>
             </div>
@@ -140,7 +140,7 @@ function Hero({ language }) {
               ⭐ 4.9 Rating
             </p>
             <p className="text-[#B4DBDC] text-sm">
-              Trusted by local users
+              {t.trustedByUsers}
             </p>
           </div>
 
@@ -151,11 +151,11 @@ function Hero({ language }) {
               <div className="flex items-center justify-between mb-7">
                 <div>
                   <p className="text-[#B4DBDC] font-bold text-sm">
-                    Live Booking
+                    {t.liveBooking}
                   </p>
 
                   <h2 className="text-3xl font-black text-[#E1E9E5]">
-                    Electrician
+                    {t.electrician}
                   </h2>
                 </div>
 
@@ -168,7 +168,7 @@ function Hero({ language }) {
 
                 <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                   <p className="text-[#6FA8AA] text-sm font-bold">
-                    Issue
+                    {t.issue}
                   </p>
                   <p className="text-[#08566E] font-extrabold">
                     Fan not working
@@ -177,17 +177,17 @@ function Hero({ language }) {
 
                 <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                   <p className="text-[#6FA8AA] text-sm font-bold">
-                    Service Location
+                    {t.serviceLocation}
                   </p>
                   <p className="text-[#08566E] font-extrabold">
-                    Near customer address
+                    {t.nearCustomerAddress}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-[#6FA8AA] rounded-2xl p-4 text-center">
                     <p className="text-[#E1E9E5] text-sm">
-                      Trust Score
+                      {t.trustScore}
                     </p>
                     <p className="text-[#08566E] text-2xl font-black">
                       96%
@@ -196,16 +196,16 @@ function Hero({ language }) {
 
                   <div className="bg-[#6FA8AA] rounded-2xl p-4 text-center">
                     <p className="text-[#E1E9E5] text-sm">
-                      Status
+                      {t.status}
                     </p>
                     <p className="text-[#08566E] text-2xl font-black">
-                      Active
+                      {t.active}
                     </p>
                   </div>
                 </div>
 
                 <button className="w-full bg-[#E1E9E5] text-[#08566E] py-4 rounded-2xl font-black shadow-lg">
-                  Smart Match Found
+                  {t.smartMatchFound}
                 </button>
 
               </div>
