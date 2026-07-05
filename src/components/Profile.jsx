@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { translations } from "../translations";
 import {
   FaArrowLeft,
   FaPlus,
@@ -7,8 +8,9 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 
-function Profile() {
+function Profile({ language = "en" }) {
   const navigate = useNavigate();
+  const t = translations[language] || translations.en;
 
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user"))
@@ -53,7 +55,12 @@ function Profile() {
     const storedDefaultIndex =
       Number(localStorage.getItem("defaultAddressIndex")) || 0;
 
-    setDefaultAddressIndex(storedDefaultIndex);
+    const validDefaultIndex = initialAddresses[storedDefaultIndex]
+      ? storedDefaultIndex
+      : 0;
+
+    setDefaultAddressIndex(validDefaultIndex);
+    localStorage.setItem("defaultAddressIndex", String(validDefaultIndex));
   }, []);
 
   const handleNewAddressChange = (e) => {
@@ -71,12 +78,12 @@ function Profile() {
 
   const addNewAddress = () => {
     if (!newAddress.label.trim()) {
-      alert("Please enter address label like Home, Office or Hostel");
+      alert(t.enterAddressLabel);
       return;
     }
 
     if (!newAddress.line1.trim()) {
-      alert("Please enter Address Line 1");
+      alert(t.enterAddressLine1);
       return;
     }
 
@@ -104,7 +111,7 @@ function Profile() {
 
     setShowAddressForm(false);
 
-    alert("Address Added Successfully");
+    alert(t.addressAdded);
   };
 
   const setDefaultAddress = async (index) => {
@@ -148,20 +155,18 @@ function Profile() {
         setUser(updatedUser);
         setDefaultAddressIndex(index);
 
-        alert("Default Address Updated Successfully");
+        alert(t.defaultAddressUpdated);
       } else {
-        alert("Failed to update default address");
+        alert(t.failedToUpdateAddress);
       }
     } catch (error) {
       console.log(error);
-      alert("Error Updating Address");
+      alert(t.errorUpdatingAddress);
     }
   };
 
   const deleteAddress = (index) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this address?"
-    );
+    const confirmDelete = window.confirm(t.deleteAddressConfirm);
 
     if (!confirmDelete) return;
 
@@ -176,12 +181,26 @@ function Profile() {
 
     setSavedAddresses(updatedAddresses);
 
+    let newDefaultIndex = defaultAddressIndex;
+
     if (defaultAddressIndex === index) {
-      localStorage.setItem("defaultAddressIndex", "0");
-      setDefaultAddressIndex(0);
+      newDefaultIndex = 0;
+    } else if (defaultAddressIndex > index) {
+      newDefaultIndex = defaultAddressIndex - 1;
     }
 
-    alert("Address Deleted");
+    if (!updatedAddresses[newDefaultIndex]) {
+      newDefaultIndex = 0;
+    }
+
+    localStorage.setItem(
+      "defaultAddressIndex",
+      String(newDefaultIndex)
+    );
+
+    setDefaultAddressIndex(newDefaultIndex);
+
+    alert(t.addressDeleted);
   };
 
   const logout = () => {
@@ -202,7 +221,7 @@ function Profile() {
             onClick={() => navigate("/")}
             className="mt-5 bg-[#E1E9E5] text-[#08566E] px-6 py-3 rounded-xl font-bold"
           >
-            Go Home
+            {t.backToHome}
           </button>
         </div>
       </div>
@@ -223,7 +242,7 @@ function Profile() {
           </button>
 
           <h1 className="text-3xl font-extrabold text-[#08566E]">
-            My Profile
+            {t.myProfile}
           </h1>
         </div>
 
@@ -241,14 +260,14 @@ function Profile() {
             </h2>
 
             <p className="text-[#B4DBDC] text-center mt-1">
-              E-SERVOO Customer
+              {t.eServooCustomer}
             </p>
 
             <div className="mt-8 space-y-4">
 
               <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Phone
+                  {t.phoneNumber}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
@@ -258,7 +277,7 @@ function Profile() {
 
               <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Email
+                  {t.email}
                 </p>
 
                 <p className="text-[#08566E] font-bold break-all">
@@ -268,11 +287,11 @@ function Profile() {
 
               <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
                 <p className="text-sm text-[#6FA8AA] font-bold">
-                  Default Address
+                  {t.defaultAddress}
                 </p>
 
                 <p className="text-[#08566E] font-bold">
-                  {user.address || "No default address selected"}
+                  {user.address || t.noDefaultAddress}
                 </p>
               </div>
 
@@ -288,11 +307,11 @@ function Profile() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                   <p className="text-[#08566E] font-bold tracking-widest text-sm uppercase">
-                    Saved Address
+                    {t.savedAddress}
                   </p>
 
                   <h2 className="text-3xl font-extrabold text-[#08566E]">
-                    Manage Addresses
+                    {t.manageAddresses}
                   </h2>
                 </div>
 
@@ -301,7 +320,7 @@ function Profile() {
                   className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                 >
                   <FaPlus />
-                  Add More Address
+                  {t.addMoreAddress}
                 </button>
               </div>
 
@@ -309,14 +328,14 @@ function Profile() {
                 <div className="bg-[#E1E9E5]/90 border border-[#6FA8AA] rounded-3xl p-5 mb-6">
 
                   <h3 className="text-2xl font-extrabold text-[#08566E] mb-4">
-                    Add New Address
+                    {t.addNewAddress}
                   </h3>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <input
                       type="text"
                       name="label"
-                      placeholder="Address Label e.g. Home, Office"
+                      placeholder={t.addressLabel}
                       value={newAddress.label}
                       onChange={handleNewAddressChange}
                       className="w-full p-4 rounded-2xl bg-white text-[#08566E] border border-[#6FA8AA] outline-none"
@@ -325,7 +344,7 @@ function Profile() {
                     <input
                       type="text"
                       name="line1"
-                      placeholder="Address Line 1"
+                      placeholder={t.addressLine1}
                       value={newAddress.line1}
                       onChange={handleNewAddressChange}
                       className="w-full p-4 rounded-2xl bg-white text-[#08566E] border border-[#6FA8AA] outline-none"
@@ -334,7 +353,7 @@ function Profile() {
                     <input
                       type="text"
                       name="line2"
-                      placeholder="Address Line 2 / Landmark"
+                      placeholder={t.addressLine2}
                       value={newAddress.line2}
                       onChange={handleNewAddressChange}
                       className="md:col-span-2 w-full p-4 rounded-2xl bg-white text-[#08566E] border border-[#6FA8AA] outline-none"
@@ -345,7 +364,7 @@ function Profile() {
                     onClick={addNewAddress}
                     className="mt-5 w-full bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] py-4 rounded-2xl font-extrabold"
                   >
-                    Save Address
+                    {t.saveAddress}
                   </button>
                 </div>
               )}
@@ -353,7 +372,7 @@ function Profile() {
               {savedAddresses.length === 0 ? (
                 <div className="bg-[#E1E9E5]/90 rounded-3xl p-6 text-center">
                   <p className="text-[#08566E] font-bold">
-                    No saved address found.
+                    {t.noSavedAddress}
                   </p>
                 </div>
               ) : (
@@ -420,8 +439,8 @@ function Profile() {
                           }`}
                         >
                           {defaultAddressIndex === index
-                            ? "Default"
-                            : "Set Default"}
+                            ? t.default
+                            : t.setDefault}
                         </button>
 
                         <button
@@ -429,7 +448,7 @@ function Profile() {
                           className="px-4 py-2 rounded-full bg-red-500 text-white font-bold flex items-center gap-2"
                         >
                           <FaTrash />
-                          Delete
+                          {t.delete}
                         </button>
 
                       </div>
@@ -447,28 +466,28 @@ function Profile() {
                 onClick={() => navigate("/bookings")}
                 className="w-full bg-[#6FA8AA] text-[#E1E9E5] p-4 rounded-2xl text-left hover:bg-[#5F9FA2] transition"
               >
-                📖 My Bookings
+                📖 {t.myBookings}
               </button>
 
               <button
                 onClick={() => navigate("/contact")}
                 className="w-full bg-[#6FA8AA] text-[#E1E9E5] p-4 rounded-2xl text-left hover:bg-[#5F9FA2] transition"
               >
-                📞 Contact Us
+                📞 {t.contactUs}
               </button>
 
               <button
                 onClick={() => navigate("/terms")}
                 className="w-full bg-[#6FA8AA] text-[#E1E9E5] p-4 rounded-2xl text-left hover:bg-[#5F9FA2] transition"
               >
-                📜 Terms & Conditions
+                📜 {t.termsAndConditions}
               </button>
 
               <button
                 onClick={logout}
                 className="w-full bg-[#B84545] hover:bg-[#963838] text-[#E1E9E5] p-4 rounded-2xl transition"
               >
-                🚪 Logout
+                🚪 {t.logout}
               </button>
 
             </div>
