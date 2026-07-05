@@ -33,7 +33,7 @@ function AIAssistant() {
     {
       sender: "ai",
       text:
-        "👋 Welcome to E-SERVOO AI.\n\nI can help you with:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency\n\nYou can type or use the mic 🎤.",
+        "👋 Namaste! Main E-SERVOO AI hoon.\n\nMain aapki help kar sakta hoon:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency Service\n\nAap type bhi kar sakte ho ya mic se bol bhi sakte ho 🎤.",
     },
   ]);
 
@@ -43,38 +43,64 @@ function AIAssistant() {
     });
   }, [messages, typing]);
 
-  /* ================= BEST VOICE LOADER ================= */
+  /* ================= INDIAN VOICE LOADER ================= */
 
   useEffect(() => {
+    const getVoiceScore = (voice) => {
+      const name = voice.name.toLowerCase();
+      const lang = voice.lang.toLowerCase();
+
+      let score = 0;
+
+      // Best for Hinglish / Indian English
+      if (lang === "en-in") score += 120;
+
+      // Good for Hindi / Hinglish
+      if (lang === "hi-in") score += 100;
+
+      // Some systems write language slightly differently
+      if (lang.includes("in")) score += 40;
+      if (lang.includes("hi")) score += 30;
+
+      // Prefer natural / Google / Microsoft India voices
+      if (name.includes("india")) score += 35;
+      if (name.includes("indian")) score += 35;
+      if (name.includes("google")) score += 25;
+      if (name.includes("microsoft")) score += 20;
+      if (name.includes("natural")) score += 25;
+
+      // Common Indian voices
+      if (name.includes("heera")) score += 40;
+      if (name.includes("ravi")) score += 40;
+      if (name.includes("neerja")) score += 40;
+      if (name.includes("prabhat")) score += 40;
+      if (name.includes("hindi")) score += 25;
+      if (name.includes("हिन्दी")) score += 25;
+      if (name.includes("हिंदी")) score += 25;
+
+      // Fallback English voices
+      if (lang.startsWith("en")) score += 10;
+
+      return score;
+    };
+
     const loadBestVoice = () => {
       if (!window.speechSynthesis) return;
 
       const voices = window.speechSynthesis.getVoices();
 
-      const selectedVoice =
-        voices.find(
-          (voice) =>
-            voice.lang === "en-IN" &&
-            voice.name.toLowerCase().includes("google")
-        ) ||
-        voices.find((voice) => voice.lang === "en-IN") ||
-        voices.find(
-          (voice) =>
-            voice.lang.startsWith("en") &&
-            voice.name.toLowerCase().includes("natural")
-        ) ||
-        voices.find(
-          (voice) =>
-            voice.lang.startsWith("en") &&
-            voice.name.toLowerCase().includes("google")
-        ) ||
-        voices.find((voice) => voice.lang.startsWith("en"));
+      if (!voices.length) return;
 
-      bestVoiceRef.current = selectedVoice || null;
+      const sortedVoices = [...voices].sort(
+        (a, b) => getVoiceScore(b) - getVoiceScore(a)
+      );
+
+      bestVoiceRef.current = sortedVoices[0] || null;
 
       console.log(
-        "Selected AI Voice:",
-        selectedVoice?.name || "Default voice"
+        "Selected E-SERVOO AI Voice:",
+        bestVoiceRef.current?.name || "Default voice",
+        bestVoiceRef.current?.lang || ""
       );
     };
 
@@ -95,7 +121,27 @@ function AIAssistant() {
     setInput(text);
   };
 
-  /* ================= IMPROVED AI VOICE ================= */
+  /* ================= HINGLISH PROMPT ================= */
+
+  const makeHinglishPrompt = (userMessage) => {
+    return `
+You are E-SERVOO AI assistant.
+
+Reply style:
+- Use simple Indian Hinglish.
+- Prefer Roman Hindi/Hinglish, like: "aap", "service", "booking", "professional", "issue", "price estimate".
+- Do not sound American.
+- Keep tone helpful, Indian, polite and friendly.
+- Keep answers short and clear.
+- For repair cost, give estimate in rupees.
+- Stay focused only on E-SERVOO home/local services.
+
+User message:
+${userMessage}
+    `;
+  };
+
+  /* ================= IMPROVED INDIAN HINGLISH VOICE ================= */
 
   const speakText = (text) => {
     if (!voiceReply) return;
@@ -112,7 +158,7 @@ function AIAssistant() {
       .replace(/₹/g, " rupees ")
       .replace(/•/g, "")
       .replace(
-        /🔧|🛠|💰|⏱|📌|⚠️|✅|❌|🚨|📖|👋|⚡|🚿|🧹|👨‍🍳|🎤/g,
+        /🔧|🛠|💰|⏱|📌|⚠️|✅|❌|🚨|📖|👋|⚡|🚿|🧹|👨‍🍳|🎤|⭐/g,
         ""
       )
       .replace(/━━━━━━━━━━━━━━━━━━━━━━/g, "")
@@ -122,7 +168,8 @@ function AIAssistant() {
 
     if (!cleanText) return;
 
-    const sentences = cleanText.match(/[^.!?]+[.!?]*/g) || [cleanText];
+    const sentences =
+      cleanText.match(/[^.!?।]+[.!?।]*/g) || [cleanText];
 
     let index = 0;
 
@@ -146,19 +193,26 @@ function AIAssistant() {
         utterance.lang = "en-IN";
       }
 
-      utterance.rate = 0.86;
-      utterance.pitch = 1.08;
+      // Indian assistant style: slower, clearer, less robotic
+      utterance.rate = 0.78;
+      utterance.pitch = 1.03;
       utterance.volume = 1;
 
       utterance.onend = () => {
         index++;
-        setTimeout(speakNextSentence, 140);
+        setTimeout(speakNextSentence, 180);
+      };
+
+      utterance.onerror = (error) => {
+        console.log("Speech error:", error);
+        index++;
+        setTimeout(speakNextSentence, 180);
       };
 
       window.speechSynthesis.speak(utterance);
     };
 
-    speakNextSentence();
+    setTimeout(speakNextSentence, 120);
   };
 
   const askAI = async (userMessage) => {
@@ -167,7 +221,7 @@ function AIAssistant() {
     setTyping(true);
 
     try {
-      const reply = await askGemini(userMessage);
+      const reply = await askGemini(makeHinglishPrompt(userMessage));
 
       setTyping(false);
 
@@ -186,7 +240,7 @@ function AIAssistant() {
       setTyping(false);
 
       const errorMessage =
-        "⚠️ AI is currently unavailable. Please try again.";
+        "⚠️ Abhi AI available nahi hai. Thodi der baad dobara try kariye.";
 
       setMessages((prev) => [
         ...prev,
@@ -230,7 +284,7 @@ function AIAssistant() {
     askAI(option);
   };
 
-  /* ================= VOICE INPUT ================= */
+  /* ================= VOICE INPUT - INDIAN HINGLISH ================= */
 
   useEffect(() => {
     const SpeechRecognition =
@@ -243,7 +297,8 @@ function AIAssistant() {
 
     const recognition = new SpeechRecognition();
 
-    recognition.lang = "en-IN";
+    // hi-IN usually works better for Indian Hinglish on Chrome
+    recognition.lang = "hi-IN";
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -258,6 +313,10 @@ function AIAssistant() {
     recognition.onerror = (event) => {
       console.log("Voice error:", event.error);
       setListening(false);
+
+      if (event.error === "not-allowed") {
+        alert("Mic permission allow kariye.");
+      }
     };
 
     recognition.onresult = (event) => {
@@ -279,7 +338,7 @@ function AIAssistant() {
 
   const startVoiceInput = () => {
     if (!recognitionRef.current) {
-      alert("Voice input is not supported in this browser. Please use Chrome.");
+      alert("Voice input is browser me supported nahi hai. Chrome use kariye.");
       return;
     }
 
@@ -416,35 +475,35 @@ function AIAssistant() {
             {/* QUICK BUTTONS */}
             <div className="flex flex-wrap gap-2 p-3 bg-[#B4DBDC]">
               <button
-                onClick={() => quickAsk("Electrician")}
+                onClick={() => quickAsk("Electrician service chahiye")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
                 Electrician
               </button>
 
               <button
-                onClick={() => quickAsk("Plumber")}
+                onClick={() => quickAsk("Plumber service chahiye")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
                 Plumber
               </button>
 
               <button
-                onClick={() => quickAsk("Cleaner")}
+                onClick={() => quickAsk("Cleaner service chahiye")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
                 Cleaner
               </button>
 
               <button
-                onClick={() => quickAsk("Fan not working")}
+                onClick={() => quickAsk("Mera fan nahi chal raha hai")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
                 Fan Issue
               </button>
 
               <button
-                onClick={() => quickAsk("Price estimate")}
+                onClick={() => quickAsk("Price estimate batao")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
                 Price
@@ -493,13 +552,13 @@ function AIAssistant() {
 
               {typing && (
                 <div className="bg-[#E1E9E5] text-[#08566E] px-4 py-3 rounded-2xl w-fit">
-                  AI is typing...
+                  AI soch raha hai...
                 </div>
               )}
 
               {listening && (
                 <div className="bg-red-100 text-red-700 px-4 py-3 rounded-2xl w-fit animate-pulse">
-                  🎤 Listening...
+                  🎤 Sun raha hoon...
                 </div>
               )}
 
@@ -515,7 +574,7 @@ function AIAssistant() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") sendMessage();
                 }}
-                placeholder="Ask anything..."
+                placeholder="Kuch bhi poochiye..."
                 className="flex-1 rounded-xl px-4 py-2 outline-none bg-white text-[#08566E]"
               />
 
