@@ -12,6 +12,7 @@ import BookingForm from "./components/BookingForm";
 import CustomerDashboard from "./components/CustomerDashboard";
 import MyBookings from "./components/MyBookings";
 import WhatsappButton from "./components/WhatsappButton";
+import FooterNav from "./components/FooterNav";
 
 import Profile from "./components/Profile";
 import Contact from "./components/Contact";
@@ -144,18 +145,6 @@ function HomePage({
           </div>
 
           <WhatsappButton />
-
-          <div className="fixed bottom-0 left-0 right-0 w-full bg-[#08566E] border-t border-[#06485C] flex justify-around py-3 z-50 text-white">
-            <a href="/">🏠 Home</a>
-
-            <a href="/services">
-              🛠 Services
-            </a>
-
-            <a href="/profile">
-              👤 Profile
-            </a>
-          </div>
         </>
       )}
     </>
@@ -197,7 +186,7 @@ function App() {
 
       {/* MAIN APP WRAPPER */}
       <div
-        className={`bg-[#B4DBDC] min-h-screen pb-20 overflow-x-hidden ${
+        className={`bg-[#B4DBDC] min-h-screen pb-28 overflow-x-hidden ${
           seniorMode ? "text-xl" : "text-base"
         }`}
       >
@@ -247,6 +236,9 @@ function App() {
             }
           />
         </Routes>
+
+        {/* LIQUID FOOTER NAV */}
+        {isLoggedIn && <FooterNav />}
       </div>
     </>
   );
