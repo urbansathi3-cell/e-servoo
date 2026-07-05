@@ -8,6 +8,17 @@ function Login({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [leaving, setLeaving] = useState(false);
+
+  const goToRegister = () => {
+    setLeaving(true);
+
+    setTimeout(() => {
+      setShowLogin(false);
+      setShowRegister(true);
+    }, 350);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -36,15 +47,17 @@ function Login({
   return (
     <section className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] overflow-hidden">
 
-      <div className="relative w-full max-w-5xl min-h-[560px] rounded-[32px] overflow-hidden shadow-2xl border border-[#6FA8AA]/70 bg-[#08566E]">
+      <div
+        className={`relative w-full max-w-5xl min-h-[560px] rounded-[32px] overflow-hidden shadow-2xl border border-[#6FA8AA]/70 bg-[#08566E] ${
+          leaving ? "auth-card-exit-left" : "auth-card-enter"
+        }`}
+      >
 
-        {/* Background Glow */}
         <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#6FA8AA]/40 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-28 -right-28 w-80 h-80 bg-[#B4DBDC]/50 rounded-full blur-3xl"></div>
 
         <div className="relative grid md:grid-cols-2 min-h-[560px]">
 
-          {/* LEFT LOGIN FORM */}
           <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-16 py-10 bg-[#08566E]">
 
             <div className="mb-8">
@@ -110,10 +123,7 @@ function Login({
 
               <button
                 type="button"
-                onClick={() => {
-                  setShowLogin(false);
-                  setShowRegister(true);
-                }}
+                onClick={goToRegister}
                 className="mt-2 text-[#E1E9E5] font-bold hover:text-[#9ECFD0] hover:underline transition"
               >
                 Create Account
@@ -122,10 +132,8 @@ function Login({
 
           </div>
 
-          {/* RIGHT WELCOME PANEL */}
           <div className="relative hidden md:flex flex-col justify-center items-center text-center px-12 bg-gradient-to-br from-[#9ECFD0] via-[#B4DBDC] to-[#6FA8AA]">
 
-            {/* Diagonal Overlay */}
             <div
               className="absolute inset-0 bg-[#E1E9E5]/25"
               style={{
