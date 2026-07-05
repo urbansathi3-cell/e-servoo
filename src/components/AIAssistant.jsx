@@ -20,6 +20,7 @@ function AIAssistant() {
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
   const bestVoiceRef = useRef(null);
+  const messagesRef = useRef([]);
 
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -29,13 +30,37 @@ function AIAssistant() {
     y: 200,
   });
 
-  const [messages, setMessages] = useState([
+  const defaultMessages = [
     {
       sender: "ai",
       text:
         "👋 Namaste! Main E-SERVOO AI hoon.\n\nMain aapki help kar sakta hoon:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency Service\n\nAap type bhi kar sakte ho ya mic se bol bhi sakte ho 🎤.",
     },
-  ]);
+  ];
+
+  const [messages, setMessages] = useState(() => {
+    try {
+      const savedMessages = localStorage.getItem("eservoo_ai_messages");
+
+      if (savedMessages) {
+        return JSON.parse(savedMessages);
+      }
+
+      return defaultMessages;
+    } catch (error) {
+      console.log(error);
+      return defaultMessages;
+    }
+  });
+
+  useEffect(() => {
+    messagesRef.current = messages;
+
+    localStorage.setItem(
+      "eservoo_ai_messages",
+      JSON.stringify(messages)
+    );
+  }, [messages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -52,24 +77,17 @@ function AIAssistant() {
 
       let score = 0;
 
-      // Best for Hinglish / Indian English
       if (lang === "en-in") score += 120;
-
-      // Good for Hindi / Hinglish
-      if (lang === "hi-in") score += 100;
-
-      // Some systems write language slightly differently
+      if (lang === "hi-in") score += 110;
       if (lang.includes("in")) score += 40;
       if (lang.includes("hi")) score += 30;
 
-      // Prefer natural / Google / Microsoft India voices
       if (name.includes("india")) score += 35;
       if (name.includes("indian")) score += 35;
       if (name.includes("google")) score += 25;
       if (name.includes("microsoft")) score += 20;
       if (name.includes("natural")) score += 25;
 
-      // Common Indian voices
       if (name.includes("heera")) score += 40;
       if (name.includes("ravi")) score += 40;
       if (name.includes("neerja")) score += 40;
@@ -78,7 +96,6 @@ function AIAssistant() {
       if (name.includes("हिन्दी")) score += 25;
       if (name.includes("हिंदी")) score += 25;
 
-      // Fallback English voices
       if (lang.startsWith("en")) score += 10;
 
       return score;
@@ -121,23 +138,54 @@ function AIAssistant() {
     setInput(text);
   };
 
-  /* ================= HINGLISH PROMPT ================= */
+  /* ================= CONTEXT AWARE HINGLISH PROMPT ================= */
 
-  const makeHinglishPrompt = (userMessage) => {
+  const makeHinglishPrompt = (userMessage, conversationMessages) => {
+    const realConversation = conversationMessages.filter(
+      (msg) =>
+        !msg.text.includes("Namaste! Main E-SERVOO AI hoon") &&
+        !msg.text.includes("Main aapki help kar sakta hoon")
+    );
+
+    const conversationHistory = realConversation
+      .slice(-12)
+      .map((msg) => {
+        return `${msg.sender === "user" ? "User" : "Assistant"}: ${msg.text}`;
+      })
+      .join("\n");
+
+    const userMessageCount = realConversation.filter(
+      (msg) => msg.sender === "user"
+    ).length;
+
     return `
 You are E-SERVOO AI assistant.
 
-Reply style:
-- Use simple Indian Hinglish.
-- Prefer Roman Hindi/Hinglish, like: "aap", "service", "booking", "professional", "issue", "price estimate".
-- Do not sound American.
-- Keep tone helpful, Indian, polite and friendly.
-- Keep answers short and clear.
-- For repair cost, give estimate in rupees.
-- Stay focused only on E-SERVOO home/local services.
+E-SERVOO is a hyperlocal home service platform for:
+Electrician, Plumber, Cleaner, Cook, Carpenter, Painter, AC Repair, Appliance Repair, CCTV, Tutor, Booking, Emergency Service and Cost Estimate.
 
-User message:
+Reply behavior:
+- Reply in simple Indian Hinglish.
+- Use Roman Hindi/Hinglish, like: "aap", "service", "booking", "issue", "estimate", "professional".
+- Do NOT sound American.
+- Do NOT say "Namaste", "Welcome", or introduce yourself again and again.
+- Greet only when it is the first real user message.
+- Current real user message count: ${userMessageCount}
+- Continue the conversation using previous chat context.
+- Understand references like "same", "uska", "ye", "wo", "pichla", "that issue", "same worker".
+- Keep replies short, practical and helpful.
+- Stay focused only on E-SERVOO home/local services.
+- For repair cost, give estimate in Indian rupees.
+- For booking help, guide the user clearly.
+- Never answer unrelated topics like politics, coding, general knowledge, or exams.
+
+Conversation so far:
+${conversationHistory || "No previous real conversation yet."}
+
+Current user message:
 ${userMessage}
+
+Reply naturally in Hinglish. Do not repeat greeting unless this is the first real user message.
     `;
   };
 
@@ -193,7 +241,6 @@ ${userMessage}
         utterance.lang = "en-IN";
       }
 
-      // Indian assistant style: slower, clearer, less robotic
       utterance.rate = 0.78;
       utterance.pitch = 1.03;
       utterance.volume = 1;
@@ -215,13 +262,18 @@ ${userMessage}
     setTimeout(speakNextSentence, 120);
   };
 
-  const askAI = async (userMessage) => {
+  const askAI = async (userMessage, updatedMessages) => {
     if (!userMessage.trim()) return;
 
     setTyping(true);
 
     try {
-      const reply = await askGemini(makeHinglishPrompt(userMessage));
+      const finalPrompt = makeHinglishPrompt(
+        userMessage,
+        updatedMessages
+      );
+
+      const reply = await askGemini(finalPrompt);
 
       setTyping(false);
 
@@ -259,29 +311,44 @@ ${userMessage}
 
     const text = input;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "user",
-        text,
-      },
-    ]);
+    const userMessageObject = {
+      sender: "user",
+      text,
+    };
 
+    const updatedMessages = [
+      ...messagesRef.current,
+      userMessageObject,
+    ];
+
+    setMessages(updatedMessages);
     setInput("");
 
-    askAI(text);
+    askAI(text, updatedMessages);
   };
 
   const handleOptionClick = (option) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "user",
-        text: option,
-      },
-    ]);
+    const userMessageObject = {
+      sender: "user",
+      text: option,
+    };
 
-    askAI(option);
+    const updatedMessages = [
+      ...messagesRef.current,
+      userMessageObject,
+    ];
+
+    setMessages(updatedMessages);
+
+    askAI(option, updatedMessages);
+  };
+
+  const clearChat = () => {
+    window.speechSynthesis?.cancel();
+
+    localStorage.removeItem("eservoo_ai_messages");
+
+    setMessages(defaultMessages);
   };
 
   /* ================= VOICE INPUT - INDIAN HINGLISH ================= */
@@ -297,7 +364,6 @@ ${userMessage}
 
     const recognition = new SpeechRecognition();
 
-    // hi-IN usually works better for Indian Hinglish on Chrome
     recognition.lang = "hi-IN";
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -322,15 +388,19 @@ ${userMessage}
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "user",
-          text: transcript,
-        },
-      ]);
+      const userMessageObject = {
+        sender: "user",
+        text: transcript,
+      };
 
-      askAI(transcript);
+      const updatedMessages = [
+        ...messagesRef.current,
+        userMessageObject,
+      ];
+
+      setMessages(updatedMessages);
+
+      askAI(transcript, updatedMessages);
     };
 
     recognitionRef.current = recognition;
@@ -451,6 +521,15 @@ ${userMessage}
 
               <div className="flex gap-3 items-center">
                 <button
+                  type="button"
+                  onClick={clearChat}
+                  className="text-xs bg-[#E1E9E5] text-[#08566E] px-2 py-1 rounded-full font-bold hover:scale-105 transition"
+                >
+                  Clear
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => {
                     setMinimized(true);
                     window.speechSynthesis?.cancel();
@@ -461,6 +540,7 @@ ${userMessage}
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     setOpen(false);
                     window.speechSynthesis?.cancel();
@@ -475,6 +555,7 @@ ${userMessage}
             {/* QUICK BUTTONS */}
             <div className="flex flex-wrap gap-2 p-3 bg-[#B4DBDC]">
               <button
+                type="button"
                 onClick={() => quickAsk("Electrician service chahiye")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
@@ -482,6 +563,7 @@ ${userMessage}
               </button>
 
               <button
+                type="button"
                 onClick={() => quickAsk("Plumber service chahiye")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
@@ -489,6 +571,7 @@ ${userMessage}
               </button>
 
               <button
+                type="button"
                 onClick={() => quickAsk("Cleaner service chahiye")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
@@ -496,6 +579,7 @@ ${userMessage}
               </button>
 
               <button
+                type="button"
                 onClick={() => quickAsk("Mera fan nahi chal raha hai")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
@@ -503,6 +587,7 @@ ${userMessage}
               </button>
 
               <button
+                type="button"
                 onClick={() => quickAsk("Price estimate batao")}
                 className="bg-[#08566E] text-white px-3 py-1 rounded-full text-sm"
               >
@@ -510,6 +595,7 @@ ${userMessage}
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   setVoiceReply(!voiceReply);
                   window.speechSynthesis?.cancel();
@@ -539,6 +625,7 @@ ${userMessage}
                       {msg.options.map((option, i) => (
                         <button
                           key={i}
+                          type="button"
                           onClick={() => handleOptionClick(option)}
                           className="bg-[#08566E] text-white px-3 py-2 rounded-full hover:bg-[#06485C] text-sm"
                         >
@@ -579,6 +666,7 @@ ${userMessage}
               />
 
               <button
+                type="button"
                 onClick={startVoiceInput}
                 className={`px-4 rounded-xl text-white ${
                   listening
@@ -590,6 +678,7 @@ ${userMessage}
               </button>
 
               <button
+                type="button"
                 onClick={sendMessage}
                 className="bg-[#08566E] hover:bg-[#06485C] text-white px-4 rounded-xl"
               >
