@@ -30,52 +30,299 @@ body,
   animation: workerSlide 1.5s ease-out;
 }
 
-/* ========== AUTH PAGE ANIMATION ========== */
+/* ========== E-SERVOO AUTH SLIDING ANIMATION ========== */
 
-.auth-card-enter {
-  animation: authEnter 0.45s ease forwards;
+.es-auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #E1E9E5, #B4DBDC, #9ECFD0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  overflow: hidden;
 }
 
-.auth-card-exit-left {
-  animation: authExitLeft 0.35s ease forwards;
+.es-auth-container {
+  position: relative;
+  width: 900px;
+  max-width: 100%;
+  min-height: 620px;
+  background: #08566E;
+  border-radius: 32px;
+  box-shadow:
+    0 0 35px rgba(8, 86, 110, 0.35),
+    0 0 70px rgba(111, 168, 170, 0.28);
+  overflow: hidden;
+  border: 1px solid rgba(180, 219, 220, 0.5);
 }
 
-.auth-card-exit-right {
-  animation: authExitRight 0.35s ease forwards;
+.es-form-box {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  padding: 45px;
+  color: #E1E9E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.7s ease-in-out;
 }
 
-@keyframes authEnter {
-  from {
+.es-auth-form {
+  width: 100%;
+  max-width: 360px;
+}
+
+.es-auth-form h1 {
+  font-size: 42px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: #E1E9E5;
+}
+
+.es-auth-subtitle {
+  color: #B4DBDC;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.es-form-box.es-login {
+  left: 0;
+  z-index: 5;
+}
+
+.es-auth-container.active .es-form-box.es-login {
+  transform: translateX(-120%);
+  opacity: 0;
+  filter: blur(10px);
+}
+
+.es-form-box.es-register {
+  right: 0;
+  z-index: 1;
+  opacity: 0;
+  transform: translateX(120%);
+  filter: blur(10px);
+}
+
+.es-auth-container.active .es-form-box.es-register {
+  transform: translateX(0);
+  opacity: 1;
+  filter: blur(0);
+  z-index: 6;
+}
+
+/* ========== INPUTS ========== */
+
+.es-input-box {
+  width: 100%;
+  margin: 14px 0;
+}
+
+.es-input-box input {
+  width: 100%;
+  height: 50px;
+  background: #E1E9E5;
+  border: 1px solid #9ECFD0;
+  outline: none;
+  border-radius: 40px;
+  padding: 0 20px;
+  color: #08566E;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.es-input-box input::placeholder {
+  color: #6FA8AA;
+}
+
+.es-input-box input:focus {
+  box-shadow: 0 0 0 4px rgba(158, 207, 208, 0.35);
+}
+
+/* ========== BUTTON ========== */
+
+.es-auth-btn {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(45deg, #9ECFD0, #6FA8AA);
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #08566E;
+  font-weight: 900;
+  margin-top: 12px;
+  box-shadow: 0 8px 24px rgba(158, 207, 208, 0.28);
+  transition: 0.25s ease;
+}
+
+.es-auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(158, 207, 208, 0.42);
+}
+
+.es-auth-link-text {
+  margin-top: 20px;
+  color: #B4DBDC;
+  font-size: 14px;
+  text-align: center;
+}
+
+.es-auth-link-text button {
+  color: #E1E9E5;
+  font-weight: 800;
+  margin-left: 5px;
+  text-decoration: underline;
+}
+
+/* ========== SLIDING TOGGLE PANEL ========== */
+
+.es-toggle-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: 0.7s ease-in-out;
+  z-index: 20;
+  border-radius: 32px 0 0 32px;
+}
+
+.es-auth-container.active .es-toggle-container {
+  transform: translateX(-100%);
+  border-radius: 0 32px 32px 0;
+}
+
+.es-toggle {
+  position: relative;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(135deg, #08566E, #0A6F78, #6FA8AA);
+  color: #E1E9E5;
+  transform: translateX(0);
+  transition: 0.7s ease-in-out;
+}
+
+.es-auth-container.active .es-toggle {
+  transform: translateX(50%);
+}
+
+.es-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(225, 233, 229, 0.22), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(180, 219, 220, 0.28), transparent 35%);
+}
+
+.es-toggle-panel {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 0;
+  padding: 0 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: 0.7s ease-in-out;
+}
+
+.es-toggle-panel h1 {
+  font-size: 42px;
+  font-weight: 900;
+  margin-bottom: 18px;
+  color: #E1E9E5;
+}
+
+.es-toggle-panel p {
+  color: #E1E9E5;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.es-toggle-badge {
+  margin-top: 28px;
+  background: #E1E9E5;
+  color: #08566E;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-weight: 900;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.es-toggle-left {
+  transform: translateX(-200%);
+}
+
+.es-auth-container.active .es-toggle-left {
+  transform: translateX(0);
+}
+
+.es-toggle-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+.es-auth-container.active .es-toggle-right {
+  transform: translateX(200%);
+}
+
+/* ========== MOBILE RESPONSIVE ========== */
+
+@media (max-width: 768px) {
+  .es-auth-page {
+    padding: 16px;
+  }
+
+  .es-auth-container {
+    max-width: 430px;
+    min-height: 700px;
+  }
+
+  .es-toggle-container {
+    display: none;
+  }
+
+  .es-form-box {
+    width: 100%;
+    padding: 32px 24px;
+  }
+
+  .es-form-box.es-login {
+    left: 0;
+  }
+
+  .es-auth-container.active .es-form-box.es-login {
+    transform: translateX(-100%);
     opacity: 0;
-    transform: translateY(30px) scale(0.96);
+    filter: blur(8px);
   }
 
-  to {
+  .es-form-box.es-register {
+    left: 0;
+    right: auto;
+    transform: translateX(100%);
+  }
+
+  .es-auth-container.active .es-form-box.es-register {
+    transform: translateX(0);
     opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes authExitLeft {
-  from {
-    opacity: 1;
-    transform: translateX(0) scale(1);
+    filter: blur(0);
   }
 
-  to {
-    opacity: 0;
-    transform: translateX(-90px) scale(0.96);
-  }
-}
-
-@keyframes authExitRight {
-  from {
-    opacity: 1;
-    transform: translateX(0) scale(1);
+  .es-auth-form h1 {
+    font-size: 34px;
   }
 
-  to {
-    opacity: 0;
-    transform: translateX(90px) scale(0.96);
+  .es-auth-subtitle {
+    font-size: 14px;
   }
 }
