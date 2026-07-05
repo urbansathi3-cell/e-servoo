@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { translations } from "../translations";
 
 function Workers({
   setSelectedWorker,
-  selectedService
+  selectedService,
+  language = "en",
 }) {
   const navigate = useNavigate();
+  const t = translations[language] || translations.en;
 
   const [workers, setWorkers] = useState([]);
   const [sortBy, setSortBy] = useState("");
@@ -38,6 +41,27 @@ function Workers({
     return () => clearInterval(interval);
   }, []);
 
+  const isAvailable = (worker) => {
+    return worker.status?.trim().toLowerCase() === "available";
+  };
+
+  const getServiceText = (service) => {
+    const serviceName = service?.trim().toLowerCase();
+
+    if (serviceName === "electrician") return t.electrician || service;
+    if (serviceName === "plumber") return t.plumber || service;
+    if (serviceName === "carpenter") return t.carpenter || service;
+    if (serviceName === "cleaner") return t.cleaner || service;
+    if (serviceName === "cook") return t.cook || service;
+    if (serviceName === "painter") return t.painter || service;
+    if (serviceName === "ac repair") return t.acRepair || service;
+    if (serviceName === "home tutor") return t.tutor || service;
+    if (serviceName === "appliance repair") return t.applianceRepair || service;
+    if (serviceName === "cctv service") return t.cctvService || service;
+
+    return service;
+  };
+
   let filteredWorkers = [...workers];
 
   if (sortBy === "rating") {
@@ -47,11 +71,21 @@ function Workers({
   }
 
   if (sortBy === "available") {
-    filteredWorkers = filteredWorkers.filter(
-      (worker) =>
-        worker.status?.trim().toLowerCase() === "available"
+    filteredWorkers = filteredWorkers.filter((worker) =>
+      isAvailable(worker)
     );
   }
+
+  const visibleWorkers = filteredWorkers
+    .filter((worker) =>
+      selectedService === "All"
+        ? true
+        : worker.service?.toLowerCase() === selectedService.toLowerCase()
+    )
+    .filter((worker) =>
+      worker.name?.toLowerCase().includes(search.toLowerCase()) ||
+      worker.service?.toLowerCase().includes(search.toLowerCase())
+    );
 
   return (
     <section
@@ -64,18 +98,18 @@ function Workers({
           onClick={() => navigate("/")}
           className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-5 py-3 rounded-xl font-bold shadow-lg transition"
         >
-          ← Back to Home
+          ← {t.backToHome || "Back to Home"}
         </button>
       </div>
 
       <h2 className="text-5xl font-bold text-center text-[#08566E] mb-12">
-        Our Workers
+        {t.ourWorkers || "Our Workers"}
       </h2>
 
       <div className="max-w-xl mx-auto mb-8">
         <input
           type="text"
-          placeholder="Search Workers"
+          placeholder={t.searchWorkers || "Search Workers"}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full p-4 rounded-xl bg-[#E1E9E5] border border-[#8FBDBE] text-slate-900 focus:border-[#08566E] outline-none"
@@ -88,35 +122,33 @@ function Workers({
           onChange={(e) => setSortBy(e.target.value)}
           className="w-full p-4 rounded-xl bg-[#E1E9E5] border border-[#8FBDBE] text-slate-900"
         >
-          <option value="">Sort Workers</option>
+          <option value="">
+            {t.sortWorkers || "Sort Workers"}
+          </option>
 
           <option value="rating">
-            Rating High → Low
+            {t.ratingHighToLow || "Rating High → Low"}
           </option>
 
           <option value="available">
-            Available Only
+            {t.availableOnly || "Available Only"}
           </option>
         </select>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-6">
-        {filteredWorkers
-          .filter((worker) =>
-            selectedService === "All"
-              ? true
-              : worker.service?.toLowerCase() ===
-                selectedService.toLowerCase()
-          )
-          .filter((worker) =>
-            worker.name?.toLowerCase().includes(search.toLowerCase()) ||
-            worker.service?.toLowerCase().includes(search.toLowerCase())
-          )
-          .map((worker, index) => (
+        {visibleWorkers.length === 0 ? (
+          <div className="bg-[#E1E9E5] border border-[#6FA8AA] rounded-3xl p-8 text-center">
+            <p className="text-[#08566E] font-bold text-xl">
+              {t.noWorkersFound || "No workers found"}
+            </p>
+          </div>
+        ) : (
+          visibleWorkers.map((worker, index) => (
             <div
               key={index}
               onClick={() => {
-                if (worker.status?.trim() !== "Available") return;
+                if (!isAvailable(worker)) return;
 
                 setSelectedWorker({
                   ...worker,
@@ -125,7 +157,7 @@ function Workers({
               }}
               className={`bg-[#8FBDBE] border border-[#6FA6A8] rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
                 ${
-                  worker.status?.trim() === "Available"
+                  isAvailable(worker)
                     ? "hover:border-[#08566E] cursor-pointer"
                     : "opacity-50 cursor-not-allowed"
                 }`}
@@ -149,7 +181,7 @@ function Workers({
                   </div>
 
                   <p className="text-[#0A5E75]">
-                    {worker.service}
+                    {getServiceText(worker.service)}
                   </p>
 
                   {worker.CertificateLink && (
@@ -162,7 +194,7 @@ function Workers({
                       }}
                       className="text-[#08566E] text-xs font-semibold hover:underline"
                     >
-                      📜 Verified Skill Certificate
+                      📜 {t.verifiedSkillCertificate || "Verified Skill Certificate"}
                     </a>
                   )}
 
@@ -172,11 +204,11 @@ function Workers({
                     </span>
 
                     <span className="text-slate-700">
-                      📍 {worker.location || "Local Area"}
+                      📍 {worker.location || t.localArea || "Local Area"}
                     </span>
 
                     <span className="text-green-500 font-semibold">
-                      🛡️ {worker.TrustScore || "90"}% Trust
+                      🛡️ {worker.TrustScore || "90"}% {t.trust || "Trust"}
                     </span>
                   </div>
                 </div>
@@ -184,27 +216,28 @@ function Workers({
 
               <div className="text-right">
                 <h3 className="text-xl font-bold text-[#08566E]">
-                  ✔ Verified Professional
+                  ✔ {t.verifiedProfessional || "Verified Professional"}
                 </h3>
 
                 <p className="text-[#E1E9E5] text-sm font-medium">
-                  Inspection Based Pricing
+                  {t.inspectionBasedPricing || "Inspection Based Pricing"}
                 </p>
 
                 <div className="mt-2">
-                  {worker.status?.trim() === "Available" ? (
+                  {isAvailable(worker) ? (
                     <span className="bg-[#08566E] text-[#E1E9E5] px-3 py-1 rounded-full text-sm">
-                      Available
+                      {t.available || "Available"}
                     </span>
                   ) : (
                     <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                      Busy
+                      {t.busy || "Busy"}
                     </span>
                   )}
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
     </section>
   );
