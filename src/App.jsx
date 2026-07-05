@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { translations } from "./translations";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -44,6 +45,8 @@ function HomePage({
   workerLoggedIn,
   setWorkerLoggedIn,
 }) {
+  const t = translations[language] || translations.en;
+
   if (showWelcome) {
     return (
       <Welcome
@@ -81,18 +84,19 @@ function HomePage({
         <BookingForm
           selectedWorker={selectedWorker}
           setSelectedWorker={setSelectedWorker}
+          language={language}
         />
       ) : (
         <>
           <div className="py-4 text-center">
-            <p className="text-[#08566E] text-sm mb-3">
-              🌐 Choose Language
+            <p className="text-[#08566E] text-sm mb-3 font-bold">
+              🌐 {t.chooseLanguage}
             </p>
 
             <div className="flex justify-center gap-3">
               <button
                 onClick={() => changeLanguage("en")}
-                className={`px-4 py-2 rounded-lg ${
+                className={`px-4 py-2 rounded-lg font-bold ${
                   language === "en"
                     ? "bg-[#08566E] text-white"
                     : "bg-[#E1E9E5] text-[#08566E]"
@@ -103,7 +107,7 @@ function HomePage({
 
               <button
                 onClick={() => changeLanguage("hi")}
-                className={`px-4 py-2 rounded-lg ${
+                className={`px-4 py-2 rounded-lg font-bold ${
                   language === "hi"
                     ? "bg-[#08566E] text-white"
                     : "bg-[#E1E9E5] text-[#08566E]"
@@ -114,7 +118,7 @@ function HomePage({
 
               <button
                 onClick={() => changeLanguage("od")}
-                className={`px-4 py-2 rounded-lg ${
+                className={`px-4 py-2 rounded-lg font-bold ${
                   language === "od"
                     ? "bg-[#08566E] text-white"
                     : "bg-[#E1E9E5] text-[#08566E]"
@@ -133,6 +137,7 @@ function HomePage({
 
           <Services
             setSelectedService={setSelectedService}
+            language={language}
           />
 
           <div className="flex justify-end p-3">
@@ -213,11 +218,50 @@ function App() {
             }
           />
 
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/dashboard" element={<CustomerDashboard />} />
-          <Route path="/bookings" element={<MyBookings />} />
+          <Route
+            path="/profile"
+            element={
+              <Profile
+                language={language}
+              />
+            }
+          />
+
+          <Route
+            path="/contact"
+            element={
+              <Contact
+                language={language}
+              />
+            }
+          />
+
+          <Route
+            path="/terms"
+            element={
+              <Terms
+                language={language}
+              />
+            }
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <CustomerDashboard
+                language={language}
+              />
+            }
+          />
+
+          <Route
+            path="/bookings"
+            element={
+              <MyBookings
+                language={language}
+              />
+            }
+          />
 
           <Route
             path="/services"
@@ -226,11 +270,13 @@ function App() {
                 <BookingForm
                   selectedWorker={selectedWorker}
                   setSelectedWorker={setSelectedWorker}
+                  language={language}
                 />
               ) : (
                 <Workers
                   setSelectedWorker={setSelectedWorker}
                   selectedService="All"
+                  language={language}
                 />
               )
             }
