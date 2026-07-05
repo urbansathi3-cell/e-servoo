@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { translations } from "./translations";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -20,277 +19,237 @@ import Terms from "./components/Terms";
 
 import Welcome from "./components/Welcome";
 import Login from "./components/Login";
-import Register from "./components/Register";
 import WorkerLogin from "./components/WorkerLogin";
 import WorkerDashboard from "./components/WorkerDashboard";
 
 function HomePage({
+  seniorMode,
+  setSeniorMode,
 
-seniorMode,
-setSeniorMode,
+  selectedService,
+  setSelectedService,
+  selectedWorker,
+  setSelectedWorker,
 
-selectedService,
-setSelectedService,
-selectedWorker,
-setSelectedWorker,
+  language,
+  changeLanguage,
 
-language,
-changeLanguage,
+  showWelcome,
+  setShowWelcome,
 
-showWelcome,
-setShowWelcome,
+  isLoggedIn,
+  setIsLoggedIn,
 
-isLoggedIn,
-setIsLoggedIn,
-
-workerLoggedIn,
-setWorkerLoggedIn,
-
-showLogin,
-setShowLogin,
-
-showRegister,
-setShowRegister,
+  workerLoggedIn,
+  setWorkerLoggedIn,
 }) {
+  if (showWelcome) {
+    return (
+      <Welcome
+        setShowWelcome={setShowWelcome}
+      />
+    );
+  }
 
-if (showWelcome) {
-return ( <Welcome  
-setShowWelcome={setShowWelcome}  
-/>
-);
-}
-console.log("showWelcome =", showWelcome);
-console.log("user =", localStorage.getItem("user"));
+  console.log("showWelcome =", showWelcome);
+  console.log("user =", localStorage.getItem("user"));
 
-if (!isLoggedIn) {
-return (
-<>
-{showLogin && ( <Login  
-setIsLoggedIn={setIsLoggedIn}  
-setShowLogin={setShowLogin}  
-setShowRegister={setShowRegister}  
-/>
-)}
+  if (!isLoggedIn) {
+    if (workerLoggedIn) {
+      return <WorkerDashboard />;
+    }
 
-{showRegister && (  
-  <Register  
-    setShowRegister={setShowRegister}  
-    setShowLogin={setShowLogin}  
-  />  
-)}  
+    return (
+      <>
+        <Login
+          setIsLoggedIn={setIsLoggedIn}
+        />
 
-{!workerLoggedIn ? (  
-  <WorkerLogin  
-    setWorkerLoggedIn={setWorkerLoggedIn}  
-  />  
-) : (  
-  <WorkerDashboard />  
-)}
+        <WorkerLogin
+          setWorkerLoggedIn={setWorkerLoggedIn}
+        />
+      </>
+    );
+  }
 
-</>
-);
+  return (
+    <>
+      <Navbar />
 
-}
+      {selectedWorker ? (
+        <BookingForm
+          selectedWorker={selectedWorker}
+          setSelectedWorker={setSelectedWorker}
+        />
+      ) : (
+        <>
+          <div className="py-4 text-center">
+            <p className="text-[#08566E] text-sm mb-3">
+              🌐 Choose Language
+            </p>
 
-return (
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => changeLanguage("en")}
+                className={`px-4 py-2 rounded-lg ${
+                  language === "en"
+                    ? "bg-[#08566E] text-white"
+                    : "bg-[#E1E9E5] text-[#08566E]"
+                }`}
+              >
+                EN
+              </button>
 
-<> <Navbar />
+              <button
+                onClick={() => changeLanguage("hi")}
+                className={`px-4 py-2 rounded-lg ${
+                  language === "hi"
+                    ? "bg-[#08566E] text-white"
+                    : "bg-[#E1E9E5] text-[#08566E]"
+                }`}
+              >
+                HI
+              </button>
 
-{selectedWorker ? (
-<BookingForm  
-selectedWorker={selectedWorker}  
-setSelectedWorker={setSelectedWorker}  
-/>
-) : (
-<>
+              <button
+                onClick={() => changeLanguage("od")}
+                className={`px-4 py-2 rounded-lg ${
+                  language === "od"
+                    ? "bg-[#08566E] text-white"
+                    : "bg-[#E1E9E5] text-[#08566E]"
+                }`}
+              >
+                OD
+              </button>
+            </div>
+          </div>
 
-  <div className="py-4 text-center">
+          <Hero language={language} />
 
-    <p className="text-[#08566E] text-sm mb-3">
-      🌐 Choose Language
-    </p>
+          <Stats />
 
-    <div className="flex justify-center gap-3">
+          <WorkerOfMonth />
 
-      <button
-        onClick={() => changeLanguage("en")}
-        className={`px-4 py-2 rounded-lg ${
-          language === "en"
-            ? "bg-[#08566E] text-white"
-            : "bg-[#E1E9E5] text-[#08566E]"
-        }`}
-      >
-        EN
-      </button>
+          <Services
+            setSelectedService={setSelectedService}
+          />
 
-      <button
-        onClick={() => changeLanguage("hi")}
-        className={`px-4 py-2 rounded-lg ${
-          language === "hi"
-            ? "bg-[#08566E] text-white"
-            : "bg-[#E1E9E5] text-[#08566E]"
-        }`}
-      >
-        HI
-      </button>
+          <div className="flex justify-end p-3">
+            <button
+              onClick={() => setSeniorMode(!seniorMode)}
+              className="bg-[#08566E] text-white px-4 py-2 rounded font-bold"
+            >
+              👴 Senior Mode
+            </button>
+          </div>
 
-      <button
-        onClick={() => changeLanguage("od")}
-        className={`px-4 py-2 rounded-lg ${
-          language === "od"
-            ? "bg-[#08566E] text-white"
-            : "bg-[#E1E9E5] text-[#08566E]"
-        }`}
-      >
-        OD
-      </button>
+          <WhatsappButton />
 
-    </div>
+          <div className="fixed bottom-0 left-0 right-0 w-full bg-[#08566E] border-t border-[#06485C] flex justify-around py-3 z-50 text-white">
+            <a href="/">🏠 Home</a>
 
-  </div>
+            <a href="/services">
+              🛠 Services
+            </a>
 
-  <Hero language={language} />
-  
-  <Stats />
-
-  <WorkerOfMonth />
-
-<Services
-setSelectedService={setSelectedService}
-/>
-
-<div className="flex justify-end p-3">
-  <button
-    onClick={() => setSeniorMode(!seniorMode)}
-    className="bg-[#08566E] text-white px-4 py-2 rounded font-bold"
-  >
-    👴 Senior Mode
-  </button>
-</div>
-
-<WhatsappButton />  
-
-  <div className="fixed bottom-0 left-0 right-0 w-full bg-[#08566E] border-t border-[#06485C] flex justify-around py-3 z-50 text-white">
-
-  <a href="/">🏠 Home</a>
-
-  <a href="/services">
-    🛠 Services
-  </a>
-
-  <a href="/profile">
-    👤 Profile
-  </a>
-
-</div>
-</>
-
-)}
-</>
-
-);
+            <a href="/profile">
+              👤 Profile
+            </a>
+          </div>
+        </>
+      )}
+    </>
+  );
 }
 
 function App() {
+  const [selectedService, setSelectedService] = useState("All");
 
-const [selectedService, setSelectedService] =
-useState("All");
+  const [selectedWorker, setSelectedWorker] = useState(null);
 
-const [selectedWorker, setSelectedWorker] =
-useState(null);
+  const [showWelcome, setShowWelcome] = useState(
+    !localStorage.getItem("user")
+  );
 
-const [showWelcome, setShowWelcome] =
-useState(!localStorage.getItem("user"));
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("user")
+  );
 
-const [isLoggedIn, setIsLoggedIn] =
-useState(!!localStorage.getItem("user"));
+  const [workerLoggedIn, setWorkerLoggedIn] = useState(
+    !!localStorage.getItem("worker")
+  );
 
-const [workerLoggedIn, setWorkerLoggedIn] =
-useState(!!localStorage.getItem("worker"));
+  const [seniorMode, setSeniorMode] = useState(false);
 
-const [showLogin, setShowLogin] =
-useState(true);
+  const [language, setLanguage] = useState(
+    localStorage.getItem("lang") || "en"
+  );
 
-const [showRegister, setShowRegister] =
-useState(false);
+  const changeLanguage = (lang) => {
+    setLanguage(lang);
+    localStorage.setItem("lang", lang);
+  };
 
-const [seniorMode, setSeniorMode] =
-useState(false);
+  return (
+    <>
+      {/* GLOBAL FLOATING AI */}
+      <AIAssistant />
 
-
-const [language, setLanguage] = useState(
-localStorage.getItem("lang") || "en"
-);
-
-const changeLanguage = (lang) => {
-setLanguage(lang);
-localStorage.setItem("lang", lang);
-};
-
-return (
-  <>
-    {/* GLOBAL FLOATING AI */}
-    <AIAssistant />
-
-    {/* MAIN APP WRAPPER */}
-    <div
-      className={`bg-[#B4DBDC] min-h-screen pb-20 overflow-x-hidden ${
-        seniorMode ? "text-xl" : "text-base"
-      }`}
-    >
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              seniorMode={seniorMode}
-              setSeniorMode={setSeniorMode}
-              selectedService={selectedService}
-              setSelectedService={setSelectedService}
-              selectedWorker={selectedWorker}
-              setSelectedWorker={setSelectedWorker}
-              language={language}
-              changeLanguage={changeLanguage}
-              showWelcome={showWelcome}
-              setShowWelcome={setShowWelcome}
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
-              workerLoggedIn={workerLoggedIn}
-              setWorkerLoggedIn={setWorkerLoggedIn}
-              showLogin={showLogin}
-              setShowLogin={setShowLogin}
-              showRegister={showRegister}
-              setShowRegister={setShowRegister}
-            />
-          }
-        />
-
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/dashboard" element={<CustomerDashboard />} />
-        <Route path="/bookings" element={<MyBookings />} />
-
-        <Route
-          path="/services"
-          element={
-            selectedWorker ? (
-              <BookingForm
+      {/* MAIN APP WRAPPER */}
+      <div
+        className={`bg-[#B4DBDC] min-h-screen pb-20 overflow-x-hidden ${
+          seniorMode ? "text-xl" : "text-base"
+        }`}
+      >
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                seniorMode={seniorMode}
+                setSeniorMode={setSeniorMode}
+                selectedService={selectedService}
+                setSelectedService={setSelectedService}
                 selectedWorker={selectedWorker}
                 setSelectedWorker={setSelectedWorker}
+                language={language}
+                changeLanguage={changeLanguage}
+                showWelcome={showWelcome}
+                setShowWelcome={setShowWelcome}
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                workerLoggedIn={workerLoggedIn}
+                setWorkerLoggedIn={setWorkerLoggedIn}
               />
-            ) : (
-              <Workers
-                setSelectedWorker={setSelectedWorker}
-                selectedService="All"
-              />
-            )
-          }
-        />
-      </Routes>
-    </div>
-  </>
-);
+            }
+          />
+
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/dashboard" element={<CustomerDashboard />} />
+          <Route path="/bookings" element={<MyBookings />} />
+
+          <Route
+            path="/services"
+            element={
+              selectedWorker ? (
+                <BookingForm
+                  selectedWorker={selectedWorker}
+                  setSelectedWorker={setSelectedWorker}
+                />
+              ) : (
+                <Workers
+                  setSelectedWorker={setSelectedWorker}
+                  selectedService="All"
+                />
+              )
+            }
+          />
+        </Routes>
+      </div>
+    </>
+  );
 }
 
 export default App;
