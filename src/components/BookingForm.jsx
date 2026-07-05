@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   FaArrowLeft,
   FaCheckCircle,
+  FaMicrophone,
 } from "react-icons/fa";
 
 function BookingForm({ selectedWorker, setSelectedWorker }) {
@@ -24,6 +25,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [profileAddress, setProfileAddress] = useState("");
   const [addressChoice, setAddressChoice] = useState("");
   const [customAddress, setCustomAddress] = useState("");
+
+  const [listeningIssue, setListeningIssue] = useState(false);
 
   const formatSavedAddress = (address) => {
     if (!address) return "";
@@ -127,12 +130,63 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     });
   };
 
+  const startIssueVoiceInput = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice typing is not supported in this browser. Please use Chrome.");
+      return;
+    }
+
+    if (listeningIssue) return;
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "hi-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setListeningIssue(true);
+    };
+
+    recognition.onend = () => {
+      setListeningIssue(false);
+    };
+
+    recognition.onerror = (event) => {
+      console.log("Voice error:", event.error);
+      setListeningIssue(false);
+
+      if (event.error === "not-allowed") {
+        alert("Please allow microphone permission.");
+      } else {
+        alert("Voice input failed. Please try again.");
+      }
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+
+      setFormData((prev) => ({
+        ...prev,
+        issueDescription: prev.issueDescription
+          ? `${prev.issueDescription} ${transcript}`
+          : transcript,
+      }));
+    };
+
+    recognition.start();
+  };
+
   const resetBooking = () => {
     setSuccess(false);
     setSelectedWorker(null);
     setAcceptedTerms(false);
     setAddressChoice("");
     setCustomAddress("");
+    setListeningIssue(false);
 
     setFormData({
       name: "",
@@ -558,19 +612,45 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-[#08566E] font-bold mb-2">
-                  Issue Description
-                </label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+                  <label className="block text-[#08566E] font-bold">
+                    Issue Description
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={startIssueVoiceInput}
+                    disabled={listeningIssue}
+                    className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold transition ${
+                      listeningIssue
+                        ? "bg-red-500 text-white cursor-not-allowed animate-pulse"
+                        : "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
+                    }`}
+                  >
+                    <FaMicrophone />
+                    {listeningIssue ? "Listening..." : "Speak Issue"}
+                  </button>
+                </div>
 
                 <textarea
                   name="issueDescription"
-                  placeholder="Describe your issue clearly..."
+                  placeholder="Describe your issue clearly or use voice..."
                   value={formData.issueDescription}
                   onChange={handleChange}
                   className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
                   rows="5"
                   required
                 />
+
+                {listeningIssue && (
+                  <p className="mt-2 text-sm font-bold text-red-600 animate-pulse">
+                    🎤 Listening... Please speak your issue now.
+                  </p>
+                )}
+
+                <p className="mt-2 text-xs text-[#08566E]/70">
+                  Voice typing works best in Chrome. You can speak in Hindi or Hinglish.
+                </p>
               </div>
 
               <div className="md:col-span-2 bg-[#08566E]/10 border border-[#08566E]/20 rounded-2xl p-4">
