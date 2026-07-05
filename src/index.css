@@ -486,3 +486,155 @@ body,
     font-size: 15px;
   }
 }
+
+/* ========== GLOBAL E-SERVOO LIQUID GLASS BUTTONS ========== */
+
+#root button:not(.es-no-liquid) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  border-radius: 999px !important;
+  border: 1px solid rgba(225, 233, 229, 0.55) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(225, 233, 229, 0.55),
+      rgba(180, 219, 220, 0.36),
+      rgba(111, 168, 170, 0.42)
+    ) !important;
+
+  color: #08566E !important;
+
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+
+  box-shadow:
+    0 10px 24px rgba(8, 86, 110, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -10px 22px rgba(8, 86, 110, 0.08) !important;
+
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    background 0.28s ease,
+    color 0.28s ease !important;
+}
+
+/* Liquid shine layer */
+#root button:not(.es-no-liquid)::before {
+  content: "";
+  position: absolute;
+  top: -80%;
+  left: -120%;
+  width: 80%;
+  height: 260%;
+
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+
+  transform: rotate(25deg);
+  transition: left 0.65s ease;
+  z-index: -1;
+}
+
+/* Inner glow */
+#root button:not(.es-no-liquid)::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(255, 255, 255, 0.35),
+      transparent 36%
+    );
+
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Hover effect */
+#root button:not(.es-no-liquid):hover {
+  transform: translateY(-2px) scale(1.02) !important;
+
+  color: #E1E9E5 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(8, 86, 110, 0.96),
+      rgba(10, 111, 120, 0.9),
+      rgba(111, 168, 170, 0.86)
+    ) !important;
+
+  border-color: rgba(225, 233, 229, 0.75) !important;
+
+  box-shadow:
+    0 16px 34px rgba(8, 86, 110, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+#root button:not(.es-no-liquid):hover::before {
+  left: 140%;
+}
+
+/* Click effect */
+#root button:not(.es-no-liquid):active {
+  transform: translateY(0) scale(0.97) !important;
+  box-shadow:
+    0 7px 16px rgba(8, 86, 110, 0.22),
+    inset 0 3px 10px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Disabled button */
+#root button:not(.es-no-liquid):disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Keep listening mic red */
+#root button.animate-pulse {
+  background: rgba(239, 68, 68, 0.9) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Auth form main buttons extra premium */
+.es-auth-btn {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(225, 233, 229, 0.72),
+      rgba(158, 207, 208, 0.58),
+      rgba(111, 168, 170, 0.68)
+    ) !important;
+
+  color: #08566E !important;
+
+  box-shadow:
+    0 14px 32px rgba(8, 86, 110, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+
+.es-auth-btn:hover {
+  color: #E1E9E5 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #08566E,
+      #0A6F78,
+      #6FA8AA
+    ) !important;
+}
