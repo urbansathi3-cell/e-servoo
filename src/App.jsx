@@ -199,7 +199,7 @@ function App() {
       }`}
     >
       {/* GLOBAL FLOATING AI */}
-      <AIAssistant />
+      <AIAssistant language={language} />
 
       <Routes>
         <Route
