@@ -756,3 +756,173 @@ body,
     font-size: 1.45rem !important;
   }
 }
+
+/* ========== E-SERVOO SMOOTH LOADER ========== */
+
+.es-loader-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background:
+    radial-gradient(circle at top left, #E1E9E5 0%, transparent 35%),
+    radial-gradient(circle at bottom right, #6FA8AA 0%, transparent 40%),
+    linear-gradient(135deg, #E1E9E5, #B4DBDC, #9ECFD0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: esLoaderFadeIn 0.4s ease forwards;
+}
+
+.es-loader-card {
+  width: min(90vw, 380px);
+  padding: 42px 28px;
+  border-radius: 36px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 80px rgba(8, 86, 110, 0.28);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.es-loader-card::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: rgba(8, 86, 110, 0.16);
+  border-radius: 50%;
+  top: -70px;
+  right: -70px;
+  filter: blur(4px);
+}
+
+.es-loader-logo {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 22px;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #08566E, #0A6F78);
+  color: #E1E9E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 46px;
+  font-weight: 900;
+  box-shadow: 0 18px 40px rgba(8, 86, 110, 0.35);
+  animation: esLogoFloat 1.8s ease-in-out infinite;
+}
+
+.es-loader-logo span {
+  animation: esLogoPulse 1.5s ease-in-out infinite;
+}
+
+.es-loader-title {
+  color: #08566E;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.es-loader-subtitle {
+  color: rgba(8, 86, 110, 0.78);
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.es-loader-ring {
+  width: 86px;
+  height: 86px;
+  margin: 30px auto 24px;
+  position: relative;
+}
+
+.es-loader-ring span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #08566E;
+  animation: esSpin 1.1s linear infinite;
+}
+
+.es-loader-ring span:nth-child(2) {
+  inset: 10px;
+  border-top-color: #6FA8AA;
+  animation-duration: 1.45s;
+  animation-direction: reverse;
+}
+
+.es-loader-ring span:nth-child(3) {
+  inset: 20px;
+  border-top-color: #E1E9E5;
+  animation-duration: 1.9s;
+}
+
+.es-loader-progress {
+  width: 100%;
+  height: 9px;
+  background: rgba(8, 86, 110, 0.16);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.es-loader-progress div {
+  height: 100%;
+  width: 45%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #08566E, #6FA8AA, #E1E9E5);
+  animation: esProgress 1.4s ease-in-out infinite;
+}
+
+@keyframes esLoaderFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes esLogoFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-10px) scale(1.04);
+  }
+}
+
+@keyframes esLogoPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes esSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes esProgress {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  50% {
+    transform: translateX(70%);
+  }
+
+  100% {
+    transform: translateX(250%);
+  }
+}
