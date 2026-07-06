@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { translations } from "./translations";
 
@@ -14,6 +14,7 @@ import CustomerDashboard from "./components/CustomerDashboard";
 import MyBookings from "./components/MyBookings";
 import WhatsappButton from "./components/WhatsappButton";
 import FooterNav from "./components/FooterNav";
+import Loader from "./components/Loader";
 
 import Profile from "./components/Profile";
 import Contact from "./components/Contact";
@@ -55,9 +56,6 @@ function HomePage({
     );
   }
 
-  console.log("showWelcome =", showWelcome);
-  console.log("user =", localStorage.getItem("user"));
-
   if (!isLoggedIn) {
     if (workerLoggedIn) {
       return <WorkerDashboard />;
@@ -67,10 +65,12 @@ function HomePage({
       <>
         <Login
           setIsLoggedIn={setIsLoggedIn}
+          language={language}
         />
 
         <WorkerLogin
           setWorkerLoggedIn={setWorkerLoggedIn}
+          language={language}
         />
       </>
     );
@@ -78,7 +78,7 @@ function HomePage({
 
   return (
     <>
-      <Navbar />
+      <Navbar language={language} />
 
       {selectedWorker ? (
         <BookingForm
@@ -148,9 +148,9 @@ function HomePage({
 
           <Hero language={language} />
 
-          <Stats />
+          <Stats language={language} />
 
-          <WorkerOfMonth />
+          <WorkerOfMonth language={language} />
 
           <Services
             setSelectedService={setSelectedService}
@@ -165,6 +165,8 @@ function HomePage({
 }
 
 function App() {
+  const [pageLoading, setPageLoading] = useState(true);
+
   const [selectedService, setSelectedService] = useState("All");
 
   const [selectedWorker, setSelectedWorker] = useState(null);
@@ -187,10 +189,22 @@ function App() {
     localStorage.getItem("lang") || "en"
   );
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const changeLanguage = (lang) => {
     setLanguage(lang);
     localStorage.setItem("lang", lang);
   };
+
+  if (pageLoading) {
+    return <Loader />;
+  }
 
   return (
     <div
@@ -290,7 +304,11 @@ function App() {
       </Routes>
 
       {/* LIQUID FOOTER NAV */}
-      {isLoggedIn && <FooterNav />}
+      {isLoggedIn && (
+        <FooterNav
+          language={language}
+        />
+      )}
     </div>
   );
 }
