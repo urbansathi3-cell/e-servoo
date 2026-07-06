@@ -4,7 +4,7 @@ import { translations } from "../translations";
 
 function Workers({
   setSelectedWorker,
-  selectedService,
+  selectedService = "All",
   language = "en",
 }) {
   const navigate = useNavigate();
@@ -13,6 +13,11 @@ function Workers({
   const [workers, setWorkers] = useState([]);
   const [sortBy, setSortBy] = useState("");
   const [search, setSearch] = useState("");
+  const [activeService, setActiveService] = useState(selectedService || "All");
+
+  useEffect(() => {
+    setActiveService(selectedService || "All");
+  }, [selectedService]);
 
   useEffect(() => {
     const fetchWorkers = () => {
@@ -41,6 +46,20 @@ function Workers({
     return () => clearInterval(interval);
   }, []);
 
+  const serviceFilters = [
+    "All",
+    "Electrician",
+    "Plumber",
+    "Carpenter",
+    "Cleaner",
+    "Cook",
+    "Painter",
+    "AC Repair",
+    "Home Tutor",
+    "Appliance Repair",
+    "CCTV Service",
+  ];
+
   const isAvailable = (worker) => {
     return worker.status?.trim().toLowerCase() === "available";
   };
@@ -62,6 +81,11 @@ function Workers({
     return service;
   };
 
+  const getFilterText = (service) => {
+    if (service === "All") return t.all || "All";
+    return getServiceText(service);
+  };
+
   let filteredWorkers = [...workers];
 
   if (sortBy === "rating") {
@@ -78,9 +102,10 @@ function Workers({
 
   const visibleWorkers = filteredWorkers
     .filter((worker) =>
-      selectedService === "All"
+      activeService === "All"
         ? true
-        : worker.service?.toLowerCase() === selectedService.toLowerCase()
+        : worker.service?.trim().toLowerCase() ===
+          activeService.trim().toLowerCase()
     )
     .filter((worker) =>
       worker.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -96,7 +121,7 @@ function Workers({
       <div className="max-w-7xl mx-auto">
 
         {/* TOP BAR */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-10">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
           <div>
             <button
               onClick={() => navigate("/")}
@@ -143,6 +168,30 @@ function Workers({
           </div>
         </div>
 
+        {/* SERVICE FILTER BUTTONS */}
+        <div className="mb-10 bg-white/35 backdrop-blur-xl border border-white/60 rounded-[28px] p-4 shadow-xl">
+          <p className="text-[#08566E] font-extrabold mb-4">
+            Filter by Service
+          </p>
+
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {serviceFilters.map((service) => (
+              <button
+                key={service}
+                type="button"
+                onClick={() => setActiveService(service)}
+                className={`shrink-0 px-5 py-3 rounded-full font-extrabold transition ${
+                  activeService === service
+                    ? "bg-[#08566E] text-[#E1E9E5] shadow-lg"
+                    : "bg-[#E1E9E5] text-[#08566E] hover:bg-[#B4DBDC]"
+                }`}
+              >
+                {getFilterText(service)}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* WORKER GRID */}
         {visibleWorkers.length === 0 ? (
           <div className="bg-[#E1E9E5] border border-[#6FA8AA] rounded-3xl p-8 text-center shadow-xl">
@@ -169,12 +218,9 @@ function Workers({
                     : "bg-white/30 border-white/50 opacity-60 cursor-not-allowed"
                 }`}
               >
-                {/* TOP STRIP */}
                 <div className="absolute top-0 left-0 right-0 h-24 bg-[#08566E]"></div>
 
                 <div className="relative p-5">
-
-                  {/* IMAGE + STATUS */}
                   <div className="flex items-start justify-between">
                     <img
                       src={worker.image || "https://via.placeholder.com/150"}
@@ -197,7 +243,6 @@ function Workers({
                     )}
                   </div>
 
-                  {/* WORKER INFO */}
                   <div className="mt-5">
                     <h3 className="text-2xl font-extrabold text-[#08566E] leading-tight">
                       {worker.name}
@@ -208,7 +253,6 @@ function Workers({
                     </p>
                   </div>
 
-                  {/* CERTIFICATE */}
                   {worker.CertificateLink && (
                     <a
                       href={worker.CertificateLink}
@@ -223,7 +267,6 @@ function Workers({
                     </a>
                   )}
 
-                  {/* MINI DETAILS */}
                   <div className="grid grid-cols-3 gap-2 mt-5">
                     <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
                       <p className="text-xs text-[#6FA8AA] font-bold">
@@ -256,7 +299,6 @@ function Workers({
                     </div>
                   </div>
 
-                  {/* VERIFIED + PRICING */}
                   <div className="mt-5 bg-[#08566E] rounded-3xl p-4">
                     <p className="text-[#E1E9E5] font-extrabold text-lg">
                       ✔ {t.verifiedProfessional || "Verified Professional"}
@@ -267,7 +309,6 @@ function Workers({
                     </p>
                   </div>
 
-                  {/* ACTION */}
                   <button
                     type="button"
                     disabled={!isAvailable(worker)}
@@ -281,7 +322,6 @@ function Workers({
                       ? `⚡ ${t.bookNow || "Book Now"}`
                       : t.busy || "Busy"}
                   </button>
-
                 </div>
               </div>
             ))}
