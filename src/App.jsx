@@ -284,23 +284,23 @@ function App() {
         />
 
         <Route
-          path="/services"
-          element={
-            selectedWorker ? (
-              <BookingForm
-                selectedWorker={selectedWorker}
-                setSelectedWorker={setSelectedWorker}
-                language={language}
-              />
-            ) : (
-              <Workers
-                setSelectedWorker={setSelectedWorker}
-                selectedService="All"
-                language={language}
-              />
-            )
-          }
-        />
+  path="/services"
+  element={
+    selectedWorker ? (
+      <BookingForm
+        selectedWorker={selectedWorker}
+        setSelectedWorker={setSelectedWorker}
+        language={language}
+      />
+    ) : (
+      <Workers
+        setSelectedWorker={setSelectedWorker}
+        selectedService={selectedService}
+        language={language}
+      />
+    )
+  }
+/>
       </Routes>
 
       {/* LIQUID FOOTER NAV */}
