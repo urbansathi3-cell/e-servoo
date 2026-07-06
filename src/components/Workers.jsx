@@ -84,106 +84,131 @@ function Workers({
     )
     .filter((worker) =>
       worker.name?.toLowerCase().includes(search.toLowerCase()) ||
-      worker.service?.toLowerCase().includes(search.toLowerCase())
+      worker.service?.toLowerCase().includes(search.toLowerCase()) ||
+      worker.location?.toLowerCase().includes(search.toLowerCase())
     );
 
   return (
     <section
       id="workers"
-      className="bg-[#B4DBDC] text-slate-900 py-24 px-5"
+      className="bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] text-slate-900 py-20 px-5"
     >
-      {/* BACK BUTTON */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <button
-          onClick={() => navigate("/")}
-          className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-5 py-3 rounded-xl font-bold shadow-lg transition"
-        >
-          ← {t.backToHome || "Back to Home"}
-        </button>
-      </div>
+      <div className="max-w-7xl mx-auto">
 
-      <h2 className="text-5xl font-bold text-center text-[#08566E] mb-12">
-        {t.ourWorkers || "Our Workers"}
-      </h2>
+        {/* TOP BAR */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-10">
+          <div>
+            <button
+              onClick={() => navigate("/")}
+              className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-5 py-3 rounded-full font-bold shadow-lg transition"
+            >
+              ← {t.backToHome || "Back to Home"}
+            </button>
 
-      <div className="max-w-xl mx-auto mb-8">
-        <input
-          type="text"
-          placeholder={t.searchWorkers || "Search Workers"}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-4 rounded-xl bg-[#E1E9E5] border border-[#8FBDBE] text-slate-900 focus:border-[#08566E] outline-none"
-        />
-      </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#08566E] mt-6">
+              {t.ourWorkers || "Our Workers"}
+            </h2>
 
-      <div className="max-w-xl mx-auto mb-8">
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="w-full p-4 rounded-xl bg-[#E1E9E5] border border-[#8FBDBE] text-slate-900"
-        >
-          <option value="">
-            {t.sortWorkers || "Sort Workers"}
-          </option>
+            <p className="text-[#08566E]/75 mt-2 font-semibold">
+              Verified local professionals ready for your service.
+            </p>
+          </div>
 
-          <option value="rating">
-            {t.ratingHighToLow || "Rating High → Low"}
-          </option>
+          <div className="bg-white/35 backdrop-blur-xl border border-white/60 rounded-3xl p-4 shadow-xl w-full md:w-[420px]">
+            <input
+              type="text"
+              placeholder={t.searchWorkers || "Search Workers"}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full p-3 rounded-2xl bg-[#E1E9E5] border border-[#8FBDBE] text-[#08566E] font-semibold focus:border-[#08566E] outline-none mb-3"
+            />
 
-          <option value="available">
-            {t.availableOnly || "Available Only"}
-          </option>
-        </select>
-      </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full p-3 rounded-2xl bg-[#E1E9E5] border border-[#8FBDBE] text-[#08566E] font-semibold outline-none"
+            >
+              <option value="">
+                {t.sortWorkers || "Sort Workers"}
+              </option>
 
-      <div className="max-w-7xl mx-auto space-y-6">
+              <option value="rating">
+                {t.ratingHighToLow || "Rating High → Low"}
+              </option>
+
+              <option value="available">
+                {t.availableOnly || "Available Only"}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        {/* WORKER GRID */}
         {visibleWorkers.length === 0 ? (
-          <div className="bg-[#E1E9E5] border border-[#6FA8AA] rounded-3xl p-8 text-center">
+          <div className="bg-[#E1E9E5] border border-[#6FA8AA] rounded-3xl p-8 text-center shadow-xl">
             <p className="text-[#08566E] font-bold text-xl">
               {t.noWorkersFound || "No workers found"}
             </p>
           </div>
         ) : (
-          visibleWorkers.map((worker, index) => (
-            <div
-              key={index}
-              onClick={() => {
-                if (!isAvailable(worker)) return;
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {visibleWorkers.map((worker, index) => (
+              <div
+                key={index}
+                onClick={() => {
+                  if (!isAvailable(worker)) return;
 
-                setSelectedWorker({
-                  ...worker,
-                  status: worker.status,
-                });
-              }}
-              className={`bg-[#8FBDBE] border border-[#6FA6A8] rounded-3xl p-5 flex flex-col md:flex-row gap-4 md:items-center md:justify-between transition
-                ${
+                  setSelectedWorker({
+                    ...worker,
+                    status: worker.status,
+                  });
+                }}
+                className={`group relative overflow-hidden rounded-[28px] border shadow-xl transition duration-300 ${
                   isAvailable(worker)
-                    ? "hover:border-[#08566E] cursor-pointer"
-                    : "opacity-50 cursor-not-allowed"
+                    ? "bg-white/45 border-white/70 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                    : "bg-white/30 border-white/50 opacity-60 cursor-not-allowed"
                 }`}
-            >
-              <div className="flex items-center gap-4">
-                <img
-                  src={worker.image || "https://via.placeholder.com/150"}
-                  alt={worker.name}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/150";
-                  }}
-                  className="w-16 h-16 rounded-2xl object-cover"
-                />
+              >
+                {/* TOP STRIP */}
+                <div className="absolute top-0 left-0 right-0 h-24 bg-[#08566E]"></div>
 
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-xl text-[#08566E]">
-                      {worker.name}
-                    </h3>
+                <div className="relative p-5">
+
+                  {/* IMAGE + STATUS */}
+                  <div className="flex items-start justify-between">
+                    <img
+                      src={worker.image || "https://via.placeholder.com/150"}
+                      alt={worker.name}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/150";
+                      }}
+                      className="w-20 h-20 rounded-3xl object-cover border-4 border-[#E1E9E5] shadow-xl"
+                    />
+
+                    {isAvailable(worker) ? (
+                      <span className="bg-[#E1E9E5] text-[#08566E] px-3 py-1 rounded-full text-xs font-extrabold shadow-md">
+                        {t.available || "Available"}
+                      </span>
+                    ) : (
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-extrabold shadow-md">
+                        {t.busy || "Busy"}
+                      </span>
+                    )}
                   </div>
 
-                  <p className="text-[#0A5E75]">
-                    {getServiceText(worker.service)}
-                  </p>
+                  {/* WORKER INFO */}
+                  <div className="mt-5">
+                    <h3 className="text-2xl font-extrabold text-[#08566E] leading-tight">
+                      {worker.name}
+                    </h3>
 
+                    <p className="text-[#0A5E75] font-bold mt-1">
+                      {getServiceText(worker.service)}
+                    </p>
+                  </div>
+
+                  {/* CERTIFICATE */}
                   {worker.CertificateLink && (
                     <a
                       href={worker.CertificateLink}
@@ -192,52 +217,77 @@ function Workers({
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
-                      className="text-[#08566E] text-xs font-semibold hover:underline"
+                      className="inline-block mt-3 text-[#08566E] text-xs font-extrabold hover:underline"
                     >
                       📜 {t.verifiedSkillCertificate || "Verified Skill Certificate"}
                     </a>
                   )}
 
-                  <div className="flex flex-wrap gap-3 mt-2 text-sm">
-                    <span className="text-yellow-400">
-                      ⭐ {worker.rating || "4.8"}
-                    </span>
+                  {/* MINI DETAILS */}
+                  <div className="grid grid-cols-3 gap-2 mt-5">
+                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
+                      <p className="text-xs text-[#6FA8AA] font-bold">
+                        Rating
+                      </p>
 
-                    <span className="text-slate-700">
-                      📍 {worker.location || t.localArea || "Local Area"}
-                    </span>
+                      <p className="text-[#08566E] font-extrabold">
+                        ⭐ {worker.rating || "4.8"}
+                      </p>
+                    </div>
 
-                    <span className="text-green-500 font-semibold">
-                      🛡️ {worker.TrustScore || "90"}% {t.trust || "Trust"}
-                    </span>
+                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
+                      <p className="text-xs text-[#6FA8AA] font-bold">
+                        {t.trust || "Trust"}
+                      </p>
+
+                      <p className="text-[#08566E] font-extrabold">
+                        {worker.TrustScore || "90"}%
+                      </p>
+                    </div>
+
+                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
+                      <p className="text-xs text-[#6FA8AA] font-bold">
+                        Area
+                      </p>
+
+                      <p className="text-[#08566E] font-extrabold truncate">
+                        {worker.location || t.localArea || "Local"}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* VERIFIED + PRICING */}
+                  <div className="mt-5 bg-[#08566E] rounded-3xl p-4">
+                    <p className="text-[#E1E9E5] font-extrabold text-lg">
+                      ✔ {t.verifiedProfessional || "Verified Professional"}
+                    </p>
+
+                    <p className="text-[#B4DBDC] text-sm font-semibold mt-1">
+                      {t.inspectionBasedPricing || "Inspection Based Pricing"}
+                    </p>
+                  </div>
+
+                  {/* ACTION */}
+                  <button
+                    type="button"
+                    disabled={!isAvailable(worker)}
+                    className={`mt-5 w-full py-3 rounded-2xl font-extrabold transition ${
+                      isAvailable(worker)
+                        ? "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
+                        : "bg-gray-400 text-white cursor-not-allowed"
+                    }`}
+                  >
+                    {isAvailable(worker)
+                      ? `⚡ ${t.bookNow || "Book Now"}`
+                      : t.busy || "Busy"}
+                  </button>
+
                 </div>
               </div>
-
-              <div className="text-right">
-                <h3 className="text-xl font-bold text-[#08566E]">
-                  ✔ {t.verifiedProfessional || "Verified Professional"}
-                </h3>
-
-                <p className="text-[#E1E9E5] text-sm font-medium">
-                  {t.inspectionBasedPricing || "Inspection Based Pricing"}
-                </p>
-
-                <div className="mt-2">
-                  {isAvailable(worker) ? (
-                    <span className="bg-[#08566E] text-[#E1E9E5] px-3 py-1 rounded-full text-sm">
-                      {t.available || "Available"}
-                    </span>
-                  ) : (
-                    <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                      {t.busy || "Busy"}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
+
       </div>
     </section>
   );
