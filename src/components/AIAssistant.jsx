@@ -8,7 +8,7 @@ import {
   FaVolumeUp,
 } from "react-icons/fa";
 
-function AIAssistant() {
+function AIAssistant({ language = localStorage.getItem("lang") || "en" }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -21,6 +21,7 @@ function AIAssistant() {
   const recognitionRef = useRef(null);
   const bestVoiceRef = useRef(null);
   const messagesRef = useRef([]);
+  const languageRef = useRef(language);
 
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -30,13 +31,45 @@ function AIAssistant() {
     y: 200,
   });
 
-  const defaultMessages = [
-    {
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
+
+  const getLanguageName = () => {
+    if (languageRef.current === "hi") return "Hindi/Hinglish";
+    if (languageRef.current === "od") return "Odia";
+    return "English/Hinglish";
+  };
+
+  const getSpeechLang = () => {
+    if (languageRef.current === "hi") return "hi-IN";
+    if (languageRef.current === "od") return "or-IN";
+    return "en-IN";
+  };
+
+  const getDefaultMessage = () => {
+    if (languageRef.current === "hi") {
+      return {
+        sender: "ai",
+        text:
+          "👋 Namaste! Main E-SERVOO AI hoon.\n\nMain aapki help kar sakta hoon:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency Service\n\nAap type bhi kar sakte ho ya mic se bol bhi sakte ho 🎤.",
+      };
+    }
+
+    if (languageRef.current === "od") {
+      return {
+        sender: "ai",
+        text:
+          "👋 ନମସ୍କାର! ମୁଁ E-SERVOO AI।\n\nମୁଁ ଆପଣଙ୍କୁ ଏହି ସେବାରେ ସାହାଯ୍ୟ କରିପାରିବି:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency Service\n\nଆପଣ type କରିପାରିବେ କିମ୍ବା mic ରେ କହିପାରିବେ 🎤.",
+      };
+    }
+
+    return {
       sender: "ai",
       text:
-        "👋 Namaste! Main E-SERVOO AI hoon.\n\nMain aapki help kar sakta hoon:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency Service\n\nAap type bhi kar sakte ho ya mic se bol bhi sakte ho 🎤.",
-    },
-  ];
+        "👋 Hello! I am E-SERVOO AI.\n\nI can help you with:\n\n⚡ Electrician\n🚿 Plumber\n🧹 Cleaner\n👨‍🍳 Cook\n💰 Cost Estimate\n📖 Booking\n🚨 Emergency Service\n\nYou can type or use the mic 🎤.",
+    };
+  };
 
   const [messages, setMessages] = useState(() => {
     try {
@@ -46,10 +79,10 @@ function AIAssistant() {
         return JSON.parse(savedMessages);
       }
 
-      return defaultMessages;
+      return [getDefaultMessage()];
     } catch (error) {
       console.log(error);
-      return defaultMessages;
+      return [getDefaultMessage()];
     }
   });
 
@@ -68,7 +101,7 @@ function AIAssistant() {
     });
   }, [messages, typing]);
 
-  /* ================= INDIAN VOICE LOADER ================= */
+  /* ================= MULTI-LANGUAGE HUMAN VOICE LOADER ================= */
 
   useEffect(() => {
     const getVoiceScore = (voice) => {
@@ -76,27 +109,50 @@ function AIAssistant() {
       const lang = voice.lang.toLowerCase();
 
       let score = 0;
+      const currentLang = languageRef.current;
 
-      if (lang === "en-in") score += 120;
-      if (lang === "hi-in") score += 110;
-      if (lang.includes("in")) score += 40;
-      if (lang.includes("hi")) score += 30;
+      if (currentLang === "od") {
+        if (lang === "or-in") score += 200;
+        if (lang.includes("or")) score += 140;
+        if (name.includes("odia")) score += 150;
+        if (name.includes("oriya")) score += 150;
+        if (name.includes("ଓଡ଼ିଆ")) score += 150;
 
-      if (name.includes("india")) score += 35;
-      if (name.includes("indian")) score += 35;
-      if (name.includes("google")) score += 25;
-      if (name.includes("microsoft")) score += 20;
-      if (name.includes("natural")) score += 25;
+        // Odia voice rare hoti hai, fallback Indian Hindi/English
+        if (lang === "hi-in") score += 80;
+        if (lang === "en-in") score += 70;
+      }
 
-      if (name.includes("heera")) score += 40;
-      if (name.includes("ravi")) score += 40;
-      if (name.includes("neerja")) score += 40;
-      if (name.includes("prabhat")) score += 40;
-      if (name.includes("hindi")) score += 25;
-      if (name.includes("हिन्दी")) score += 25;
-      if (name.includes("हिंदी")) score += 25;
+      if (currentLang === "hi") {
+        if (lang === "hi-in") score += 180;
+        if (lang === "en-in") score += 120;
+        if (lang.includes("hi")) score += 80;
+      }
 
-      if (lang.startsWith("en")) score += 10;
+      if (currentLang === "en") {
+        if (lang === "en-in") score += 180;
+        if (lang === "hi-in") score += 80;
+        if (lang.startsWith("en")) score += 60;
+      }
+
+      if (lang.includes("in")) score += 45;
+
+      // More natural sounding voices
+      if (name.includes("google")) score += 35;
+      if (name.includes("microsoft")) score += 30;
+      if (name.includes("natural")) score += 40;
+      if (name.includes("online")) score += 25;
+      if (name.includes("neural")) score += 35;
+      if (name.includes("premium")) score += 25;
+
+      // Indian voice names
+      if (name.includes("india")) score += 40;
+      if (name.includes("indian")) score += 40;
+      if (name.includes("heera")) score += 45;
+      if (name.includes("ravi")) score += 45;
+      if (name.includes("neerja")) score += 45;
+      if (name.includes("prabhat")) score += 45;
+      if (name.includes("hindi")) score += 30;
 
       return score;
     };
@@ -132,18 +188,22 @@ function AIAssistant() {
         window.speechSynthesis.onvoiceschanged = null;
       }
     };
-  }, []);
+  }, [language]);
 
   const quickAsk = (text) => {
     setInput(text);
   };
 
-  /* ================= CONTEXT AWARE HINGLISH PROMPT ================= */
+  /* ================= CONTEXT AWARE MULTI-LANGUAGE PROMPT ================= */
 
-  const makeHinglishPrompt = (userMessage, conversationMessages) => {
+  const makeLanguagePrompt = (userMessage, conversationMessages) => {
+    const selectedLanguage = getLanguageName();
+
     const realConversation = conversationMessages.filter(
       (msg) =>
         !msg.text.includes("Namaste! Main E-SERVOO AI hoon") &&
+        !msg.text.includes("ମୁଁ E-SERVOO AI") &&
+        !msg.text.includes("I am E-SERVOO AI") &&
         !msg.text.includes("Main aapki help kar sakta hoon")
     );
 
@@ -164,15 +224,20 @@ You are E-SERVOO AI assistant.
 E-SERVOO is a hyperlocal home service platform for:
 Electrician, Plumber, Cleaner, Cook, Carpenter, Painter, AC Repair, Appliance Repair, CCTV, Tutor, Booking, Emergency Service and Cost Estimate.
 
-Reply behavior:
-- Reply in simple Indian Hinglish.
-- Use Roman Hindi/Hinglish, like: "aap", "service", "booking", "issue", "estimate", "professional".
+Selected app language: ${selectedLanguage}
+
+Language rules:
+- If selected language is Odia, reply mainly in simple Odia script.
+- If selected language is Hindi/Hinglish, reply in simple Indian Hinglish/Roman Hindi.
+- If selected language is English/Hinglish, reply in simple Indian English with Hinglish touch.
+- Do NOT mix too many languages in one reply.
+- Keep service names like Electrician, Plumber, Cleaner okay in English if needed.
 - Do NOT sound American.
 - Do NOT say "Namaste", "Welcome", or introduce yourself again and again.
 - Greet only when it is the first real user message.
 - Current real user message count: ${userMessageCount}
 - Continue the conversation using previous chat context.
-- Understand references like "same", "uska", "ye", "wo", "pichla", "that issue", "same worker".
+- Understand references like "same", "uska", "ye", "wo", "pichla", "that issue", "same worker", "seita", "eita".
 - Keep replies short, practical and helpful.
 - Stay focused only on E-SERVOO home/local services.
 - For repair cost, give estimate in Indian rupees.
@@ -185,11 +250,11 @@ ${conversationHistory || "No previous real conversation yet."}
 Current user message:
 ${userMessage}
 
-Reply naturally in Hinglish. Do not repeat greeting unless this is the first real user message.
+Reply naturally in the selected language. Do not repeat greeting unless this is the first real user message.
     `;
   };
 
-  /* ================= IMPROVED INDIAN HINGLISH VOICE ================= */
+  /* ================= HUMANIZED MULTI-LANGUAGE VOICE ================= */
 
   const speakText = (text) => {
     if (!voiceReply) return;
@@ -238,28 +303,38 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
         utterance.voice = bestVoiceRef.current;
         utterance.lang = bestVoiceRef.current.lang;
       } else {
-        utterance.lang = "en-IN";
+        utterance.lang = getSpeechLang();
       }
 
-      utterance.rate = 0.78;
-      utterance.pitch = 1.03;
+      // Human-like slow clear assistant voice
+      if (languageRef.current === "od") {
+        utterance.rate = 0.72;
+        utterance.pitch = 1.02;
+      } else if (languageRef.current === "hi") {
+        utterance.rate = 0.76;
+        utterance.pitch = 1.03;
+      } else {
+        utterance.rate = 0.82;
+        utterance.pitch = 1.02;
+      }
+
       utterance.volume = 1;
 
       utterance.onend = () => {
         index++;
-        setTimeout(speakNextSentence, 180);
+        setTimeout(speakNextSentence, 220);
       };
 
       utterance.onerror = (error) => {
         console.log("Speech error:", error);
         index++;
-        setTimeout(speakNextSentence, 180);
+        setTimeout(speakNextSentence, 220);
       };
 
       window.speechSynthesis.speak(utterance);
     };
 
-    setTimeout(speakNextSentence, 120);
+    setTimeout(speakNextSentence, 160);
   };
 
   const askAI = async (userMessage, updatedMessages) => {
@@ -268,7 +343,7 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
     setTyping(true);
 
     try {
-      const finalPrompt = makeHinglishPrompt(
+      const finalPrompt = makeLanguagePrompt(
         userMessage,
         updatedMessages
       );
@@ -292,7 +367,11 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
       setTyping(false);
 
       const errorMessage =
-        "⚠️ Abhi AI available nahi hai. Thodi der baad dobara try kariye.";
+        languageRef.current === "od"
+          ? "⚠️ ଏବେ AI available ନାହିଁ। କିଛି ସମୟ ପରେ ପୁଣି try କରନ୍ତୁ।"
+          : languageRef.current === "hi"
+            ? "⚠️ Abhi AI available nahi hai. Thodi der baad dobara try kariye."
+            : "⚠️ AI is currently unavailable. Please try again later.";
 
       setMessages((prev) => [
         ...prev,
@@ -348,10 +427,10 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
 
     localStorage.removeItem("eservoo_ai_messages");
 
-    setMessages(defaultMessages);
+    setMessages([getDefaultMessage()]);
   };
 
-  /* ================= VOICE INPUT - INDIAN HINGLISH ================= */
+  /* ================= VOICE INPUT MULTI-LANGUAGE ================= */
 
   useEffect(() => {
     const SpeechRecognition =
@@ -364,7 +443,7 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
 
     const recognition = new SpeechRecognition();
 
-    recognition.lang = "hi-IN";
+    recognition.lang = getSpeechLang();
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -381,7 +460,13 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
       setListening(false);
 
       if (event.error === "not-allowed") {
-        alert("Mic permission allow kariye.");
+        alert(
+          languageRef.current === "od"
+            ? "Mic permission allow କରନ୍ତୁ।"
+            : languageRef.current === "hi"
+              ? "Mic permission allow kariye."
+              : "Please allow mic permission."
+        );
       }
     };
 
@@ -404,17 +489,24 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
     };
 
     recognitionRef.current = recognition;
-  }, []);
+  }, [language]);
 
   const startVoiceInput = () => {
     if (!recognitionRef.current) {
-      alert("Voice input is browser me supported nahi hai. Chrome use kariye.");
+      alert(
+        languageRef.current === "od"
+          ? "Voice input browser ରେ supported ନୁହେଁ। Chrome use କରନ୍ତୁ।"
+          : languageRef.current === "hi"
+            ? "Voice input is browser me supported nahi hai. Chrome use kariye."
+            : "Voice input is not supported in this browser. Please use Chrome."
+      );
       return;
     }
 
     if (listening) return;
 
     try {
+      recognitionRef.current.lang = getSpeechLang();
       recognitionRef.current.start();
     } catch (error) {
       console.log("Voice start error:", error);
@@ -471,6 +563,24 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
 
   const handleTouchEnd = () => {
     dragging.current = false;
+  };
+
+  const getTypingText = () => {
+    if (language === "od") return "AI ଭାବୁଛି...";
+    if (language === "hi") return "AI soch raha hai...";
+    return "AI is thinking...";
+  };
+
+  const getListeningText = () => {
+    if (language === "od") return "🎤 ଶୁଣୁଛି...";
+    if (language === "hi") return "🎤 Sun raha hoon...";
+    return "🎤 Listening...";
+  };
+
+  const getPlaceholderText = () => {
+    if (language === "od") return "କିଛି ପଚାରନ୍ତୁ...";
+    if (language === "hi") return "Kuch bhi poochiye...";
+    return "Ask anything...";
   };
 
   return (
@@ -639,13 +749,13 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
 
               {typing && (
                 <div className="bg-[#E1E9E5] text-[#08566E] px-4 py-3 rounded-2xl w-fit">
-                  AI soch raha hai...
+                  {getTypingText()}
                 </div>
               )}
 
               {listening && (
                 <div className="bg-red-100 text-red-700 px-4 py-3 rounded-2xl w-fit animate-pulse">
-                  🎤 Sun raha hoon...
+                  {getListeningText()}
                 </div>
               )}
 
@@ -661,7 +771,7 @@ Reply naturally in Hinglish. Do not repeat greeting unless this is the first rea
                 onKeyDown={(e) => {
                   if (e.key === "Enter") sendMessage();
                 }}
-                placeholder="Kuch bhi poochiye..."
+                placeholder={getPlaceholderText()}
                 className="flex-1 rounded-xl px-4 py-2 outline-none bg-white text-[#08566E]"
               />
 
