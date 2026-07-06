@@ -88,6 +88,7 @@ function HomePage({
         />
       ) : (
         <>
+          {/* LANGUAGE SELECTOR */}
           <div className="py-4 text-center">
             <p className="text-[#08566E] text-sm mb-3 font-bold">
               🌐 {t.chooseLanguage}
@@ -129,6 +130,22 @@ function HomePage({
             </div>
           </div>
 
+          {/* SENIOR MODE NEAR HERO */}
+          <div className="max-w-7xl mx-auto px-5 mb-4 flex justify-center md:justify-end">
+            <button
+              onClick={() => setSeniorMode(!seniorMode)}
+              className={`px-6 py-3 rounded-full font-extrabold shadow-xl transition hover:-translate-y-1 ${
+                seniorMode
+                  ? "bg-[#B84545] text-white"
+                  : "bg-[#08566E] text-white"
+              }`}
+            >
+              {seniorMode
+                ? "👴 Senior Mode ON"
+                : "👴 Senior Mode"}
+            </button>
+          </div>
+
           <Hero language={language} />
 
           <Stats />
@@ -139,19 +156,6 @@ function HomePage({
             setSelectedService={setSelectedService}
             language={language}
           />
-
-          <div className="flex justify-end p-3">
-            <button
-              onClick={() => setSeniorMode(!seniorMode)}
-              className={`px-5 py-3 rounded-xl font-extrabold shadow-lg transition ${
-                seniorMode
-                  ? "bg-[#B84545] text-white"
-                  : "bg-[#08566E] text-white"
-              }`}
-            >
-              {seniorMode ? "👴 Senior Mode ON" : "👴 Senior Mode"}
-            </button>
-          </div>
 
           <WhatsappButton />
         </>
