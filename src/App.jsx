@@ -143,9 +143,13 @@ function HomePage({
           <div className="flex justify-end p-3">
             <button
               onClick={() => setSeniorMode(!seniorMode)}
-              className="bg-[#08566E] text-white px-4 py-2 rounded font-bold"
+              className={`px-5 py-3 rounded-xl font-extrabold shadow-lg transition ${
+                seniorMode
+                  ? "bg-[#B84545] text-white"
+                  : "bg-[#08566E] text-white"
+              }`}
             >
-              👴 Senior Mode
+              {seniorMode ? "👴 Senior Mode ON" : "👴 Senior Mode"}
             </button>
           </div>
 
@@ -185,108 +189,105 @@ function App() {
   };
 
   return (
-    <>
+    <div
+      className={`bg-[#B4DBDC] min-h-screen pb-28 overflow-x-hidden ${
+        seniorMode ? "senior-mode" : ""
+      }`}
+    >
       {/* GLOBAL FLOATING AI */}
       <AIAssistant />
 
-      {/* MAIN APP WRAPPER */}
-      <div
-        className={`bg-[#B4DBDC] min-h-screen pb-28 overflow-x-hidden ${
-          seniorMode ? "text-xl" : "text-base"
-        }`}
-      >
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                seniorMode={seniorMode}
-                setSeniorMode={setSeniorMode}
-                selectedService={selectedService}
-                setSelectedService={setSelectedService}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              seniorMode={seniorMode}
+              setSeniorMode={setSeniorMode}
+              selectedService={selectedService}
+              setSelectedService={setSelectedService}
+              selectedWorker={selectedWorker}
+              setSelectedWorker={setSelectedWorker}
+              language={language}
+              changeLanguage={changeLanguage}
+              showWelcome={showWelcome}
+              setShowWelcome={setShowWelcome}
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+              workerLoggedIn={workerLoggedIn}
+              setWorkerLoggedIn={setWorkerLoggedIn}
+            />
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <Profile
+              language={language}
+            />
+          }
+        />
+
+        <Route
+          path="/contact"
+          element={
+            <Contact
+              language={language}
+            />
+          }
+        />
+
+        <Route
+          path="/terms"
+          element={
+            <Terms
+              language={language}
+            />
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <CustomerDashboard
+              language={language}
+            />
+          }
+        />
+
+        <Route
+          path="/bookings"
+          element={
+            <MyBookings
+              language={language}
+            />
+          }
+        />
+
+        <Route
+          path="/services"
+          element={
+            selectedWorker ? (
+              <BookingForm
                 selectedWorker={selectedWorker}
                 setSelectedWorker={setSelectedWorker}
                 language={language}
-                changeLanguage={changeLanguage}
-                showWelcome={showWelcome}
-                setShowWelcome={setShowWelcome}
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                workerLoggedIn={workerLoggedIn}
-                setWorkerLoggedIn={setWorkerLoggedIn}
               />
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={
-              <Profile
+            ) : (
+              <Workers
+                setSelectedWorker={setSelectedWorker}
+                selectedService="All"
                 language={language}
               />
-            }
-          />
+            )
+          }
+        />
+      </Routes>
 
-          <Route
-            path="/contact"
-            element={
-              <Contact
-                language={language}
-              />
-            }
-          />
-
-          <Route
-            path="/terms"
-            element={
-              <Terms
-                language={language}
-              />
-            }
-          />
-
-          <Route
-            path="/dashboard"
-            element={
-              <CustomerDashboard
-                language={language}
-              />
-            }
-          />
-
-          <Route
-            path="/bookings"
-            element={
-              <MyBookings
-                language={language}
-              />
-            }
-          />
-
-          <Route
-            path="/services"
-            element={
-              selectedWorker ? (
-                <BookingForm
-                  selectedWorker={selectedWorker}
-                  setSelectedWorker={setSelectedWorker}
-                  language={language}
-                />
-              ) : (
-                <Workers
-                  setSelectedWorker={setSelectedWorker}
-                  selectedService="All"
-                  language={language}
-                />
-              )
-            }
-          />
-        </Routes>
-
-        {/* LIQUID FOOTER NAV */}
-        {isLoggedIn && <FooterNav />}
-      </div>
-    </>
+      {/* LIQUID FOOTER NAV */}
+      {isLoggedIn && <FooterNav />}
+    </div>
   );
 }
 
