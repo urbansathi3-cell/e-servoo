@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import FreeMapPicker from "./FreeMapPicker";
 
 function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [formData, setFormData] = useState({
