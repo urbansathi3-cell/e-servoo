@@ -14,15 +14,21 @@ function Workers({
   const [sortBy, setSortBy] = useState("");
   const [search, setSearch] = useState("");
   const [activeService, setActiveService] = useState(selectedService || "All");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setActiveService(selectedService || "All");
   }, [selectedService]);
 
   useEffect(() => {
-    const fetchWorkers = () => {
+    const fetchWorkers = (showLoader = false) => {
+      if (showLoader) {
+        setLoading(true);
+      }
+
       fetch(
-        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec"
+        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec?nocache=" +
+          Date.now()
       )
         .then((res) => res.json())
         .then((data) => {
@@ -31,16 +37,20 @@ function Workers({
           } else {
             setWorkers([]);
           }
+
+          setLoading(false);
         })
         .catch((error) => {
           console.log(error);
+          setWorkers([]);
+          setLoading(false);
         });
     };
 
-    fetchWorkers();
+    fetchWorkers(true);
 
     const interval = setInterval(() => {
-      fetchWorkers();
+      fetchWorkers(false);
     }, 3000);
 
     return () => clearInterval(interval);
@@ -95,9 +105,7 @@ function Workers({
   }
 
   if (sortBy === "available") {
-    filteredWorkers = filteredWorkers.filter((worker) =>
-      isAvailable(worker)
-    );
+    filteredWorkers = filteredWorkers.filter((worker) => isAvailable(worker));
   }
 
   const visibleWorkers = filteredWorkers
@@ -112,6 +120,41 @@ function Workers({
       worker.service?.toLowerCase().includes(search.toLowerCase()) ||
       worker.location?.toLowerCase().includes(search.toLowerCase())
     );
+
+  const WorkerSkeleton = () => {
+    return (
+      <div className="relative overflow-hidden rounded-[28px] border border-white/60 bg-white/35 backdrop-blur-xl shadow-xl animate-pulse">
+        <div className="absolute top-0 left-0 right-0 h-24 bg-[#08566E]/30"></div>
+
+        <div className="relative p-5">
+          <div className="flex items-start justify-between">
+            <div className="w-20 h-20 rounded-3xl bg-[#08566E]/20 border-4 border-[#E1E9E5]"></div>
+
+            <div className="h-7 w-24 rounded-full bg-[#08566E]/20"></div>
+          </div>
+
+          <div className="mt-5">
+            <div className="h-7 w-44 rounded-full bg-[#08566E]/20"></div>
+            <div className="h-4 w-28 rounded-full bg-[#08566E]/20 mt-3"></div>
+            <div className="h-4 w-52 rounded-full bg-[#08566E]/20 mt-4"></div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-5">
+            <div className="h-20 rounded-2xl bg-[#08566E]/15"></div>
+            <div className="h-20 rounded-2xl bg-[#08566E]/15"></div>
+            <div className="h-20 rounded-2xl bg-[#08566E]/15"></div>
+          </div>
+
+          <div className="mt-5 bg-[#08566E]/20 rounded-3xl p-4">
+            <div className="h-5 w-52 rounded-full bg-[#E1E9E5]/60"></div>
+            <div className="h-4 w-40 rounded-full bg-[#E1E9E5]/50 mt-3"></div>
+          </div>
+
+          <div className="mt-5 h-12 w-full rounded-2xl bg-[#08566E]/25"></div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <section
@@ -193,7 +236,13 @@ function Workers({
         </div>
 
         {/* WORKER GRID */}
-        {visibleWorkers.length === 0 ? (
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <WorkerSkeleton key={item} />
+            ))}
+          </div>
+        ) : visibleWorkers.length === 0 ? (
           <div className="bg-[#E1E9E5] border border-[#6FA8AA] rounded-3xl p-8 text-center shadow-xl">
             <p className="text-[#08566E] font-bold text-xl">
               {t.noWorkersFound || "No workers found"}
