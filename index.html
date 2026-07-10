@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="color-scheme: only light; background-color: #B4DBDC;">
   <head>
     <meta charset="UTF-8" />
 
@@ -8,8 +8,9 @@
       content="ueBnU28LbhzIu9UB1PSOZ9xu8v__HBrL4hH4p2AlXjM"
     />
 
-    <!-- FORCE LIGHT THEME / STOP MOBILE DARK AUTO COLOR -->
-    <meta name="color-scheme" content="light" />
+    <!-- HARD LOCK LIGHT THEME -->
+    <meta name="color-scheme" content="only light" />
+    <meta name="supported-color-schemes" content="light" />
     <meta name="theme-color" content="#B4DBDC" />
     <meta name="msapplication-TileColor" content="#B4DBDC" />
 
@@ -21,10 +22,32 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
 
+    <!-- FIRST PAINT THEME FIX -->
+    <style>
+      :root {
+        color-scheme: only light;
+        background-color: #B4DBDC;
+      }
+
+      html,
+      body,
+      #root {
+        margin: 0;
+        min-height: 100%;
+        background-color: #B4DBDC;
+        color: #08566E;
+        color-scheme: only light;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+    </style>
+
     <title>E-SERVOO</title>
   </head>
 
-  <body>
+  <body style="background-color: #B4DBDC; color: #08566E; color-scheme: only light;">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
