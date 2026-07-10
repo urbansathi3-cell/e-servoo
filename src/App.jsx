@@ -213,11 +213,12 @@ function App() {
 
   return (
     <div
-      className={`bg-[#B4DBDC] text-[#08566E] min-h-screen pb-28 overflow-x-hidden ${
+      data-theme="light"
+      className={`es-light-lock bg-[#B4DBDC] text-[#08566E] min-h-screen pb-28 overflow-x-hidden ${
         seniorMode ? "senior-mode" : ""
       }`}
       style={{
-        colorScheme: "light",
+        colorScheme: "only light",
         backgroundColor: "#B4DBDC",
         color: "#08566E",
       }}
