@@ -52,13 +52,18 @@ function HomePage({
     return (
       <Welcome
         setShowWelcome={setShowWelcome}
+        language={language}
       />
     );
   }
 
   if (!isLoggedIn) {
     if (workerLoggedIn) {
-      return <WorkerDashboard />;
+      return (
+        <WorkerDashboard
+          language={language}
+        />
+      );
     }
 
     return (
@@ -89,17 +94,17 @@ function HomePage({
       ) : (
         <>
           {/* LANGUAGE SELECTOR */}
-          <div className="py-4 text-center">
+          <div className="py-4 text-center bg-[#B4DBDC] text-[#08566E]">
             <p className="text-[#08566E] text-sm mb-3 font-bold">
-              🌐 {t.chooseLanguage}
+              🌐 {t.chooseLanguage || "Choose Language"}
             </p>
 
             <div className="flex justify-center gap-3">
               <button
                 onClick={() => changeLanguage("en")}
-                className={`px-4 py-2 rounded-lg font-bold ${
+                className={`px-4 py-2 rounded-lg font-bold shadow-md transition ${
                   language === "en"
-                    ? "bg-[#08566E] text-white"
+                    ? "bg-[#08566E] text-[#E1E9E5]"
                     : "bg-[#E1E9E5] text-[#08566E]"
                 }`}
               >
@@ -108,9 +113,9 @@ function HomePage({
 
               <button
                 onClick={() => changeLanguage("hi")}
-                className={`px-4 py-2 rounded-lg font-bold ${
+                className={`px-4 py-2 rounded-lg font-bold shadow-md transition ${
                   language === "hi"
-                    ? "bg-[#08566E] text-white"
+                    ? "bg-[#08566E] text-[#E1E9E5]"
                     : "bg-[#E1E9E5] text-[#08566E]"
                 }`}
               >
@@ -119,9 +124,9 @@ function HomePage({
 
               <button
                 onClick={() => changeLanguage("od")}
-                className={`px-4 py-2 rounded-lg font-bold ${
+                className={`px-4 py-2 rounded-lg font-bold shadow-md transition ${
                   language === "od"
-                    ? "bg-[#08566E] text-white"
+                    ? "bg-[#08566E] text-[#E1E9E5]"
                     : "bg-[#E1E9E5] text-[#08566E]"
                 }`}
               >
@@ -131,7 +136,7 @@ function HomePage({
           </div>
 
           {/* SENIOR MODE NEAR HERO */}
-          <div className="max-w-7xl mx-auto px-5 mb-4 flex justify-center md:justify-end">
+          <div className="max-w-7xl mx-auto px-5 mb-4 flex justify-center md:justify-end bg-[#B4DBDC]">
             <button
               onClick={() => setSeniorMode(!seniorMode)}
               className={`px-6 py-3 rounded-full font-extrabold shadow-xl transition hover:-translate-y-1 ${
@@ -208,9 +213,14 @@ function App() {
 
   return (
     <div
-      className={`bg-[#B4DBDC] min-h-screen pb-28 overflow-x-hidden ${
+      className={`bg-[#B4DBDC] text-[#08566E] min-h-screen pb-28 overflow-x-hidden ${
         seniorMode ? "senior-mode" : ""
       }`}
+      style={{
+        colorScheme: "light",
+        backgroundColor: "#B4DBDC",
+        color: "#08566E",
+      }}
     >
       {/* GLOBAL FLOATING AI */}
       <AIAssistant language={language} />
@@ -284,23 +294,23 @@ function App() {
         />
 
         <Route
-  path="/services"
-  element={
-    selectedWorker ? (
-      <BookingForm
-        selectedWorker={selectedWorker}
-        setSelectedWorker={setSelectedWorker}
-        language={language}
-      />
-    ) : (
-      <Workers
-        setSelectedWorker={setSelectedWorker}
-        selectedService={selectedService}
-        language={language}
-      />
-    )
-  }
-/>
+          path="/services"
+          element={
+            selectedWorker ? (
+              <BookingForm
+                selectedWorker={selectedWorker}
+                setSelectedWorker={setSelectedWorker}
+                language={language}
+              />
+            ) : (
+              <Workers
+                setSelectedWorker={setSelectedWorker}
+                selectedService={selectedService}
+                language={language}
+              />
+            )
+          }
+        />
       </Routes>
 
       {/* LIQUID FOOTER NAV */}
