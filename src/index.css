@@ -927,10 +927,10 @@ body,
   }
 }
 
-/* ========== GLOBAL THEME LOCK FOR E-SERVOO ========== */
+/* ========== E-SERVOO HARD LIGHT MODE LOCK ========== */
 
 :root {
-  color-scheme: light;
+  color-scheme: only light !important;
 
   --es-bg: #B4DBDC;
   --es-card: #9ECFD0;
@@ -940,97 +940,107 @@ body,
   --es-text-dark: #08566E;
 }
 
-html {
-  color-scheme: light;
-  background: var(--es-bg);
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: var(--es-bg) !important;
-  color: var(--es-text-dark) !important;
-  color-scheme: light;
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: #B4DBDC !important;
+  color: #08566E !important;
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Android / browser dark mode auto-color fix */
-* {
-  color-scheme: light;
+body {
+  margin: 0;
 }
 
-/* Prevent mobile browser from auto darkening form elements */
+/* App root hard lock */
+.es-light-lock {
+  background-color: #B4DBDC !important;
+  color: #08566E !important;
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+}
+
+/* Prevent Android Chrome auto dark effect */
+.es-light-lock,
+.es-light-lock * {
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+}
+
+/* Form fields exact color lock */
 input,
 textarea,
 select,
-button {
-  color-scheme: light !important;
-  font-family: inherit;
-}
-
-/* Inputs/selects exact E-SERVOO colors */
-input,
-textarea,
-select {
+option {
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
   background-color: #E1E9E5 !important;
   color: #08566E !important;
+  -webkit-text-fill-color: #08566E !important;
   border-color: #6FA8AA !important;
+  caret-color: #08566E !important;
 }
 
 input::placeholder,
 textarea::placeholder {
   color: rgba(8, 86, 110, 0.65) !important;
+  -webkit-text-fill-color: rgba(8, 86, 110, 0.65) !important;
 }
 
-/* Select dropdown text fix */
-option {
-  background-color: #E1E9E5 !important;
-  color: #08566E !important;
+button,
+a {
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Links should not become default blue/purple in dark mode */
 a {
   color: inherit;
 }
 
-/* Image rendering consistency */
+img,
+svg,
+video,
+canvas {
+  forced-color-adjust: none !important;
+}
+
 img {
   max-width: 100%;
   display: block;
 }
 
-/* Remove weird tap highlight on mobile */
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Disable browser forced dark color changes where supported */
+/* Chrome / Android dark mode override */
 @media (prefers-color-scheme: dark) {
+  :root,
   html,
   body,
-  #root {
-    background: #B4DBDC !important;
+  #root,
+  .es-light-lock {
+    background-color: #B4DBDC !important;
     color: #08566E !important;
+    color-scheme: only light !important;
+    forced-color-adjust: none !important;
   }
 
   input,
   textarea,
-  select {
-    background-color: #E1E9E5 !important;
-    color: #08566E !important;
-    border-color: #6FA8AA !important;
-  }
-
+  select,
   option {
     background-color: #E1E9E5 !important;
     color: #08566E !important;
+    -webkit-text-fill-color: #08566E !important;
+    border-color: #6FA8AA !important;
   }
 }
 
-/* Ubuntu/Linux browser color consistency */
+/* Ubuntu/Linux browser consistency helper classes */
 .bg-es-page {
   background: #B4DBDC !important;
 }
