@@ -11,98 +11,105 @@ import {
 function WorkerOfMonth({ language = "en" }) {
   const t = translations[language] || translations.en;
 
-  const [worker, setWorker] = useState(null);
+  const [bestWorker, setBestWorker] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const getText = {
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
+
+  const text = {
     badge:
       language === "hi"
-        ? "महीने का बेस्ट प्रोफेशनल"
+        ? "महीने का सर्वश्रेष्ठ वर्कर"
         : language === "od"
-          ? "ମାସର ଶ୍ରେଷ୍ଠ ପ୍ରୋଫେସନାଲ୍"
-          : "Best Professional of the Month",
+          ? "ମାସର ସର୍ବଶ୍ରେଷ୍ଠ worker"
+          : "Worker of the Month",
 
     title:
       language === "hi"
-        ? "Worker of the Month"
+        ? "E-SERVOO Top Performer"
         : language === "od"
-          ? "ମାସର ଶ୍ରେଷ୍ଠ କର୍ମଚାରୀ"
-          : "Worker of the Month",
+          ? "E-SERVOO Top Performer"
+          : "E-SERVOO Top Performer",
 
     subtitle:
       language === "hi"
-        ? "सबसे अच्छा rating और trust score वाला verified worker"
+        ? "Rating, trust score और availability के आधार पर चुना गया best worker."
         : language === "od"
-          ? "ସର୍ବୋତ୍ତମ rating ଏବଂ trust score ଥିବା verified worker"
-          : "Top verified worker based on rating and trust score",
+          ? "Rating, trust score ଏବଂ availability ଆଧାରରେ ଚୟନ ହୋଇଥିବା best worker."
+          : "Selected using rating, trust score, and service performance.",
 
-    topRated:
+    loading:
       language === "hi"
-        ? "Top Rated"
+        ? "Top worker load हो रहा है..."
         : language === "od"
-          ? "Top Rated"
-          : "Top Rated",
+          ? "Top worker load ହେଉଛି..."
+          : "Loading top worker...",
+
+    noData:
+      language === "hi"
+        ? "Top worker data जल्द ही update होगा"
+        : language === "od"
+          ? "Top worker data ଶୀଘ୍ର update ହେବ"
+          : "Top worker data will update soon",
 
     verified:
-      language === "hi"
-        ? "Verified Professional"
-        : language === "od"
-          ? "Verified Professional"
-          : "Verified Professional",
+      t.verifiedProfessional || "Verified Professional",
 
-    localExpert:
-      language === "hi"
-        ? "Local Expert"
-        : language === "od"
-          ? "Local Expert"
-          : "Local Expert",
+    rating: t.ratingLabel || "Rating",
 
-    performance:
-      language === "hi"
-        ? "Performance Score"
-        : language === "od"
-          ? "Performance Score"
-          : "Performance Score",
+    trust: t.trust || "Trust",
+
+    area: t.localArea || "Area",
+
+    certificate:
+      t.verifiedSkillCertificate || "Verified Skill Certificate",
   };
 
-  useEffect(() => {
-    fetch(
-      "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec?nocache=" +
-        Date.now()
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (!Array.isArray(data)) {
-          setLoading(false);
-          return;
-        }
+  const getValue = (obj, keys, fallback = "") => {
+    for (const key of keys) {
+      if (obj?.[key] !== undefined && obj?.[key] !== null && obj?.[key] !== "") {
+        return obj[key];
+      }
+    }
 
-        const bestWorker = [...data]
-          .filter((item) => item.name)
-          .sort((a, b) => {
-            const ratingA = Number(a.rating || 0);
-            const ratingB = Number(b.rating || 0);
+    return fallback;
+  };
 
-            const trustA = Number(a.TrustScore || 0);
-            const trustB = Number(b.TrustScore || 0);
+  const toNumber = (value, fallback = 0) => {
+    const num = parseFloat(String(value || "").replace(/[^\d.]/g, ""));
 
-            const scoreA = ratingA * 20 + trustA;
-            const scoreB = ratingB * 20 + trustB;
+    if (Number.isNaN(num)) {
+      return fallback;
+    }
 
-            return scoreB - scoreA;
-          })[0];
+    return num;
+  };
 
-        setWorker(bestWorker || null);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log("Worker of Month Error:", error);
-        setLoading(false);
-      });
-  }, []);
+  const normalizeWorker = (worker) => {
+    return {
+      id: getValue(worker, ["WorkerId", "WorkerID", "Worker id", "id"], ""),
+      name: getValue(worker, ["name", "Name"], ""),
+      service: getValue(worker, ["service", "Service"], ""),
+      rating: toNumber(getValue(worker, ["rating", "Rating"], 0), 0),
+      trustScore: toNumber(
+        getValue(worker, ["TrustScore", "trustScore", "Trust Score"], 0),
+        0
+      ),
+      location: getValue(worker, ["location", "Location"], "Local Area"),
+      image: getValue(worker, ["image", "Image"], ""),
+      status: getValue(worker, ["status", "Status"], "Available"),
+      verified: getValue(worker, ["Verified", "verified"], "Yes"),
+      certificate: getValue(
+        worker,
+        ["CertificateLink", "certificateLink", "Certificate Link"],
+        ""
+      ),
+    };
+  };
 
   const getServiceText = (service) => {
-    const serviceName = service?.trim().toLowerCase();
+    const serviceName = String(service || "").trim().toLowerCase();
 
     if (serviceName === "electrician") return t.electrician || service;
     if (serviceName === "plumber") return t.plumber || service;
@@ -115,177 +122,219 @@ function WorkerOfMonth({ language = "en" }) {
     if (serviceName === "appliance repair") return t.applianceRepair || service;
     if (serviceName === "cctv service") return t.cctvService || service;
 
-    return service;
+    return service || "Service Expert";
   };
+
+  useEffect(() => {
+    const fetchTopWorker = async () => {
+      try {
+        setLoading(true);
+
+        const res = await fetch(`${API_URL}?nocache=${Date.now()}`);
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          setBestWorker(null);
+          setLoading(false);
+          return;
+        }
+
+        const cleanWorkers = data
+          .map((worker) => normalizeWorker(worker))
+          .filter((worker) => worker.name || worker.service);
+
+        if (cleanWorkers.length === 0) {
+          setBestWorker(null);
+          setLoading(false);
+          return;
+        }
+
+        const sortedWorkers = cleanWorkers.sort((a, b) => {
+          const scoreA = a.rating * 20 + a.trustScore;
+          const scoreB = b.rating * 20 + b.trustScore;
+
+          return scoreB - scoreA;
+        });
+
+        setBestWorker(sortedWorkers[0]);
+      } catch (error) {
+        console.log("Worker of Month Error:", error);
+        setBestWorker(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopWorker();
+  }, []);
 
   if (loading) {
     return (
-      <section className="py-12 bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0]">
-        <div className="max-w-6xl mx-auto px-5">
-          <div className="bg-white/35 backdrop-blur-xl border border-white/60 rounded-[32px] p-8 shadow-xl animate-pulse">
-            <div className="h-8 w-56 bg-[#08566E]/20 rounded-full mx-auto"></div>
-            <div className="h-24 w-24 bg-[#08566E]/20 rounded-full mx-auto mt-6"></div>
-            <div className="h-6 w-40 bg-[#08566E]/20 rounded-full mx-auto mt-6"></div>
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] py-16 px-5">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white/35 backdrop-blur-xl border border-white/60 rounded-[36px] p-7 md:p-10 shadow-2xl animate-pulse">
+            <div className="h-8 w-56 bg-[#08566E]/20 rounded-full mb-6"></div>
+
+            <div className="grid md:grid-cols-[220px_1fr] gap-8 items-center">
+              <div className="w-44 h-44 rounded-[36px] bg-[#08566E]/20 mx-auto"></div>
+
+              <div>
+                <div className="h-10 w-72 bg-[#08566E]/20 rounded-full"></div>
+                <div className="h-5 w-48 bg-[#08566E]/20 rounded-full mt-4"></div>
+                <div className="h-5 w-full max-w-xl bg-[#08566E]/20 rounded-full mt-5"></div>
+
+                <div className="grid grid-cols-3 gap-3 mt-7">
+                  <div className="h-24 bg-[#08566E]/15 rounded-2xl"></div>
+                  <div className="h-24 bg-[#08566E]/15 rounded-2xl"></div>
+                  <div className="h-24 bg-[#08566E]/15 rounded-2xl"></div>
+                </div>
+
+                <div className="h-12 w-full bg-[#08566E]/20 rounded-2xl mt-7"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
-  if (!worker) return null;
-
-  const rating = worker.rating || "4.8";
-  const trustScore = worker.TrustScore || "90";
-  const performanceScore = Math.min(
-    100,
-    Math.round(Number(rating || 0) * 10 + Number(trustScore || 0) / 2)
-  );
+  const worker = bestWorker;
 
   return (
-    <section className="relative overflow-hidden py-16 bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0]">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] py-16 px-5">
+      <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#08566E]/20 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#6FA8AA]/35 rounded-full blur-3xl"></div>
 
-      {/* BACKGROUND GLOW */}
-      <div className="absolute -top-20 -left-20 w-72 h-72 bg-[#08566E]/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#6FA8AA]/35 rounded-full blur-3xl"></div>
-
-      <div className="relative z-10 max-w-6xl mx-auto px-5">
-
-        {/* HEADING */}
+      <div className="relative z-10 max-w-6xl mx-auto">
         <div className="text-center mb-9">
           <div className="inline-flex items-center gap-2 bg-white/40 backdrop-blur-xl border border-white/60 px-5 py-2 rounded-full shadow-lg text-[#08566E] font-extrabold mb-4">
-            <FaTrophy />
-            {getText.badge}
+            <FaTrophy className="text-yellow-500" />
+            {text.badge}
           </div>
 
           <h2 className="text-4xl md:text-5xl font-black text-[#08566E]">
-            🏆 {getText.title}
+            {text.title}
           </h2>
 
-          <p className="text-[#08566E]/75 font-semibold mt-3">
-            {getText.subtitle}
+          <p className="text-[#08566E]/75 mt-3 font-semibold max-w-2xl mx-auto">
+            {text.subtitle}
           </p>
         </div>
 
-        {/* SPOTLIGHT CARD */}
-        <div className="relative max-w-4xl mx-auto bg-white/35 backdrop-blur-xl border border-white/60 rounded-[36px] shadow-2xl overflow-hidden">
+        {!worker ? (
+          <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[36px] p-10 text-center shadow-2xl">
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-[#08566E] text-[#E1E9E5] flex items-center justify-center text-3xl shadow-xl">
+              <FaTrophy />
+            </div>
 
-          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-[#08566E] via-[#0A6F78] to-[#6FA8AA]"></div>
+            <h3 className="text-2xl md:text-3xl font-black text-[#08566E] mt-6">
+              {text.noData}
+            </h3>
 
-          <div className="relative p-6 md:p-8 grid md:grid-cols-[0.8fr_1.2fr] gap-7 items-center">
+            <p className="text-[#08566E]/70 font-semibold mt-2">
+              Worker records are loading from E-SERVOO database.
+            </p>
+          </div>
+        ) : (
+          <div className="animate-workerSlide bg-white/40 backdrop-blur-xl border border-white/60 rounded-[36px] p-7 md:p-10 shadow-2xl overflow-hidden">
+            <div className="grid md:grid-cols-[220px_1fr] gap-8 items-center">
+              <div className="relative mx-auto">
+                <div className="absolute -inset-3 bg-[#08566E]/20 rounded-[42px] blur-xl"></div>
 
-            {/* LEFT PROFILE */}
-            <div className="text-center">
-              <div className="relative inline-block">
                 <img
-                  src={worker.image || "https://via.placeholder.com/150"}
+                  src={worker.image || "https://via.placeholder.com/200"}
                   alt={worker.name}
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/150";
+                    e.target.src = "https://via.placeholder.com/200";
                   }}
-                  className="w-32 h-32 md:w-40 md:h-40 rounded-[32px] object-cover border-4 border-[#E1E9E5] shadow-2xl mx-auto"
+                  className="relative w-44 h-44 rounded-[36px] object-cover border-4 border-[#E1E9E5] shadow-2xl"
                 />
 
-                <div className="absolute -bottom-3 -right-3 w-14 h-14 bg-[#E1E9E5] rounded-2xl flex items-center justify-center shadow-xl text-[#08566E] text-2xl">
+                <div className="absolute -top-4 -right-4 w-14 h-14 rounded-2xl bg-yellow-400 text-[#08566E] flex items-center justify-center text-2xl shadow-xl">
                   <FaTrophy />
                 </div>
               </div>
 
-              <h3 className="text-3xl font-black text-[#08566E] mt-7">
-                {worker.name}
-              </h3>
+              <div>
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <span className="bg-[#08566E] text-[#E1E9E5] px-4 py-2 rounded-full text-sm font-extrabold shadow-md">
+                    #{worker.id || "TOP"}
+                  </span>
 
-              <p className="text-[#0A6F78] font-extrabold mt-1">
-                {getServiceText(worker.service)}
-              </p>
-
-              <div className="mt-4 inline-flex items-center gap-2 bg-[#08566E] text-[#E1E9E5] px-4 py-2 rounded-full font-extrabold shadow-lg">
-                <FaUserCheck />
-                {getText.verified}
-              </div>
-            </div>
-
-            {/* RIGHT DETAILS */}
-            <div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-[#E1E9E5]/90 rounded-3xl p-4 text-center shadow-md">
-                  <FaStar className="text-[#08566E] mx-auto text-2xl" />
-
-                  <p className="text-xs text-[#6FA8AA] font-bold mt-2">
-                    Rating
-                  </p>
-
-                  <h4 className="text-2xl font-black text-[#08566E]">
-                    {rating}
-                  </h4>
+                  <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-extrabold shadow-md flex items-center gap-2">
+                    <FaUserCheck />
+                    {text.verified}
+                  </span>
                 </div>
 
-                <div className="bg-[#E1E9E5]/90 rounded-3xl p-4 text-center shadow-md">
-                  <FaShieldAlt className="text-[#08566E] mx-auto text-2xl" />
+                <h3 className="text-3xl md:text-5xl font-black text-[#08566E] leading-tight">
+                  {worker.name}
+                </h3>
 
-                  <p className="text-xs text-[#6FA8AA] font-bold mt-2">
-                    {t.trust || "Trust"}
-                  </p>
-
-                  <h4 className="text-2xl font-black text-[#08566E]">
-                    {trustScore}%
-                  </h4>
-                </div>
-
-                <div className="bg-[#E1E9E5]/90 rounded-3xl p-4 text-center shadow-md">
-                  <FaMapMarkerAlt className="text-[#08566E] mx-auto text-2xl" />
-
-                  <p className="text-xs text-[#6FA8AA] font-bold mt-2">
-                    Area
-                  </p>
-
-                  <h4 className="text-lg font-black text-[#08566E] truncate">
-                    {worker.location || t.localArea || "Local"}
-                  </h4>
-                </div>
-              </div>
-
-              {/* PERFORMANCE BAR */}
-              <div className="mt-6 bg-[#08566E] rounded-[28px] p-5 shadow-xl">
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <p className="text-[#E1E9E5] font-extrabold">
-                    {getText.performance}
-                  </p>
-
-                  <p className="text-[#B4DBDC] font-black">
-                    {performanceScore}%
-                  </p>
-                </div>
-
-                <div className="h-3 bg-[#E1E9E5]/25 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#E1E9E5] to-[#9ECFD0] rounded-full"
-                    style={{
-                      width: `${performanceScore}%`,
-                    }}
-                  ></div>
-                </div>
-
-                <p className="text-[#B4DBDC] text-sm font-semibold mt-4">
-                  ⭐ {getText.topRated} • 🛡️ {getText.localExpert} • ⚡ Fast Service
+                <p className="text-[#0A5E75] font-extrabold text-xl mt-2">
+                  {getServiceText(worker.service)}
                 </p>
+
+                <div className="grid sm:grid-cols-3 gap-4 mt-7">
+                  <div className="bg-[#E1E9E5]/90 rounded-3xl p-5 text-center shadow-md">
+                    <p className="text-[#6FA8AA] font-extrabold text-sm flex justify-center items-center gap-2">
+                      <FaStar className="text-yellow-500" />
+                      {text.rating}
+                    </p>
+
+                    <p className="text-[#08566E] text-2xl font-black mt-1">
+                      {worker.rating || "4.8"}
+                    </p>
+                  </div>
+
+                  <div className="bg-[#E1E9E5]/90 rounded-3xl p-5 text-center shadow-md">
+                    <p className="text-[#6FA8AA] font-extrabold text-sm flex justify-center items-center gap-2">
+                      <FaShieldAlt />
+                      {text.trust}
+                    </p>
+
+                    <p className="text-[#08566E] text-2xl font-black mt-1">
+                      {worker.trustScore || "90"}%
+                    </p>
+                  </div>
+
+                  <div className="bg-[#E1E9E5]/90 rounded-3xl p-5 text-center shadow-md">
+                    <p className="text-[#6FA8AA] font-extrabold text-sm flex justify-center items-center gap-2">
+                      <FaMapMarkerAlt />
+                      {text.area}
+                    </p>
+
+                    <p className="text-[#08566E] text-lg font-black mt-1 truncate">
+                      {worker.location || "Local Area"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-7 bg-[#08566E] rounded-3xl p-5 shadow-xl">
+                  <p className="text-[#E1E9E5] font-black text-lg">
+                    ✔ {text.verified}
+                  </p>
+
+                  <p className="text-[#B4DBDC] font-semibold mt-1">
+                    High trust score, strong service rating and verified worker profile.
+                  </p>
+
+                  {worker.certificate && (
+                    <a
+                      href={worker.certificate}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block mt-3 text-[#E1E9E5] font-extrabold underline"
+                    >
+                      📜 {text.certificate}
+                    </a>
+                  )}
+                </div>
               </div>
-
-              {worker.CertificateLink && (
-                <a
-                  href={worker.CertificateLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-5 inline-block text-[#08566E] font-extrabold underline hover:text-[#06485C]"
-                >
-                  📜 {t.verifiedSkillCertificate || "Verified Skill Certificate"}
-                </a>
-              )}
             </div>
-
           </div>
-        </div>
-
+        )}
       </div>
     </section>
   );
