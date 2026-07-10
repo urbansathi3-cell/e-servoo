@@ -153,16 +153,16 @@ function HomePage({
 
           <Hero language={language} />
 
-          <Stats language={language} />
+<Stats language={language} />
 
-          <WorkerOfMonth language={language} />
+<WorkerOfMonth language={language} />
 
-          <Services
-            setSelectedService={setSelectedService}
-            language={language}
-          />
+<Services
+  setSelectedService={setSelectedService}
+  language={language}
+/>
 
-          <WhatsappButton />
+<WhatsappButton />
         </>
       )}
     </>
