@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+/* ========== E-SERVOO PROFESSIONAL TYPOGRAPHY FIX ========== */
+
+:root {
+  --es-font-main: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html,
+body,
+#root {
+  font-family: var(--es-font-main) !important;
+}
+
+* {
+  font-family: var(--es-font-main) !important;
+  letter-spacing: 0 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--es-font-main) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em !important;
+  color: #08566E;
+}
+
+p,
+span,
+label,
+input,
+textarea,
+select,
+button,
+a {
+  font-family: var(--es-font-main) !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
