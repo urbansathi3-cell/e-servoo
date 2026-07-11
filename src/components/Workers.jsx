@@ -1,6 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { translations } from "../translations";
+import {
+  FaArrowLeft,
+  FaBolt,
+  FaCertificate,
+  FaFilter,
+  FaMapMarkerAlt,
+  FaSearch,
+  FaShieldAlt,
+  FaStar,
+  FaUserCheck,
+} from "react-icons/fa";
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
 
 function Workers({
   setSelectedWorker,
@@ -26,10 +40,7 @@ function Workers({
         setLoading(true);
       }
 
-      fetch(
-        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec?nocache=" +
-          Date.now()
-      )
+      fetch(`${API_URL}?action=workers&nocache=${Date.now()}`)
         .then((res) => res.json())
         .then((data) => {
           if (Array.isArray(data)) {
@@ -70,12 +81,80 @@ function Workers({
     "CCTV Service",
   ];
 
+  const pushEvent = (eventName, extraData = {}) => {
+    window.dataLayer = window.dataLayer || [];
+
+    window.dataLayer.push({
+      event: eventName,
+      page_section: "workers",
+      ...extraData,
+    });
+  };
+
+  const getValue = (worker, keys, fallback = "") => {
+    for (const key of keys) {
+      if (
+        worker?.[key] !== undefined &&
+        worker?.[key] !== null &&
+        worker?.[key] !== ""
+      ) {
+        return worker[key];
+      }
+    }
+
+    return fallback;
+  };
+
+  const getWorkerId = (worker) => {
+    return getValue(worker, ["WorkerId", "WorkerID", "Worker id", "id"], "");
+  };
+
+  const getWorkerName = (worker) => {
+    return getValue(worker, ["name", "Name"], "Worker");
+  };
+
+  const getWorkerService = (worker) => {
+    return getValue(worker, ["service", "Service"], "Service");
+  };
+
+  const getWorkerRating = (worker) => {
+    return getValue(worker, ["rating", "Rating"], "4.8");
+  };
+
+  const getWorkerLocation = (worker) => {
+    return getValue(worker, ["location", "Location"], t.localArea || "Local");
+  };
+
+  const getWorkerImage = (worker) => {
+    return getValue(worker, ["image", "Image"], "");
+  };
+
+  const getWorkerStatus = (worker) => {
+    return getValue(worker, ["status", "Status"], "Available");
+  };
+
+  const getTrustScore = (worker) => {
+    return getValue(
+      worker,
+      ["TrustScore", "trustScore", "Trust Score", "trust score"],
+      "90"
+    );
+  };
+
+  const getCertificateLink = (worker) => {
+    return getValue(
+      worker,
+      ["CertificateLink", "certificateLink", "Certificate Link"],
+      ""
+    );
+  };
+
   const isAvailable = (worker) => {
-    return worker.status?.trim().toLowerCase() === "available";
+    return String(getWorkerStatus(worker)).trim().toLowerCase() === "available";
   };
 
   const getServiceText = (service) => {
-    const serviceName = service?.trim().toLowerCase();
+    const serviceName = String(service || "").trim().toLowerCase();
 
     if (serviceName === "electrician") return t.electrician || service;
     if (serviceName === "plumber") return t.plumber || service;
@@ -88,7 +167,7 @@ function Workers({
     if (serviceName === "appliance repair") return t.applianceRepair || service;
     if (serviceName === "cctv service") return t.cctvService || service;
 
-    return service;
+    return service || "Service";
   };
 
   const getFilterText = (service) => {
@@ -96,11 +175,36 @@ function Workers({
     return getServiceText(service);
   };
 
+  const handleServiceFilter = (service) => {
+    setActiveService(service);
+
+    pushEvent("service_filter_click", {
+      service_name: service,
+    });
+  };
+
+  const handleBookWorker = (worker) => {
+    if (!isAvailable(worker)) return;
+
+    const service = getWorkerService(worker);
+
+    pushEvent("booking_started", {
+      service_name: service,
+      worker_id: getWorkerId(worker),
+      worker_service: service,
+    });
+
+    setSelectedWorker({
+      ...worker,
+      status: getWorkerStatus(worker),
+    });
+  };
+
   let filteredWorkers = [...workers];
 
   if (sortBy === "rating") {
     filteredWorkers.sort(
-      (a, b) => Number(b.rating || 0) - Number(a.rating || 0)
+      (a, b) => Number(getWorkerRating(b) || 0) - Number(getWorkerRating(a) || 0)
     );
   }
 
@@ -109,21 +213,26 @@ function Workers({
   }
 
   const visibleWorkers = filteredWorkers
-    .filter((worker) =>
-      activeService === "All"
+    .filter((worker) => {
+      const service = getWorkerService(worker);
+
+      return activeService === "All"
         ? true
-        : worker.service?.trim().toLowerCase() ===
-          activeService.trim().toLowerCase()
-    )
-    .filter((worker) =>
-      worker.name?.toLowerCase().includes(search.toLowerCase()) ||
-      worker.service?.toLowerCase().includes(search.toLowerCase()) ||
-      worker.location?.toLowerCase().includes(search.toLowerCase())
-    );
+        : service.trim().toLowerCase() === activeService.trim().toLowerCase();
+    })
+    .filter((worker) => {
+      const searchText = search.toLowerCase();
+
+      return (
+        getWorkerName(worker).toLowerCase().includes(searchText) ||
+        getWorkerService(worker).toLowerCase().includes(searchText) ||
+        getWorkerLocation(worker).toLowerCase().includes(searchText)
+      );
+    });
 
   const WorkerSkeleton = () => {
     return (
-      <div className="relative overflow-hidden rounded-[28px] border border-white/60 bg-white/35 backdrop-blur-xl shadow-xl animate-pulse">
+      <div className="relative overflow-hidden rounded-[28px] border border-white/70 bg-[#E1E9E5]/70 backdrop-blur-xl shadow-xl animate-pulse">
         <div className="absolute top-0 left-0 right-0 h-24 bg-[#08566E]/30"></div>
 
         <div className="relative p-5">
@@ -159,7 +268,7 @@ function Workers({
   return (
     <section
       id="workers"
-      className="bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] text-slate-900 py-20 px-5"
+      className="bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] text-[#08566E] py-20 px-5"
     >
       <div className="max-w-7xl mx-auto">
 
@@ -167,22 +276,33 @@ function Workers({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
           <div>
             <button
+              type="button"
               onClick={() => navigate("/")}
-              className="bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-5 py-3 rounded-full font-bold shadow-lg transition"
+              className="es-secondary-cta inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-black transition"
             >
-              ← {t.backToHome || "Back to Home"}
+              <FaArrowLeft />
+              {t.backToHome || "Back to Home"}
             </button>
 
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#08566E] mt-6">
+            <h2 className="text-4xl md:text-5xl font-black text-[#08566E] mt-6">
               {t.ourWorkers || "Our Workers"}
             </h2>
 
-            <p className="text-[#08566E]/75 mt-2 font-semibold">
-              Verified local professionals ready for your service.
+            <p className="text-[#06485C] mt-2 font-semibold max-w-2xl">
+              {language === "hi"
+                ? "Verified local professionals आपके service request के लिए ready हैं।"
+                : language === "od"
+                  ? "Verified local professionals ଆପଣଙ୍କ service request ପାଇଁ ready ଅଛନ୍ତି।"
+                  : "Verified local professionals ready for your service request."}
             </p>
           </div>
 
-          <div className="bg-white/35 backdrop-blur-xl border border-white/60 rounded-3xl p-4 shadow-xl w-full md:w-[420px]">
+          <div className="bg-[#E1E9E5]/85 backdrop-blur-xl border border-white/80 rounded-3xl p-4 shadow-xl w-full md:w-[420px]">
+            <label className="text-[#08566E] font-black text-sm flex items-center gap-2 mb-2">
+              <FaSearch />
+              {t.searchWorkers || "Search Workers"}
+            </label>
+
             <input
               type="text"
               placeholder={t.searchWorkers || "Search Workers"}
@@ -190,6 +310,11 @@ function Workers({
               onChange={(e) => setSearch(e.target.value)}
               className="w-full p-3 rounded-2xl bg-[#E1E9E5] border border-[#8FBDBE] text-[#08566E] font-semibold focus:border-[#08566E] outline-none mb-3"
             />
+
+            <label className="text-[#08566E] font-black text-sm flex items-center gap-2 mb-2">
+              <FaFilter />
+              {t.sortWorkers || "Sort Workers"}
+            </label>
 
             <select
               value={sortBy}
@@ -212,9 +337,14 @@ function Workers({
         </div>
 
         {/* SERVICE FILTER BUTTONS */}
-        <div className="mb-10 bg-white/35 backdrop-blur-xl border border-white/60 rounded-[28px] p-4 shadow-xl">
-          <p className="text-[#08566E] font-extrabold mb-4">
-            Filter by Service
+        <div className="mb-10 bg-[#E1E9E5]/85 backdrop-blur-xl border border-white/80 rounded-[28px] p-4 shadow-xl">
+          <p className="text-[#08566E] font-black mb-4 flex items-center gap-2">
+            <FaFilter />
+            {language === "hi"
+              ? "Service के हिसाब से Filter करें"
+              : language === "od"
+                ? "Service ଅନୁସାରେ Filter କରନ୍ତୁ"
+                : "Filter by Service"}
           </p>
 
           <div className="flex gap-3 overflow-x-auto pb-2">
@@ -222,11 +352,11 @@ function Workers({
               <button
                 key={service}
                 type="button"
-                onClick={() => setActiveService(service)}
-                className={`shrink-0 px-5 py-3 rounded-full font-extrabold transition ${
+                onClick={() => handleServiceFilter(service)}
+                className={`shrink-0 px-5 py-3 rounded-2xl font-black transition border ${
                   activeService === service
-                    ? "bg-[#08566E] text-[#E1E9E5] shadow-lg"
-                    : "bg-[#E1E9E5] text-[#08566E] hover:bg-[#B4DBDC]"
+                    ? "bg-[#08566E] text-[#E1E9E5] border-[#08566E] shadow-lg"
+                    : "bg-[#E1E9E5] text-[#08566E] border-[#6FA8AA] hover:bg-[#B4DBDC]"
                 }`}
               >
                 {getFilterText(service)}
@@ -244,136 +374,161 @@ function Workers({
           </div>
         ) : visibleWorkers.length === 0 ? (
           <div className="bg-[#E1E9E5] border border-[#6FA8AA] rounded-3xl p-8 text-center shadow-xl">
-            <p className="text-[#08566E] font-bold text-xl">
+            <p className="text-[#08566E] font-black text-xl">
               {t.noWorkersFound || "No workers found"}
+            </p>
+
+            <p className="text-[#06485C] font-semibold mt-2">
+              Try another service filter or search term.
             </p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {visibleWorkers.map((worker, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  if (!isAvailable(worker)) return;
+            {visibleWorkers.map((worker, index) => {
+              const workerName = getWorkerName(worker);
+              const workerService = getWorkerService(worker);
+              const workerLocation = getWorkerLocation(worker);
+              const workerImage = getWorkerImage(worker);
+              const certificateLink = getCertificateLink(worker);
+              const available = isAvailable(worker);
 
-                  setSelectedWorker({
-                    ...worker,
-                    status: worker.status,
-                  });
-                }}
-                className={`group relative overflow-hidden rounded-[28px] border shadow-xl transition duration-300 ${
-                  isAvailable(worker)
-                    ? "bg-white/45 border-white/70 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
-                    : "bg-white/30 border-white/50 opacity-60 cursor-not-allowed"
-                }`}
-              >
-                <div className="absolute top-0 left-0 right-0 h-24 bg-[#08566E]"></div>
+              return (
+                <div
+                  key={getWorkerId(worker) || index}
+                  onClick={() => handleBookWorker(worker)}
+                  className={`group relative overflow-hidden rounded-[28px] border shadow-xl transition duration-300 ${
+                    available
+                      ? "bg-[#E1E9E5]/88 border-white/90 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                      : "bg-[#E1E9E5]/55 border-white/60 opacity-70 cursor-not-allowed"
+                  }`}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-24 bg-[#08566E]"></div>
 
-                <div className="relative p-5">
-                  <div className="flex items-start justify-between">
-                    <img
-                      src={worker.image || "https://via.placeholder.com/150"}
-                      alt={worker.name}
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/150";
-                      }}
-                      className="w-20 h-20 rounded-3xl object-cover border-4 border-[#E1E9E5] shadow-xl"
-                    />
+                  <div className="relative p-5">
+                    <div className="flex items-start justify-between">
+                      <img
+                        src={workerImage || "https://via.placeholder.com/150"}
+                        alt={workerName}
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/150";
+                        }}
+                        className="w-20 h-20 rounded-3xl object-cover border-4 border-[#E1E9E5] shadow-xl"
+                      />
 
-                    {isAvailable(worker) ? (
-                      <span className="bg-[#E1E9E5] text-[#08566E] px-3 py-1 rounded-full text-xs font-extrabold shadow-md">
-                        {t.available || "Available"}
-                      </span>
-                    ) : (
-                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-extrabold shadow-md">
-                        {t.busy || "Busy"}
-                      </span>
+                      {available ? (
+                        <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-black shadow-md flex items-center gap-1">
+                          <FaUserCheck />
+                          {t.available || "Available"}
+                        </span>
+                      ) : (
+                        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-black shadow-md">
+                          {t.busy || "Busy"}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-5">
+                      <h3 className="text-2xl font-black text-[#08566E] leading-tight">
+                        {workerName}
+                      </h3>
+
+                      <p className="text-[#06485C] font-extrabold mt-1">
+                        {getServiceText(workerService)}
+                      </p>
+                    </div>
+
+                    {certificateLink && (
+                      <a
+                        href={certificateLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          pushEvent("worker_certificate_click", {
+                            worker_id: getWorkerId(worker),
+                            worker_service: workerService,
+                          });
+                        }}
+                        className="inline-flex items-center gap-2 mt-3 text-[#08566E] text-xs font-black hover:underline"
+                      >
+                        <FaCertificate />
+                        {t.verifiedSkillCertificate || "Verified Skill Certificate"}
+                      </a>
                     )}
-                  </div>
 
-                  <div className="mt-5">
-                    <h3 className="text-2xl font-extrabold text-[#08566E] leading-tight">
-                      {worker.name}
-                    </h3>
+                    <div className="grid grid-cols-3 gap-2 mt-5">
+                      <div className="bg-white/90 rounded-2xl p-3 text-center border border-[#B4DBDC]">
+                        <p className="text-xs text-[#6FA8AA] font-black flex justify-center items-center gap-1">
+                          <FaStar />
+                          Rating
+                        </p>
 
-                    <p className="text-[#0A5E75] font-bold mt-1">
-                      {getServiceText(worker.service)}
-                    </p>
-                  </div>
+                        <p className="text-[#08566E] font-black">
+                          ⭐ {getWorkerRating(worker)}
+                        </p>
+                      </div>
 
-                  {worker.CertificateLink && (
-                    <a
-                      href={worker.CertificateLink}
-                      target="_blank"
-                      rel="noreferrer"
+                      <div className="bg-white/90 rounded-2xl p-3 text-center border border-[#B4DBDC]">
+                        <p className="text-xs text-[#6FA8AA] font-black flex justify-center items-center gap-1">
+                          <FaShieldAlt />
+                          {t.trust || "Trust"}
+                        </p>
+
+                        <p className="text-[#08566E] font-black">
+                          {getTrustScore(worker)}%
+                        </p>
+                      </div>
+
+                      <div className="bg-white/90 rounded-2xl p-3 text-center border border-[#B4DBDC]">
+                        <p className="text-xs text-[#6FA8AA] font-black flex justify-center items-center gap-1">
+                          <FaMapMarkerAlt />
+                          Area
+                        </p>
+
+                        <p className="text-[#08566E] font-black truncate">
+                          {workerLocation}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 bg-[#08566E] rounded-3xl p-4">
+                      <p className="text-[#E1E9E5] font-black text-lg">
+                        ✔ {t.verifiedProfessional || "Verified Professional"}
+                      </p>
+
+                      <p className="text-[#B4DBDC] text-sm font-semibold mt-1">
+                        {t.inspectionBasedPricing || "Inspection Based Pricing"}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={!available}
                       onClick={(e) => {
                         e.stopPropagation();
+                        handleBookWorker(worker);
                       }}
-                      className="inline-block mt-3 text-[#08566E] text-xs font-extrabold hover:underline"
+                      className={`es-booking-cta mt-5 w-full py-3 rounded-2xl font-black transition flex items-center justify-center gap-2 ${
+                        available
+                          ? "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
+                          : "bg-gray-400 text-white cursor-not-allowed"
+                      }`}
                     >
-                      📜 {t.verifiedSkillCertificate || "Verified Skill Certificate"}
-                    </a>
-                  )}
-
-                  <div className="grid grid-cols-3 gap-2 mt-5">
-                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
-                      <p className="text-xs text-[#6FA8AA] font-bold">
-                        Rating
-                      </p>
-
-                      <p className="text-[#08566E] font-extrabold">
-                        ⭐ {worker.rating || "4.8"}
-                      </p>
-                    </div>
-
-                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
-                      <p className="text-xs text-[#6FA8AA] font-bold">
-                        {t.trust || "Trust"}
-                      </p>
-
-                      <p className="text-[#08566E] font-extrabold">
-                        {worker.TrustScore || "90"}%
-                      </p>
-                    </div>
-
-                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-3 text-center">
-                      <p className="text-xs text-[#6FA8AA] font-bold">
-                        Area
-                      </p>
-
-                      <p className="text-[#08566E] font-extrabold truncate">
-                        {worker.location || t.localArea || "Local"}
-                      </p>
-                    </div>
+                      {available ? (
+                        <>
+                          <FaBolt />
+                          {t.bookNow || "Book Now"}
+                        </>
+                      ) : (
+                        t.busy || "Busy"
+                      )}
+                    </button>
                   </div>
-
-                  <div className="mt-5 bg-[#08566E] rounded-3xl p-4">
-                    <p className="text-[#E1E9E5] font-extrabold text-lg">
-                      ✔ {t.verifiedProfessional || "Verified Professional"}
-                    </p>
-
-                    <p className="text-[#B4DBDC] text-sm font-semibold mt-1">
-                      {t.inspectionBasedPricing || "Inspection Based Pricing"}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={!isAvailable(worker)}
-                    className={`mt-5 w-full py-3 rounded-2xl font-extrabold transition ${
-                      isAvailable(worker)
-                        ? "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
-                        : "bg-gray-400 text-white cursor-not-allowed"
-                    }`}
-                  >
-                    {isAvailable(worker)
-                      ? `⚡ ${t.bookNow || "Book Now"}`
-                      : t.busy || "Busy"}
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
