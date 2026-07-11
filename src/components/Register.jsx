@@ -1,8 +1,13 @@
 import { useState } from "react";
+import AnimatedAuthButton from "./AnimatedAuthButton";
+
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
 
 function Register({
   setShowRegister,
-  setShowLogin
+  setShowLogin,
+  language = "en",
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -11,6 +16,7 @@ function Register({
   const [address, setAddress] = useState("");
 
   const [leaving, setLeaving] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const goToLogin = () => {
     setLeaving(true);
@@ -21,24 +27,34 @@ function Register({
     }, 350);
   };
 
+  const getRegisterText = () => {
+    if (language === "hi") return "Account बनाएं";
+    if (language === "od") return "Account ବନାନ୍ତୁ";
+    return "Create Account";
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            action: "register",
-            name,
-            phone,
-            email,
-            password,
-            address,
-          }),
-        }
-      );
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "register",
+          name: name.trim(),
+          phone: phone.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+          address: address.trim(),
+        }),
+      });
 
       const data = await res.json();
 
@@ -52,6 +68,8 @@ function Register({
       console.log(error);
       alert("Registration Failed");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -204,12 +222,11 @@ function Register({
                 />
               </div>
 
-              <button
+              <AnimatedAuthButton
+                text={getRegisterText()}
+                loading={loading}
                 type="submit"
-                className="w-full mt-2 py-4 rounded-2xl bg-gradient-to-r from-[#9ECFD0] to-[#6FA8AA] text-[#08566E] font-extrabold shadow-lg hover:scale-[1.02] hover:shadow-xl transition"
-              >
-                Create Account
-              </button>
+              />
             </form>
 
             <div className="text-center mt-6">
@@ -220,7 +237,7 @@ function Register({
               <button
                 type="button"
                 onClick={goToLogin}
-                className="mt-2 text-[#E1E9E5] font-bold hover:text-[#9ECFD0] hover:underline transition"
+                className="es-no-liquid mt-2 text-[#E1E9E5] font-bold hover:text-[#9ECFD0] hover:underline transition"
               >
                 Login
               </button>
