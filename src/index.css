@@ -1,20 +1,54 @@
 @import "tailwindcss";
 
-/* ========== E-SERVOO PROFESSIONAL TYPOGRAPHY FIX ========== */
+/* ========== E-SERVOO DESIGN SYSTEM ========== */
 
 :root {
-  --es-font-main: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: only light !important;
+
+  --es-bg: #B4DBDC;
+  --es-card: #9ECFD0;
+  --es-secondary: #6FA8AA;
+  --es-primary: #08566E;
+  --es-primary-dark: #06485C;
+  --es-text-light: #E1E9E5;
+  --es-text-dark: #08566E;
+
+  --es-font-main: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ========== GLOBAL BASE FIX ========== */
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: only light !important;
+  background: #B4DBDC !important;
 }
 
 html,
 body,
 #root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: #B4DBDC !important;
+  color: #08566E !important;
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
   font-family: var(--es-font-main) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+body {
+  margin: 0;
+}
+
+/* ========== PROFESSIONAL TYPOGRAPHY FIX ========== */
 
 * {
   font-family: var(--es-font-main) !important;
-  letter-spacing: 0 !important;
 }
 
 h1,
@@ -40,16 +74,135 @@ a {
   font-family: var(--es-font-main) !important;
 }
 
-html {
-  scroll-behavior: smooth;
+p {
+  line-height: 1.7;
 }
 
-html,
-body,
-#root {
-  overflow-x: hidden;
-  width: 100%;
+button {
+  font-weight: 800 !important;
+}
+
+/* ========== READABILITY / CONTRAST FIX ========== */
+
+.es-readable-text {
+  color: rgba(8, 86, 110, 0.9) !important;
+}
+
+.es-muted-text {
+  color: rgba(8, 86, 110, 0.72) !important;
+}
+
+.es-hero-title,
+.hero-title {
+  color: #08566E !important;
+  font-weight: 950 !important;
+  text-shadow: none !important;
+  letter-spacing: -0.04em !important;
+}
+
+.es-hero-subtitle,
+.hero-subtitle {
+  color: #06485C !important;
+  font-weight: 700 !important;
+}
+
+/* ========== APP LIGHT LOCK ========== */
+
+.es-light-lock {
+  background-color: #B4DBDC !important;
+  color: #08566E !important;
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+}
+
+.es-light-lock,
+.es-light-lock * {
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+}
+
+/* ========== FORM FIELD COLOR LOCK ========== */
+
+input,
+textarea,
+select,
+option {
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+  background-color: #E1E9E5 !important;
+  color: #08566E !important;
+  -webkit-text-fill-color: #08566E !important;
+  border-color: #6FA8AA !important;
+  caret-color: #08566E !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(8, 86, 110, 0.62) !important;
+  -webkit-text-fill-color: rgba(8, 86, 110, 0.62) !important;
+}
+
+button,
+a {
+  color-scheme: only light !important;
+  forced-color-adjust: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  forced-color-adjust: none !important;
+}
+
+img {
   max-width: 100%;
+  display: block;
+}
+
+/* ========== CHROME / ANDROID DARK OVERRIDE ========== */
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  html,
+  body,
+  #root,
+  .es-light-lock {
+    background-color: #B4DBDC !important;
+    color: #08566E !important;
+    color-scheme: only light !important;
+    forced-color-adjust: none !important;
+  }
+
+  input,
+  textarea,
+  select,
+  option {
+    background-color: #E1E9E5 !important;
+    color: #08566E !important;
+    -webkit-text-fill-color: #08566E !important;
+    border-color: #6FA8AA !important;
+  }
+}
+
+/* ========== UBUNTU / LINUX CONSISTENCY HELPERS ========== */
+
+.bg-es-page {
+  background: #B4DBDC !important;
+}
+
+.text-es-primary {
+  color: #08566E !important;
+}
+
+.card-es {
+  background: #9ECFD0 !important;
+  color: #08566E !important;
 }
 
 /* ========== WORKER SLIDE ANIMATION ========== */
@@ -118,13 +271,13 @@ body,
   font-size: 42px;
   font-weight: 900;
   margin-bottom: 8px;
-  color: #E1E9E5;
+  color: #E1E9E5 !important;
 }
 
 .es-auth-subtitle {
-  color: #B4DBDC;
+  color: #B4DBDC !important;
   margin-bottom: 24px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .es-form-box.es-login {
@@ -153,7 +306,7 @@ body,
   z-index: 6;
 }
 
-/* ========== INPUTS ========== */
+/* ========== AUTH INPUTS ========== */
 
 .es-input-box {
   width: 100%;
@@ -163,36 +316,38 @@ body,
 .es-input-box input {
   width: 100%;
   height: 50px;
-  background: #E1E9E5;
-  border: 1px solid #9ECFD0;
+  background: #E1E9E5 !important;
+  border: 1px solid #9ECFD0 !important;
   outline: none;
   border-radius: 40px;
   padding: 0 20px;
-  color: #08566E;
+  color: #08566E !important;
+  -webkit-text-fill-color: #08566E !important;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .es-input-box input::placeholder {
-  color: #6FA8AA;
+  color: #6FA8AA !important;
+  -webkit-text-fill-color: #6FA8AA !important;
 }
 
 .es-input-box input:focus {
   box-shadow: 0 0 0 4px rgba(158, 207, 208, 0.35);
 }
 
-/* ========== BUTTON ========== */
+/* ========== AUTH OLD BUTTON SUPPORT ========== */
 
 .es-auth-btn {
   width: 100%;
   height: 48px;
-  background: linear-gradient(45deg, #9ECFD0, #6FA8AA);
+  background: linear-gradient(45deg, #9ECFD0, #6FA8AA) !important;
   border: none;
   outline: none;
   border-radius: 40px;
   cursor: pointer;
   font-size: 16px;
-  color: #08566E;
+  color: #08566E !important;
   font-weight: 900;
   margin-top: 12px;
   box-shadow: 0 8px 24px rgba(158, 207, 208, 0.28);
@@ -201,18 +356,20 @@ body,
 
 .es-auth-btn:hover {
   transform: translateY(-2px);
+  color: #E1E9E5 !important;
+  background: linear-gradient(135deg, #08566E, #0A6F78, #6FA8AA) !important;
   box-shadow: 0 12px 28px rgba(158, 207, 208, 0.42);
 }
 
 .es-auth-link-text {
   margin-top: 20px;
-  color: #B4DBDC;
+  color: #B4DBDC !important;
   font-size: 14px;
   text-align: center;
 }
 
 .es-auth-link-text button {
-  color: #E1E9E5;
+  color: #E1E9E5 !important;
   font-weight: 800;
   margin-left: 5px;
   text-decoration: underline;
@@ -279,13 +436,13 @@ body,
   font-size: 42px;
   font-weight: 900;
   margin-bottom: 18px;
-  color: #E1E9E5;
+  color: #E1E9E5 !important;
 }
 
 .es-toggle-panel p {
-  color: #E1E9E5;
+  color: #E1E9E5 !important;
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .es-toggle-badge {
@@ -315,7 +472,7 @@ body,
   transform: translateX(200%);
 }
 
-/* ========== MOBILE RESPONSIVE ========== */
+/* ========== MOBILE AUTH RESPONSIVE ========== */
 
 @media (max-width: 768px) {
   .es-auth-page {
@@ -387,13 +544,13 @@ body,
   gap: 4px;
   padding: 8px;
   border-radius: 999px;
-  background: rgba(225, 233, 229, 0.62);
+  background: rgba(225, 233, 229, 0.82);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(180, 219, 220, 0.75);
+  border: 1px solid rgba(180, 219, 220, 0.9);
   box-shadow:
     0 14px 35px rgba(8, 86, 110, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
   overflow: hidden;
   pointer-events: auto;
 }
@@ -446,7 +603,7 @@ body,
 }
 
 .es-footer-item-active {
-  color: #E1E9E5;
+  color: #E1E9E5 !important;
 }
 
 .es-footer-icon {
@@ -496,8 +653,6 @@ body,
   }
 }
 
-/* Mobile */
-
 @media (max-width: 640px) {
   .es-footer-wrapper {
     bottom: 10px;
@@ -527,16 +682,68 @@ body,
   }
 }
 
-/* ========== GLOBAL E-SERVOO LIQUID GLASS BUTTONS ========== */
+/* ========== BUTTON CONSISTENCY FIX ========== */
 
-#root button:not(.es-no-liquid) {
+/*
+  Important:
+  Purana rule #root button:not(.es-no-liquid) sab buttons ko liquid bana raha tha.
+  Isse CTA unclear ho raha tha.
+  Ab liquid effect sirf .es-liquid-btn class wale buttons par lagega.
+*/
+
+#root button {
+  font-family: var(--es-font-main) !important;
+  font-weight: 800 !important;
+}
+
+/* Main CTA */
+.es-primary-cta,
+.es-booking-cta,
+.es-main-cta {
+  background: #08566E !important;
+  color: #E1E9E5 !important;
+  -webkit-text-fill-color: #E1E9E5 !important;
+  border: 2px solid #08566E !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 28px rgba(8, 86, 110, 0.28) !important;
+}
+
+.es-primary-cta:hover,
+.es-booking-cta:hover,
+.es-main-cta:hover {
+  background: #06485C !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Secondary CTA */
+.es-secondary-cta {
+  background: #E1E9E5 !important;
+  color: #08566E !important;
+  -webkit-text-fill-color: #08566E !important;
+  border: 2px solid #6FA8AA !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 20px rgba(8, 86, 110, 0.14) !important;
+}
+
+/* Text button */
+.es-text-btn {
+  background: transparent !important;
+  color: #08566E !important;
+  -webkit-text-fill-color: #08566E !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Optional liquid button */
+.es-liquid-btn {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-
   border-radius: 999px !important;
   border: 1px solid rgba(225, 233, 229, 0.55) !important;
-
   background:
     linear-gradient(
       135deg,
@@ -544,17 +751,13 @@ body,
       rgba(180, 219, 220, 0.36),
       rgba(111, 168, 170, 0.42)
     ) !important;
-
   color: #08566E !important;
-
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
-
   box-shadow:
     0 10px 24px rgba(8, 86, 110, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
     inset 0 -10px 22px rgba(8, 86, 110, 0.08) !important;
-
   transition:
     transform 0.28s ease,
     box-shadow 0.28s ease,
@@ -563,51 +766,27 @@ body,
     color 0.28s ease !important;
 }
 
-/* Liquid shine layer */
-#root button:not(.es-no-liquid)::before {
+.es-liquid-btn::before {
   content: "";
   position: absolute;
   top: -80%;
   left: -120%;
   width: 80%;
   height: 260%;
-
   background: linear-gradient(
     120deg,
     transparent,
     rgba(255, 255, 255, 0.65),
     transparent
   );
-
   transform: rotate(25deg);
   transition: left 0.65s ease;
   z-index: -1;
 }
 
-/* Inner glow */
-#root button:not(.es-no-liquid)::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-
-  background:
-    radial-gradient(
-      circle at 30% 20%,
-      rgba(255, 255, 255, 0.35),
-      transparent 36%
-    );
-
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Hover effect */
-#root button:not(.es-no-liquid):hover {
+.es-liquid-btn:hover {
   transform: translateY(-2px) scale(1.02) !important;
-
   color: #E1E9E5 !important;
-
   background:
     linear-gradient(
       135deg,
@@ -615,29 +794,14 @@ body,
       rgba(10, 111, 120, 0.9),
       rgba(111, 168, 170, 0.86)
     ) !important;
-
-  border-color: rgba(225, 233, 229, 0.75) !important;
-
-  box-shadow:
-    0 16px 34px rgba(8, 86, 110, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -12px 24px rgba(0, 0, 0, 0.15) !important;
 }
 
-#root button:not(.es-no-liquid):hover::before {
+.es-liquid-btn:hover::before {
   left: 140%;
 }
 
-/* Click effect */
-#root button:not(.es-no-liquid):active {
-  transform: translateY(0) scale(0.97) !important;
-  box-shadow:
-    0 7px 16px rgba(8, 86, 110, 0.22),
-    inset 0 3px 10px rgba(0, 0, 0, 0.18) !important;
-}
-
-/* Disabled button */
-#root button:not(.es-no-liquid):disabled {
+button:disabled,
+.es-liquid-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   transform: none !important;
@@ -647,36 +811,8 @@ body,
 #root button.animate-pulse {
   background: rgba(239, 68, 68, 0.9) !important;
   color: white !important;
+  -webkit-text-fill-color: white !important;
   border-color: rgba(255, 255, 255, 0.4) !important;
-}
-
-/* Auth form main buttons extra premium */
-.es-auth-btn {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(225, 233, 229, 0.72),
-      rgba(158, 207, 208, 0.58),
-      rgba(111, 168, 170, 0.68)
-    ) !important;
-
-  color: #08566E !important;
-
-  box-shadow:
-    0 14px 32px rgba(8, 86, 110, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
-}
-
-.es-auth-btn:hover {
-  color: #E1E9E5 !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      #08566E,
-      #0A6F78,
-      #6FA8AA
-    ) !important;
 }
 
 /* ========== SENIOR CITIZEN MODE ========== */
@@ -685,7 +821,6 @@ body,
   letter-spacing: 0.2px;
 }
 
-/* Normal text */
 .senior-mode p,
 .senior-mode span,
 .senior-mode label,
@@ -698,15 +833,14 @@ body,
   line-height: 1.75 !important;
 }
 
-/* Buttons and links */
 .senior-mode button,
 .senior-mode a {
   font-size: 1.15rem !important;
   line-height: 1.45 !important;
   font-weight: 800 !important;
+  min-height: 48px !important;
 }
 
-/* Headings */
 .senior-mode h1 {
   font-size: clamp(3rem, 7vw, 5.5rem) !important;
   line-height: 1.15 !important;
@@ -722,7 +856,6 @@ body,
   line-height: 1.3 !important;
 }
 
-/* Bigger input fields */
 .senior-mode input,
 .senior-mode textarea,
 .senior-mode select {
@@ -730,13 +863,6 @@ body,
   padding: 18px !important;
 }
 
-/* Bigger tap area */
-.senior-mode button,
-.senior-mode a {
-  min-height: 48px !important;
-}
-
-/* Cards spacing */
 .senior-mode section {
   scroll-margin-top: 90px;
 }
@@ -747,7 +873,6 @@ body,
   box-shadow: 0 12px 30px rgba(8, 86, 110, 0.16);
 }
 
-/* Footer nav bigger */
 .senior-mode .es-footer-item {
   padding: 15px 22px !important;
 }
@@ -760,13 +885,11 @@ body,
   font-size: 1.25rem !important;
 }
 
-/* AI assistant bigger */
 .senior-mode input::placeholder,
 .senior-mode textarea::placeholder {
   font-size: 1.05rem !important;
 }
 
-/* Mobile control */
 @media (max-width: 640px) {
   .senior-mode p,
   .senior-mode span,
@@ -817,8 +940,8 @@ body,
   width: min(90vw, 380px);
   padding: 42px 28px;
   border-radius: 36px;
-  background: rgba(255, 255, 255, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(20px);
   box-shadow: 0 30px 80px rgba(8, 86, 110, 0.28);
   text-align: center;
@@ -859,15 +982,15 @@ body,
 }
 
 .es-loader-title {
-  color: #08566E;
+  color: #08566E !important;
   font-size: 38px;
   font-weight: 900;
-  letter-spacing: 1px;
+  letter-spacing: -0.03em;
   margin: 0;
 }
 
 .es-loader-subtitle {
-  color: rgba(8, 86, 110, 0.78);
+  color: rgba(8, 86, 110, 0.78) !important;
   font-weight: 700;
   margin-top: 8px;
 }
@@ -967,133 +1090,6 @@ body,
   }
 }
 
-/* ========== E-SERVOO HARD LIGHT MODE LOCK ========== */
-
-:root {
-  color-scheme: only light !important;
-
-  --es-bg: #B4DBDC;
-  --es-card: #9ECFD0;
-  --es-secondary: #6FA8AA;
-  --es-primary: #08566E;
-  --es-text-light: #E1E9E5;
-  --es-text-dark: #08566E;
-}
-
-html,
-body,
-#root {
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-  background-color: #B4DBDC !important;
-  color: #08566E !important;
-  color-scheme: only light !important;
-  forced-color-adjust: none !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  margin: 0;
-}
-
-/* App root hard lock */
-.es-light-lock {
-  background-color: #B4DBDC !important;
-  color: #08566E !important;
-  color-scheme: only light !important;
-  forced-color-adjust: none !important;
-}
-
-/* Prevent Android Chrome auto dark effect */
-.es-light-lock,
-.es-light-lock * {
-  color-scheme: only light !important;
-  forced-color-adjust: none !important;
-}
-
-/* Form fields exact color lock */
-input,
-textarea,
-select,
-option {
-  color-scheme: only light !important;
-  forced-color-adjust: none !important;
-  background-color: #E1E9E5 !important;
-  color: #08566E !important;
-  -webkit-text-fill-color: #08566E !important;
-  border-color: #6FA8AA !important;
-  caret-color: #08566E !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: rgba(8, 86, 110, 0.65) !important;
-  -webkit-text-fill-color: rgba(8, 86, 110, 0.65) !important;
-}
-
-button,
-a {
-  color-scheme: only light !important;
-  forced-color-adjust: none !important;
-  -webkit-tap-highlight-color: transparent;
-}
-
-a {
-  color: inherit;
-}
-
-img,
-svg,
-video,
-canvas {
-  forced-color-adjust: none !important;
-}
-
-img {
-  max-width: 100%;
-  display: block;
-}
-
-/* Chrome / Android dark mode override */
-@media (prefers-color-scheme: dark) {
-  :root,
-  html,
-  body,
-  #root,
-  .es-light-lock {
-    background-color: #B4DBDC !important;
-    color: #08566E !important;
-    color-scheme: only light !important;
-    forced-color-adjust: none !important;
-  }
-
-  input,
-  textarea,
-  select,
-  option {
-    background-color: #E1E9E5 !important;
-    color: #08566E !important;
-    -webkit-text-fill-color: #08566E !important;
-    border-color: #6FA8AA !important;
-  }
-}
-
-/* Ubuntu/Linux browser consistency helper classes */
-.bg-es-page {
-  background: #B4DBDC !important;
-}
-
-.text-es-primary {
-  color: #08566E !important;
-}
-
-.card-es {
-  background: #9ECFD0 !important;
-  color: #08566E !important;
-}
-
 /* ========== E-SERVOO ANIMATED AUTH BUTTON ========== */
 
 .es-animated-auth-btn {
@@ -1105,7 +1101,6 @@ img {
   outline: none;
   border-radius: 18px !important;
   cursor: pointer;
-
   background:
     linear-gradient(
       135deg,
@@ -1113,16 +1108,14 @@ img {
       #0A6F78,
       #3B82F6
     ) !important;
-
   color: #E1E9E5 !important;
+  -webkit-text-fill-color: #E1E9E5 !important;
   font-size: 17px;
   font-weight: 900;
-  letter-spacing: 0.3px;
-
+  letter-spacing: 0 !important;
   box-shadow:
     0 14px 30px rgba(8, 86, 110, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
-
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease,
@@ -1151,7 +1144,8 @@ img {
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
-  color: #E1E9E5;
+  color: #E1E9E5 !important;
+  -webkit-text-fill-color: #E1E9E5 !important;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
