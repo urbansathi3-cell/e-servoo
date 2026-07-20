@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { translations } from "../translations";
+import { FaStar, FaArrowLeft, FaClipboardList } from "react-icons/fa";
 import {
-  FaStar,
-  FaArrowLeft,
-  FaClipboardList,
-  FaUserCheck,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaCheckCircle,
-  FaPen,
-} from "react-icons/fa";
+  getStoredUser,
+  getStoredToken,
+  safeJsonParse,
+  saveJsonToStorage,
+} from "../utils/storage";
 
-function MyBookings({ language = "en" }) {
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
+
+function MyBookings() {
   const navigate = useNavigate();
-  const t = translations[language] || translations.en;
 
   const [bookings, setBookings] = useState([]);
   const [ratings, setRatings] = useState({});
@@ -23,171 +21,33 @@ function MyBookings({ language = "en" }) {
   const [loading, setLoading] = useState(true);
 
   const [reviewedBookings, setReviewedBookings] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("reviewedBookings")) || {};
-    } catch {
+    const saved = safeJsonParse(localStorage.getItem("reviewedBookings"), {});
+
+    if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
+      localStorage.removeItem("reviewedBookings");
       return {};
     }
+
+    return saved;
   });
 
-  const text = {
-    back:
-      language === "hi"
-        ? "वापस"
-        : language === "od"
-          ? "ପଛକୁ"
-          : "Back",
+  const pushEvent = (eventName, extraData = {}) => {
+    window.dataLayer = window.dataLayer || [];
 
-    title:
-      t.myBookingsTitle ||
-      (language === "hi"
-        ? "मेरी बुकिंग्स"
-        : language === "od"
-          ? "ମୋ ବୁକିଂ"
-          : "My Bookings"),
-
-    subtitle:
-      language === "hi"
-        ? "आपकी सभी सर्विस बुकिंग्स और उनके स्टेटस यहाँ दिखेंगे।"
-        : language === "od"
-          ? "ଆପଣଙ୍କ ସମସ୍ତ service booking ଏବଂ status ଏଠାରେ ଦେଖାଯିବ।"
-          : "Track all your service bookings and review completed jobs.",
-
-    noBookings:
-      t.noBookingsFound ||
-      (language === "hi"
-        ? "कोई बुकिंग नहीं मिली"
-        : language === "od"
-          ? "କୌଣସି ବୁକିଂ ମିଳିଲା ନାହିଁ"
-          : "No Bookings Found"),
-
-    loading:
-      language === "hi"
-        ? "बुकिंग्स लोड हो रही हैं..."
-        : language === "od"
-          ? "ବୁକିଂ load ହେଉଛି..."
-          : "Loading bookings...",
-
-    bookingId:
-      t.bookingId || "Booking ID",
-
-    service:
-      t.service || "Service",
-
-    worker:
-      t.worker || "Worker",
-
-    date:
-      t.date || "Date",
-
-    status:
-      t.bookingStatus || "Status",
-
-    address:
-      t.address || "Address",
-
-    issue:
-      t.issueDescription || "Issue Description",
-
-    priority:
-      t.priority || "Priority",
-
-    rateWorker:
-      language === "hi"
-        ? "इस वर्कर को रेट करें"
-        : language === "od"
-          ? "ଏହି worker କୁ rating ଦିଅନ୍ତୁ"
-          : "Rate This Worker",
-
-    writeReview:
-      language === "hi"
-        ? "अपना review लिखें..."
-        : language === "od"
-          ? "ଆପଣଙ୍କ review ଲେଖନ୍ତୁ..."
-          : "Write your review...",
-
-    submitReview:
-      language === "hi"
-        ? "Review Submit करें"
-        : language === "od"
-          ? "Review Submit କରନ୍ତୁ"
-          : "Submit Review",
-
-    submitting:
-      language === "hi"
-        ? "Submit हो रहा है..."
-        : language === "od"
-          ? "Submit ହେଉଛି..."
-          : "Submitting...",
-
-    reviewSubmitted:
-      language === "hi"
-        ? "Review Submit हो गया"
-        : language === "od"
-          ? "Review Submit ହୋଇଗଲା"
-          : "Review Submitted",
-
-    reviewRequired:
-      language === "hi"
-        ? "कृपया review लिखें"
-        : language === "od"
-          ? "ଦୟାକରି review ଲେଖନ୍ତୁ"
-          : "Please write a review",
-
-    success:
-      language === "hi"
-        ? "Review सफलतापूर्वक submit हो गया"
-        : language === "od"
-          ? "Review ସଫଳତାର ସହିତ submit ହେଲା"
-          : "Review Submitted Successfully",
-
-    failed:
-      language === "hi"
-        ? "Review Failed"
-        : language === "od"
-          ? "Review Failed"
-          : "Review Failed",
-
-    networkError:
-      language === "hi"
-        ? "Network Error"
-        : language === "od"
-          ? "Network Error"
-          : "Network Error",
+    window.dataLayer.push({
+      event: eventName,
+      page_section: "my_bookings",
+      ...extraData,
+    });
   };
 
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    fetch(`${API_URL}?phone=${user.phone}&nocache=${Date.now()}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setBookings(data);
-        } else {
-          setBookings([]);
-        }
-
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setBookings([]);
-        setLoading(false);
-      });
-  }, []);
-
-  const getValue = (booking, keys, fallback = "") => {
+  const getBookingValue = (booking, keys, fallback = "") => {
     for (const key of keys) {
-      if (booking?.[key] !== undefined && booking?.[key] !== null) {
+      if (
+        booking?.[key] !== undefined &&
+        booking?.[key] !== null &&
+        booking?.[key] !== ""
+      ) {
         return booking[key];
       }
     }
@@ -195,15 +55,19 @@ function MyBookings({ language = "en" }) {
     return fallback;
   };
 
-  const getBookingKey = (booking, index) => {
+  const getBookingKey = (booking, index = 0) => {
     return (
-      getValue(booking, ["BookingID", "BookingId", "Booking id", "bookingId"]) ||
-      `${getValue(booking, ["Worker"], "worker")}-${index}`
+      getBookingValue(
+        booking,
+        ["BookingID", "BookingId", "Booking id", "bookingId", "id"],
+        ""
+      ) ||
+      `${getBookingValue(booking, ["Worker", "worker"], "worker")}-${index}`
     );
   };
 
   const formatDate = (dateValue) => {
-    if (!dateValue) return "N/A";
+    if (!dateValue) return "Not Available";
 
     const date = new Date(dateValue);
 
@@ -218,27 +82,38 @@ function MyBookings({ language = "en" }) {
     });
   };
 
-  const getStatusClass = (status) => {
-    const statusText = String(status || "").trim().toLowerCase();
+  useEffect(() => {
+    const user = getStoredUser();
 
-    if (statusText === "completed") {
-      return "bg-green-600 text-white";
+    if (!user || !user.phone) {
+      setBookings([]);
+      setLoading(false);
+      return;
     }
 
-    if (statusText === "pending") {
-      return "bg-yellow-500 text-[#08566E]";
-    }
+    setLoading(true);
 
-    if (statusText === "cancelled" || statusText === "canceled") {
-      return "bg-red-500 text-white";
-    }
+    fetch(
+      `${API_URL}?phone=${encodeURIComponent(user.phone)}&nocache=${Date.now()}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBookings(data);
+        } else if (Array.isArray(data.bookings)) {
+          setBookings(data.bookings);
+        } else {
+          setBookings([]);
+        }
 
-    if (statusText === "accepted" || statusText === "confirmed") {
-      return "bg-[#08566E] text-[#E1E9E5]";
-    }
-
-    return "bg-[#6FA8AA] text-[#E1E9E5]";
-  };
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setBookings([]);
+        setLoading(false);
+      });
+  }, []);
 
   const submitReview = async (booking, index) => {
     const bookingKey = getBookingKey(booking, index);
@@ -247,163 +122,214 @@ function MyBookings({ language = "en" }) {
     const writtenReview = reviews[bookingKey] || "";
 
     if (!writtenReview.trim()) {
-      alert(text.reviewRequired);
+      alert("Please write a review.");
       return;
     }
 
     setSubmittingId(bookingKey);
 
     try {
+      const workerId = getBookingValue(
+        booking,
+        ["WorkerId", "WorkerID", "Worker id", "workerId"],
+        getBookingValue(booking, ["Worker", "worker"], "")
+      );
+
+      const bookingId = getBookingValue(
+        booking,
+        ["BookingID", "BookingId", "Booking id", "bookingId"],
+        bookingKey
+      );
+
       const res = await fetch(API_URL, {
         method: "POST",
         body: JSON.stringify({
           action: "review",
-
-          workerId:
-            getValue(booking, ["WorkerId", "WorkerID", "Worker id"]) ||
-            getValue(booking, ["Worker"]),
-
-          bookingId: getValue(booking, [
-            "BookingID",
-            "BookingId",
-            "Booking id",
-            "bookingId",
-          ]),
-
+          token: getStoredToken(),
+          workerId,
+          bookingId,
           rating: selectedRating,
-
-          review: writtenReview,
+          review: writtenReview.trim(),
         }),
       });
 
       const data = await res.json();
 
-      if (data.success) {
-        alert(text.success);
-
-        const updatedReviewedBookings = {
-          ...reviewedBookings,
-          [bookingKey]: true,
-        };
-
-        setReviewedBookings(updatedReviewedBookings);
-
-        localStorage.setItem(
-          "reviewedBookings",
-          JSON.stringify(updatedReviewedBookings)
-        );
-
-        setReviews({
-          ...reviews,
-          [bookingKey]: "",
-        });
-
-        setRatings({
-          ...ratings,
-          [bookingKey]: 5,
-        });
-      } else {
-        alert(data.message || text.failed);
+      if (data.success === false) {
+        alert(data.message || "Review failed.");
+        setSubmittingId(null);
+        return;
       }
+
+      alert("Review Submitted Successfully");
+
+      const updatedReviewedBookings = {
+        ...reviewedBookings,
+        [bookingKey]: true,
+      };
+
+      setReviewedBookings(updatedReviewedBookings);
+      saveJsonToStorage("reviewedBookings", updatedReviewedBookings);
+
+      setReviews({
+        ...reviews,
+        [bookingKey]: "",
+      });
+
+      setRatings({
+        ...ratings,
+        [bookingKey]: 5,
+      });
+
+      pushEvent("review_submitted", {
+        rating: selectedRating,
+      });
     } catch (error) {
       console.log(error);
-      alert(text.networkError);
+      alert("Network Error");
     }
 
     setSubmittingId(null);
   };
 
+  const user = getStoredUser();
+
+  if (!user) {
+    return (
+      <section className="bg-[#B4DBDC] min-h-screen text-[#08566E] py-20 px-5 flex items-center justify-center">
+        <div className="bg-[#E1E9E5] rounded-3xl p-8 text-center shadow-xl max-w-md w-full border border-[#6FA8AA]">
+          <FaClipboardList className="text-5xl mx-auto text-[#08566E]" />
+
+          <h2 className="text-3xl font-black text-[#08566E] mt-5">
+            Please Login First
+          </h2>
+
+          <p className="text-[#06485C] font-semibold mt-3">
+            Your session was not found. Login again to view your bookings.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="es-primary-cta mt-6 px-6 py-3 rounded-2xl font-black"
+          >
+            Go to Home
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="relative overflow-hidden min-h-screen bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] text-slate-900 py-20 px-5">
-
-      {/* BACKGROUND GLOW */}
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#08566E]/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#6FA8AA]/35 rounded-full blur-3xl"></div>
-
-      <div className="relative z-10 max-w-7xl mx-auto">
-
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-10">
+    <section className="bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] min-h-screen text-[#08566E] py-20 px-5">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-8">
           <div>
             <button
+              type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5] px-5 py-3 rounded-full font-bold shadow-lg transition"
+              className="es-secondary-cta inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-black transition"
             >
               <FaArrowLeft />
-              {text.back}
+              Back
             </button>
 
-            <div className="mt-6">
-              <div className="inline-flex items-center gap-2 bg-white/40 backdrop-blur-xl border border-white/60 px-5 py-2 rounded-full shadow-lg text-[#08566E] font-extrabold mb-4">
-                <FaClipboardList />
-                {text.title}
-              </div>
+            <h2 className="text-4xl md:text-5xl font-black text-[#08566E] mt-6">
+              My Bookings
+            </h2>
 
-              <h2 className="text-4xl md:text-5xl font-black text-[#08566E]">
-                {text.title}
-              </h2>
+            <p className="text-[#06485C] font-semibold mt-2">
+              Track your service bookings and submit reviews after completion.
+            </p>
+          </div>
 
-              <p className="text-[#08566E]/75 mt-3 font-semibold max-w-2xl">
-                {text.subtitle}
-              </p>
-            </div>
+          <div className="bg-[#E1E9E5]/85 border border-white/80 rounded-3xl p-5 shadow-xl">
+            <p className="text-[#6FA8AA] font-black text-sm">
+              Total Bookings
+            </p>
+
+            <p className="text-[#08566E] text-4xl font-black">
+              {bookings.length}
+            </p>
           </div>
         </div>
 
-        {/* LOADING */}
-        {loading && (
+        {loading ? (
           <div className="grid md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((item) => (
               <div
                 key={item}
-                className="bg-white/35 backdrop-blur-xl border border-white/60 rounded-[30px] p-6 shadow-xl animate-pulse"
+                className="bg-[#E1E9E5]/80 border border-white/80 rounded-3xl p-6 shadow-xl animate-pulse"
               >
                 <div className="h-7 w-40 bg-[#08566E]/20 rounded-full"></div>
                 <div className="h-4 w-64 bg-[#08566E]/20 rounded-full mt-5"></div>
                 <div className="h-4 w-52 bg-[#08566E]/20 rounded-full mt-3"></div>
-                <div className="h-10 w-full bg-[#08566E]/20 rounded-2xl mt-6"></div>
+                <div className="h-10 w-32 bg-[#08566E]/20 rounded-full mt-6"></div>
               </div>
             ))}
           </div>
-        )}
+        ) : bookings.length === 0 ? (
+          <div className="bg-[#E1E9E5]/90 border border-[#6FA8AA] rounded-3xl p-10 text-center shadow-xl">
+            <FaClipboardList className="text-5xl mx-auto text-[#08566E]" />
 
-        {/* EMPTY */}
-        {!loading && bookings.length === 0 && (
-          <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[32px] p-10 text-center shadow-2xl">
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-[#08566E] text-[#E1E9E5] flex items-center justify-center text-3xl shadow-xl">
-              <FaClipboardList />
-            </div>
-
-            <h3 className="text-3xl font-black text-[#08566E] mt-6">
-              {text.noBookings}
-            </h3>
-
-            <p className="text-[#08566E]/70 font-semibold mt-2">
-              Book a service from E-SERVOO and your request will appear here.
+            <p className="text-[#08566E] font-black text-2xl mt-5">
+              No Bookings Found
             </p>
-          </div>
-        )}
 
-        {/* BOOKINGS GRID */}
-        {!loading && bookings.length > 0 && (
+            <p className="text-[#06485C] font-semibold mt-2">
+              Book a service first, then your bookings will appear here.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate("/services")}
+              className="es-primary-cta mt-6 px-6 py-3 rounded-2xl font-black"
+            >
+              Book a Service
+            </button>
+          </div>
+        ) : (
           <div className="grid md:grid-cols-2 gap-6">
             {bookings.map((booking, index) => {
               const bookingKey = getBookingKey(booking, index);
-
               const currentRating = ratings[bookingKey] || 5;
               const currentReview = reviews[bookingKey] || "";
 
-              const service = getValue(booking, ["Service", "service"], "N/A");
-              const worker = getValue(booking, ["Worker", "worker"], "N/A");
-              const status = getValue(booking, ["Status", "status"], "Pending");
-              const date = getValue(booking, ["Date", "date"], "");
-              const address = getValue(booking, ["Address", "address"], "");
-              const issue = getValue(
+              const service = getBookingValue(
                 booking,
-                ["Issue Description", "IssueDescription", "issueDescription"],
+                ["Service", "service"],
+                "Service"
+              );
+
+              const worker = getBookingValue(
+                booking,
+                ["Worker", "worker"],
+                "Worker"
+              );
+
+              const bookingId = getBookingValue(
+                booking,
+                ["BookingID", "BookingId", "Booking id", "bookingId"],
+                bookingKey
+              );
+
+              const date = getBookingValue(
+                booking,
+                ["Date", "date"],
                 ""
               );
-              const urgency = getValue(booking, ["Urgency", "urgency"], "");
+
+              const status = getBookingValue(
+                booking,
+                ["Status", "status"],
+                "Pending"
+              );
+
+              const issue = getBookingValue(
+                booking,
+                ["Issue Description", "issueDescription", "Issue", "issue"],
+                ""
+              );
 
               const isCompleted =
                 String(status).trim().toLowerCase() === "completed";
@@ -411,106 +337,58 @@ function MyBookings({ language = "en" }) {
               return (
                 <div
                   key={bookingKey}
-                  className="group relative overflow-hidden bg-white/40 backdrop-blur-xl border border-white/60 rounded-[30px] p-6 shadow-xl hover:-translate-y-1 hover:shadow-2xl transition duration-300"
+                  className="bg-[#E1E9E5]/90 shadow-xl p-6 rounded-3xl border border-white/90"
                 >
-                  <div className="absolute inset-x-0 top-0 h-2 bg-[#08566E]"></div>
-
-                  {/* CARD TOP */}
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="text-2xl font-black text-[#08566E]">
                         {service}
                       </h3>
 
-                      <p className="text-[#08566E]/70 font-bold mt-1">
-                        {text.bookingId}: {bookingKey}
+                      <p className="mt-2 text-[#06485C] font-semibold">
+                        Worker: {worker}
                       </p>
                     </div>
 
                     <span
-                      className={`shrink-0 px-4 py-2 rounded-full text-xs font-extrabold shadow-md ${getStatusClass(
-                        status
-                      )}`}
+                      className={`px-3 py-1 rounded-full text-sm font-black ${
+                        String(status).trim().toLowerCase() === "completed"
+                          ? "bg-green-600 text-white"
+                          : String(status).trim().toLowerCase() === "cancelled"
+                            ? "bg-red-500 text-white"
+                            : "bg-[#08566E] text-[#E1E9E5]"
+                      }`}
                     >
                       {status}
                     </span>
                   </div>
 
-                  {/* DETAILS */}
-                  <div className="mt-6 grid sm:grid-cols-2 gap-4">
-                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-4">
-                      <p className="text-xs text-[#6FA8AA] font-bold flex items-center gap-2">
-                        <FaUserCheck />
-                        {text.worker}
+                  <div className="mt-5 bg-white/85 border border-[#B4DBDC] rounded-2xl p-4">
+                    <p className="text-[#08566E] font-bold">
+                      <strong>Booking ID:</strong> {bookingId}
+                    </p>
+
+                    <p className="mt-2 text-[#08566E] font-bold">
+                      <strong>Date:</strong> {formatDate(date)}
+                    </p>
+
+                    {issue && (
+                      <p className="mt-2 text-[#06485C] font-semibold">
+                        <strong>Issue:</strong> {issue}
                       </p>
-
-                      <p className="text-[#08566E] font-extrabold mt-1">
-                        {worker}
-                      </p>
-                    </div>
-
-                    <div className="bg-[#E1E9E5]/90 rounded-2xl p-4">
-                      <p className="text-xs text-[#6FA8AA] font-bold flex items-center gap-2">
-                        <FaCalendarAlt />
-                        {text.date}
-                      </p>
-
-                      <p className="text-[#08566E] font-extrabold mt-1">
-                        {formatDate(date)}
-                      </p>
-                    </div>
-
-                    {urgency && (
-                      <div className="bg-[#E1E9E5]/90 rounded-2xl p-4">
-                        <p className="text-xs text-[#6FA8AA] font-bold">
-                          {text.priority}
-                        </p>
-
-                        <p className="text-[#08566E] font-extrabold mt-1">
-                          {urgency}
-                        </p>
-                      </div>
-                    )}
-
-                    {address && (
-                      <div className="bg-[#E1E9E5]/90 rounded-2xl p-4">
-                        <p className="text-xs text-[#6FA8AA] font-bold flex items-center gap-2">
-                          <FaMapMarkerAlt />
-                          {text.address}
-                        </p>
-
-                        <p className="text-[#08566E] font-extrabold mt-1 line-clamp-2">
-                          {address}
-                        </p>
-                      </div>
                     )}
                   </div>
 
-                  {issue && (
-                    <div className="mt-4 bg-[#08566E]/10 border border-[#08566E]/15 rounded-2xl p-4">
-                      <p className="text-[#08566E] font-extrabold">
-                        {text.issue}
-                      </p>
-
-                      <p className="text-[#08566E]/75 font-semibold mt-1">
-                        {issue}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* REVIEW SECTION */}
                   {isCompleted && (
-                    <div className="mt-6 border-t border-[#08566E]/20 pt-5">
+                    <div className="mt-6 border-t border-[#6FA8AA]/40 pt-4">
                       {reviewedBookings[bookingKey] ? (
-                        <div className="bg-green-600 text-white p-4 rounded-2xl font-bold text-center flex items-center justify-center gap-2">
-                          <FaCheckCircle />
-                          {text.reviewSubmitted}
+                        <div className="bg-green-600 text-white p-4 rounded-2xl font-black text-center">
+                          ✅ Review Submitted
                         </div>
                       ) : (
                         <>
-                          <h4 className="font-black text-[#08566E] mb-3 flex items-center gap-2">
-                            <FaPen />
-                            {text.rateWorker}
+                          <h4 className="font-black text-[#08566E] mb-3">
+                            Rate This Worker
                           </h4>
 
                           <div className="flex gap-2 mb-4">
@@ -524,7 +402,7 @@ function MyBookings({ language = "en" }) {
                                     [bookingKey]: star,
                                   })
                                 }
-                                className={`cursor-pointer transition hover:scale-110 ${
+                                className={`cursor-pointer transition ${
                                   star <= currentRating
                                     ? "text-yellow-400"
                                     : "text-gray-300"
@@ -541,23 +419,24 @@ function MyBookings({ language = "en" }) {
                                 [bookingKey]: e.target.value,
                               })
                             }
-                            placeholder={text.writeReview}
-                            className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
+                            placeholder="Write your review..."
+                            className="w-full p-3 rounded-2xl text-[#08566E] bg-white border border-[#6FA8AA] outline-none font-semibold"
                             rows={3}
                           />
 
                           <button
+                            type="button"
                             onClick={() => submitReview(booking, index)}
                             disabled={submittingId === bookingKey}
-                            className={`mt-4 text-white px-5 py-3 rounded-2xl w-full font-extrabold transition ${
+                            className={`es-primary-cta mt-4 px-5 py-3 rounded-2xl w-full font-black ${
                               submittingId === bookingKey
                                 ? "bg-gray-500 cursor-not-allowed"
                                 : "bg-[#08566E] hover:bg-[#06485C]"
                             }`}
                           >
                             {submittingId === bookingKey
-                              ? text.submitting
-                              : text.submitReview}
+                              ? "Submitting..."
+                              : "Submit Review"}
                           </button>
                         </>
                       )}
@@ -568,7 +447,6 @@ function MyBookings({ language = "en" }) {
             })}
           </div>
         )}
-
       </div>
     </section>
   );

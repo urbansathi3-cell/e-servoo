@@ -1,296 +1,161 @@
-import { useEffect, useState } from "react";
-import AnimatedAuthButton from "./AnimatedAuthButton";
+import { useState } from "react";
+import { saveJsonToStorage } from "../utils/storage";
 
-const SCRIPT_URL =
+const API_URL =
   "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
 
 function Login({
   setIsLoggedIn,
-  initialMode = "login",
-  language = "en",
+  setShowLogin,
+  setShowRegister,
 }) {
-  const [active, setActive] = useState(initialMode === "register");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const pushEvent = (eventName, extraData = {}) => {
+    window.dataLayer = window.dataLayer || [];
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [address, setAddress] = useState("");
-
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [registerLoading, setRegisterLoading] = useState(false);
-
-  useEffect(() => {
-    setActive(initialMode === "register");
-  }, [initialMode]);
-
-  const getLoginText = () => {
-    if (language === "hi") return "Login करें";
-    if (language === "od") return "Login କରନ୍ତୁ";
-    return "Sign in";
-  };
-
-  const getRegisterText = () => {
-    if (language === "hi") return "Register करें";
-    if (language === "od") return "Register କରନ୍ତୁ";
-    return "Register";
+    window.dataLayer.push({
+      event: eventName,
+      page_section: "customer_login",
+      ...extraData,
+    });
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const cleanEmail = loginEmail.trim().toLowerCase();
-    const cleanPassword = loginPassword.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
 
     if (!cleanEmail || !cleanPassword) {
-      alert("Please enter email and password");
+      alert("Please enter email and password.");
       return;
     }
 
-    setLoginLoading(true);
+    setLoading(true);
 
     try {
-      const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "login",
-          email: cleanEmail,
-          password: cleanPassword,
-        }),
-      });
+      const res = await fetch(
+        `${API_URL}?email=${encodeURIComponent(cleanEmail)}&password=${encodeURIComponent(cleanPassword)}&nocache=${Date.now()}`
+      );
 
       const data = await res.json();
 
-      if (data.success) {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setIsLoggedIn(true);
-      } else {
+      if (!data.success) {
+        setLoading(false);
         alert(data.message || "Invalid Email or Password");
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      alert("Login Failed");
-    }
 
-    setLoginLoading(false);
-  };
+      const userData = data.user || data.customer || null;
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+      if (!userData || typeof userData !== "object") {
+        setLoading(false);
+        alert("Login response is invalid. User data not found.");
+        return;
+      }
 
-    if (registerPassword.length < 6) {
-      alert("Password must be at least 6 characters");
-      return;
-    }
+      saveJsonToStorage("user", userData);
 
-    setRegisterLoading(true);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
 
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "register",
-          name: name.trim(),
-          phone: phone.trim(),
-          email: registerEmail.trim().toLowerCase(),
-          password: registerPassword,
-          address: address.trim(),
-        }),
+      pushEvent("customer_login_success", {
+        user_type: "customer",
       });
 
-      const data = await res.json();
-
-      if (data.success) {
-        alert("Account Created Successfully");
-
-        setName("");
-        setPhone("");
-        setRegisterEmail("");
-        setRegisterPassword("");
-        setAddress("");
-
-        setActive(false);
-      } else {
-        alert(data.message || "Registration Failed");
-      }
+      setLoading(false);
+      setIsLoggedIn(true);
     } catch (error) {
       console.log(error);
-      alert("Registration Failed");
+      setLoading(false);
+      alert("Login Failed. Please try again.");
     }
-
-    setRegisterLoading(false);
   };
 
   return (
-    <section className="es-auth-page">
-      <div className={`es-auth-container ${active ? "active" : ""}`}>
-
-        {/* REGISTER FORM */}
-        <div className="es-form-box es-register">
-          <form onSubmit={handleRegister} className="es-auth-form">
-            <h1>Create Account</h1>
-
-            <p className="es-auth-subtitle">
-              Join E-SERVOO and book trusted local services.
-            </p>
-
-            <div className="es-input-box">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="es-input-box">
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="es-input-box">
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={registerEmail}
-                onChange={(e) => setRegisterEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="es-input-box">
-              <input
-                type="password"
-                placeholder="Create Password"
-                value={registerPassword}
-                onChange={(e) => setRegisterPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="es-input-box">
-              <input
-                type="text"
-                placeholder="Full Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-              />
-            </div>
-
-            <AnimatedAuthButton
-              text={getRegisterText()}
-              loading={registerLoading}
-              type="submit"
-            />
-
-            <p className="es-auth-link-text">
-              Already have an account?
-              <button
-                type="button"
-                onClick={() => setActive(false)}
-                className="es-no-liquid"
-              >
-                Sign In
-              </button>
-            </p>
-          </form>
-        </div>
-
-        {/* LOGIN FORM */}
-        <div className="es-form-box es-login">
-          <form onSubmit={handleLogin} className="es-auth-form">
-            <h1>Login</h1>
-
-            <p className="es-auth-subtitle">
-              Welcome back to E-SERVOO.
-            </p>
-
-            <div className="es-input-box">
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="es-input-box">
-              <input
-                type="password"
-                placeholder="Password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <AnimatedAuthButton
-              text={getLoginText()}
-              loading={loginLoading}
-              type="submit"
-            />
-
-            <p className="es-auth-link-text">
-              Don't have an account?
-              <button
-                type="button"
-                onClick={() => setActive(true)}
-                className="es-no-liquid"
-              >
-                Sign Up
-              </button>
-            </p>
-          </form>
-        </div>
-
-        {/* SLIDING TOGGLE PANEL */}
-        <div className="es-toggle-container">
-          <div className="es-toggle">
-
-            <div className="es-toggle-panel es-toggle-left">
-              <h1>Welcome!</h1>
-
-              <p>
-                Create your E-SERVOO account and access smart local services
-                with verified professionals near you.
-              </p>
-
-              <div className="es-toggle-badge">
-                Smart Local Services
-              </div>
-            </div>
-
-            <div className="es-toggle-panel es-toggle-right">
-              <h1>Welcome Back!</h1>
-
-              <p>
-                Login again and continue booking verified electricians,
-                plumbers, cleaners, cooks and trusted local workers.
-              </p>
-
-              <div className="es-toggle-badge">
-                Trusted Home Services
-              </div>
-            </div>
-
+    <section className="bg-gradient-to-b from-[#E1E9E5] via-[#B4DBDC] to-[#A4D1D2] min-h-screen flex justify-center items-center px-5">
+      <div className="bg-[#E1E9E5]/90 shadow-2xl p-8 rounded-3xl w-full max-w-md border border-white/80">
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-[#08566E] text-[#E1E9E5] rounded-3xl flex items-center justify-center mx-auto text-4xl font-black shadow-xl">
+            E
           </div>
+
+          <h2 className="text-4xl font-black text-[#08566E] mt-5">
+            Customer Login
+          </h2>
+
+          <p className="text-[#06485C] font-semibold mt-2">
+            Login to book trusted local workers.
+          </p>
         </div>
 
+        <form
+          onSubmit={handleLogin}
+          className="flex flex-col gap-4"
+        >
+          <div>
+            <label className="text-[#08566E] font-black text-sm">
+              Email
+            </label>
+
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] border border-[#6FA8AA] text-[#08566E] placeholder:text-[#6FA8AA] outline-none focus:border-[#08566E] font-semibold"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-[#08566E] font-black text-sm">
+              Password
+            </label>
+
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] border border-[#6FA8AA] text-[#08566E] placeholder:text-[#6FA8AA] outline-none focus:border-[#08566E] font-semibold"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`es-primary-cta py-4 rounded-2xl font-black transition ${
+              loading
+                ? "bg-gray-500 text-white cursor-not-allowed"
+                : "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
+            }`}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <div className="text-center mt-6">
+          <p className="text-[#06485C] font-semibold">
+            Don&apos;t have an account?
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowLogin(false);
+              setShowRegister(true);
+            }}
+            className="es-text-btn text-[#08566E] mt-2 font-black hover:underline"
+          >
+            Create Account
+          </button>
+        </div>
       </div>
     </section>
   );

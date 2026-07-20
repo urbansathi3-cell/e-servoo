@@ -1,18 +1,11 @@
 import { useState, useEffect } from "react";
-import { translations } from "../translations";
-import {
-  FaArrowLeft,
-  FaCheckCircle,
-  FaMicrophone,
-} from "react-icons/fa";
+import { FaTimes, FaCheckCircle, FaBolt } from "react-icons/fa";
+import { getStoredUser, getStoredToken } from "../utils/storage";
 
-function BookingForm({
-  selectedWorker,
-  setSelectedWorker,
-  language = "en",
-}) {
-  const t = translations[language] || translations.en;
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
 
+function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -26,67 +19,48 @@ function BookingForm({
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [bookingId, setBookingId] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  const [savedAddresses, setSavedAddresses] = useState([]);
-  const [profileAddress, setProfileAddress] = useState("");
-  const [addressChoice, setAddressChoice] = useState("");
-  const [customAddress, setCustomAddress] = useState("");
+  const getWorkerValue = (keys, fallback = "") => {
+    if (!selectedWorker) return fallback;
 
-  const [listeningIssue, setListeningIssue] = useState(false);
+    for (const key of keys) {
+      if (
+        selectedWorker[key] !== undefined &&
+        selectedWorker[key] !== null &&
+        selectedWorker[key] !== ""
+      ) {
+        return selectedWorker[key];
+      }
+    }
 
-  const formatSavedAddress = (address) => {
-    if (!address) return "";
-
-    return `${address.label ? address.label + ": " : ""}${address.line1 || ""}${
-      address.line2 ? ", " + address.line2 : ""
-    }`;
+    return fallback;
   };
 
   useEffect(() => {
     if (!selectedWorker) return;
 
-    const user = JSON.parse(localStorage.getItem("user")) || {};
-    const storedAddresses =
-      JSON.parse(localStorage.getItem("savedAddresses")) || [];
-
-    const defaultIndexRaw =
-      Number(localStorage.getItem("defaultAddressIndex")) || 0;
-
-    const validDefaultIndex = storedAddresses[defaultIndexRaw]
-      ? defaultIndexRaw
-      : 0;
-
-    let selectedAddress = "";
-    let selectedChoice = "custom";
-
-    if (storedAddresses.length > 0) {
-      selectedAddress = formatSavedAddress(
-        storedAddresses[validDefaultIndex]
-      );
-      selectedChoice = String(validDefaultIndex);
-    } else if (user?.address) {
-      selectedAddress = user.address;
-      selectedChoice = "profile";
-    }
-
-    setSavedAddresses(storedAddresses);
-    setProfileAddress(user?.address || "");
-    setAddressChoice(selectedChoice);
-    setCustomAddress("");
+    const user = getStoredUser();
 
     setFormData({
       name: user?.name || "",
-      phone: String(user?.phone || ""),
-      address: selectedAddress,
+      phone: user?.phone || "",
+      address: user?.address || "",
       issueDescription: "",
       urgency: "Normal",
-      service: selectedWorker.service || "",
-      worker: selectedWorker.name || "",
+      service: getWorkerValue(["service", "Service"], ""),
+      worker: getWorkerValue(["name", "Name"], ""),
     });
-
-    setAcceptedTerms(false);
   }, [selectedWorker]);
+
+  const pushEvent = (eventName, extraData = {}) => {
+    window.dataLayer = window.dataLayer || [];
+
+    window.dataLayer.push({
+      event: eventName,
+      page_section: "booking_form",
+      ...extraData,
+    });
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -95,111 +69,10 @@ function BookingForm({
     });
   };
 
-  const handleAddressChoiceChange = (e) => {
-    const value = e.target.value;
-
-    setAddressChoice(value);
-
-    if (value === "custom") {
-      setFormData({
-        ...formData,
-        address: customAddress,
-      });
-
-      return;
-    }
-
-    if (value === "profile") {
-      setFormData({
-        ...formData,
-        address: profileAddress,
-      });
-
-      return;
-    }
-
-    const selectedAddress = savedAddresses[Number(value)];
-
-    setFormData({
-      ...formData,
-      address: formatSavedAddress(selectedAddress),
-    });
-  };
-
-  const handleCustomAddressChange = (e) => {
-    const value = e.target.value;
-
-    setCustomAddress(value);
-
-    setFormData({
-      ...formData,
-      address: value,
-    });
-  };
-
-  const startIssueVoiceInput = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert("Voice typing is not supported in this browser. Please use Chrome.");
-      return;
-    }
-
-    if (listeningIssue) return;
-
-    const recognition = new SpeechRecognition();
-
-    recognition.lang =
-      language === "hi"
-        ? "hi-IN"
-        : language === "od"
-          ? "or-IN"
-          : "en-IN";
-
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-      setListeningIssue(true);
-    };
-
-    recognition.onend = () => {
-      setListeningIssue(false);
-    };
-
-    recognition.onerror = (event) => {
-      console.log("Voice error:", event.error);
-      setListeningIssue(false);
-
-      if (event.error === "not-allowed") {
-        alert("Please allow microphone permission.");
-      } else {
-        alert("Voice input failed. Please try again.");
-      }
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-
-      setFormData((prev) => ({
-        ...prev,
-        issueDescription: prev.issueDescription
-          ? `${prev.issueDescription} ${transcript}`
-          : transcript,
-      }));
-    };
-
-    recognition.start();
-  };
-
-  const resetBooking = () => {
+  const resetBookingForm = () => {
     setSuccess(false);
+    setBookingId("");
     setSelectedWorker(null);
-    setAcceptedTerms(false);
-    setAddressChoice("");
-    setCustomAddress("");
-    setListeningIssue(false);
 
     setFormData({
       name: "",
@@ -212,56 +85,84 @@ function BookingForm({
     });
   };
 
-  const getUrgencyText = (value) => {
-    if (value === "Normal") return t.normal;
-    if (value === "Urgent") return t.urgent;
-    if (value === "Emergency") return t.emergency;
-    return value;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const cleanPhone = String(formData.phone || "").replace(/\D/g, "");
+
     if (!formData.name.trim()) {
-      alert(t.enterName);
+      alert("Name is required.");
       return;
     }
 
-    if (String(formData.phone).length < 10) {
-      alert(t.enterValidPhone);
+    if (cleanPhone.length < 10) {
+      alert("Enter valid phone number.");
       return;
     }
 
     if (!formData.address.trim()) {
-      alert(t.selectOrEnterAddress);
+      alert("Address is required.");
       return;
     }
 
-    if (!acceptedTerms) {
-      alert(t.acceptTermsAlert);
+    if (!formData.issueDescription.trim()) {
+      alert("Please describe your issue.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch(
-        "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec",
-        {
-          method: "POST",
-          body: JSON.stringify(formData),
-        }
+      const workerId = getWorkerValue(
+        ["WorkerId", "WorkerID", "Worker id", "id"],
+        ""
       );
+
+      const payload = {
+        action: "booking",
+        token: getStoredToken(),
+        workerId,
+        name: formData.name.trim(),
+        phone: cleanPhone,
+        address: formData.address.trim(),
+        issueDescription: formData.issueDescription.trim(),
+        urgency: formData.urgency,
+        service: formData.service,
+        worker: formData.worker,
+      };
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
       const data = await res.json();
 
-      setBookingId(data.bookingId || "Generated");
+      if (data.success === false) {
+        setLoading(false);
+        alert(data.message || "Booking failed. Please try again.");
+        return;
+      }
+
+      const finalBookingId =
+        data.bookingId ||
+        data.BookingID ||
+        data.id ||
+        `BK-${Date.now()}`;
+
+      setBookingId(finalBookingId);
+
+      pushEvent("booking_success", {
+        service_name: formData.service,
+        urgency: formData.urgency,
+      });
+
       setLoading(false);
       setSuccess(true);
     } catch (error) {
       console.error(error);
       setLoading(false);
-      alert(t.bookingFailed);
+      alert("Booking failed. Please try again.");
     }
   };
 
@@ -269,487 +170,233 @@ function BookingForm({
     return null;
   }
 
-  if (success) {
-    return (
-      <section className="min-h-screen bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] px-5 py-24 flex items-center justify-center">
-        <div className="w-full max-w-2xl bg-[#08566E] rounded-[32px] shadow-2xl border border-[#6FA8AA]/70 p-8 md:p-10 text-center">
-
-          <div className="w-24 h-24 mx-auto rounded-full bg-[#E1E9E5] flex items-center justify-center shadow-xl mb-6">
-            <FaCheckCircle className="text-[#08566E] text-5xl" />
-          </div>
-
-          <h2 className="text-4xl font-extrabold text-[#E1E9E5]">
-            {t.bookingSuccessful}
-          </h2>
-
-          <p className="mt-3 text-[#B4DBDC]">
-            {t.bookingSuccessMessage}
-          </p>
-
-          <div className="mt-8 bg-[#E1E9E5]/95 rounded-3xl p-6 text-left space-y-4">
-            <div>
-              <p className="text-sm text-[#6FA8AA] font-bold">
-                {t.bookingId}
-              </p>
-
-              <p className="text-2xl font-extrabold text-[#08566E]">
-                {bookingId}
-              </p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.customerName}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  {formData.name}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.phoneNumber}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  {formData.phone}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.worker}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  {formData.worker}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.service}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  {formData.service}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.priority}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  {getUrgencyText(formData.urgency)}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.pricing}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  {t.inspectionBased}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-[#6FA8AA] font-bold">
-                {t.serviceAddress}
-              </p>
-
-              <p className="text-[#08566E]">
-                {formData.address}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-[#6FA8AA] font-bold">
-                {t.issueDescription}
-              </p>
-
-              <p className="text-[#08566E]">
-                {formData.issueDescription || t.noIssueAdded}
-              </p>
-            </div>
-          </div>
-
-          <p className="mt-6 text-[#B4DBDC]">
-            {t.ourTeamContact}
-          </p>
-
-          <button
-            onClick={resetBooking}
-            className="mt-8 px-8 py-4 rounded-full bg-[#E1E9E5] text-[#08566E] font-extrabold hover:bg-[#B4DBDC] transition"
-          >
-            {t.backToServices}
-          </button>
-        </div>
-      </section>
-    );
-  }
+  const workerName = getWorkerValue(["name", "Name"], "Worker");
+  const workerService = getWorkerValue(["service", "Service"], "Service");
+  const workerImage = getWorkerValue(["image", "Image"], "");
+  const workerFare = getWorkerValue(["fare", "Fare"], "Not Available");
+  const workerStatus = getWorkerValue(["status", "Status"], "Available");
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] px-5 py-24">
+    <>
+      {success && (
+        <div className="fixed inset-0 bg-[#08566E]/45 backdrop-blur-sm flex justify-center items-center z-[100] px-5">
+          <div className="bg-[#E1E9E5] shadow-2xl p-8 rounded-3xl border border-[#6FA8AA] text-center max-w-md w-full">
+            <div className="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl">
+              <FaCheckCircle />
+            </div>
 
-      <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl font-black text-[#08566E] mt-5">
+              Booking Successful
+            </h2>
 
-        <button
-          onClick={() => setSelectedWorker(null)}
-          className="mb-8 inline-flex items-center gap-2 bg-[#08566E] text-[#E1E9E5] px-5 py-3 rounded-full font-bold shadow-lg hover:bg-[#06485C] transition"
-        >
-          <FaArrowLeft />
-          {t.back}
-        </button>
+            <p className="mt-3 text-lg font-black text-[#08566E]">
+              Booking ID: {bookingId}
+            </p>
 
-        <div className="grid lg:grid-cols-[0.9fr_1.4fr] gap-8 items-start">
+            <div className="mt-5 bg-white/80 rounded-2xl p-4 text-left border border-[#B4DBDC]">
+              <p className="text-[#08566E] font-bold">
+                Worker: {formData.worker}
+              </p>
 
-          <div className="bg-[#08566E] rounded-[32px] shadow-2xl border border-[#6FA8AA]/70 p-7 lg:sticky lg:top-24">
+              <p className="text-[#08566E] font-bold mt-2">
+                Service: {formData.service}
+              </p>
 
-            <div className="text-center">
-              <img
-                src={selectedWorker.image || "https://via.placeholder.com/150"}
-                alt={selectedWorker.name}
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/150";
-                }}
-                className="w-28 h-28 rounded-full object-cover mx-auto border-4 border-[#E1E9E5] shadow-xl"
-              />
+              <p className="text-[#08566E] font-bold mt-2">
+                Priority: {formData.urgency}
+              </p>
 
-              <h2 className="text-3xl font-extrabold text-[#E1E9E5] mt-5">
-                {selectedWorker.name}
-              </h2>
-
-              <p className="text-[#B4DBDC] font-semibold mt-1">
-                {selectedWorker.service}
+              <p className="text-[#06485C] font-semibold mt-2">
+                Issue: {formData.issueDescription}
               </p>
             </div>
 
-            <div className="mt-7 space-y-4">
-              <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.status}
-                </p>
+            <p className="mt-4 text-[#06485C] font-semibold">
+              Our team will contact you shortly.
+            </p>
 
-                <p className="text-[#08566E] text-xl font-extrabold">
-                  ✔ {t.verifiedProfessional}
-                </p>
-              </div>
-
-              <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.pricing}
-                </p>
-
-                <p className="text-[#08566E] text-xl font-extrabold">
-                  {t.inspectionBasedPricing}
-                </p>
-
-                <p className="text-[#08566E]/80 text-sm mt-1">
-                  {t.bookingNote}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-[#6FA8AA] rounded-2xl p-4 text-center">
-                  <p className="text-[#E1E9E5] text-sm">
-                    Rating
-                  </p>
-
-                  <p className="text-[#08566E] text-xl font-extrabold">
-                    ⭐ {selectedWorker.rating || "4.8"}
-                  </p>
-                </div>
-
-                <div className="bg-[#6FA8AA] rounded-2xl p-4 text-center">
-                  <p className="text-[#E1E9E5] text-sm">
-                    {t.trust}
-                  </p>
-
-                  <p className="text-[#08566E] text-xl font-extrabold">
-                    {selectedWorker.TrustScore || "90"}%
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-[#E1E9E5]/95 rounded-2xl p-4">
-                <p className="text-sm text-[#6FA8AA] font-bold">
-                  {t.location}
-                </p>
-
-                <p className="text-[#08566E] font-bold">
-                  📍 {selectedWorker.location || t.localArea}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-[#9ECFD0] rounded-[32px] shadow-2xl border border-[#6FA8AA]/70 p-6 md:p-8">
-
-            <div className="mb-8">
-              <p className="text-[#08566E] font-bold tracking-widest text-sm uppercase">
-                {t.eServooBooking}
-              </p>
-
-              <h1 className="text-4xl md:text-5xl font-extrabold text-[#08566E] mt-2">
-                {t.bookingTitle}
-              </h1>
-
-              <p className="text-[#08566E]/80 mt-3">
-                {t.bookingSubtitle}
-              </p>
-            </div>
-
-            <form
-              onSubmit={handleSubmit}
-              className="grid md:grid-cols-2 gap-5"
+            <button
+              type="button"
+              onClick={resetBookingForm}
+              className="es-primary-cta px-6 py-3 rounded-2xl mt-6 font-black transition"
             >
-              <div>
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.yourName}
-                </label>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
-                <input
-                  type="text"
-                  name="name"
-                  placeholder={t.yourName}
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
-                  required
-                />
-              </div>
+      <div className="fixed inset-0 bg-[#08566E]/45 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center px-0 sm:px-5">
+        <div className="bg-[#E1E9E5] shadow-2xl w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 border border-[#6FA8AA] max-h-[95vh] overflow-y-auto relative">
+          <button
+            type="button"
+            onClick={() => setSelectedWorker(null)}
+            className="es-text-btn absolute top-5 right-5 text-[#08566E] text-xl"
+            aria-label="Close booking form"
+          >
+            <FaTimes />
+          </button>
 
-              <div>
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.phoneNumber}
-                </label>
+          <div className="text-center">
+            <img
+              src={workerImage || "https://via.placeholder.com/150"}
+              alt={workerName}
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/150";
+              }}
+              className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-[#08566E] shadow-xl"
+            />
 
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder={t.phoneNumber}
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
-                  required
-                />
-              </div>
+            <h2 className="text-3xl font-black text-[#08566E] mt-5">
+              Book Your Service
+            </h2>
 
-              <div className="md:col-span-2">
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.selectServiceAddress}
-                </label>
-
-                <select
-                  value={addressChoice}
-                  onChange={handleAddressChoiceChange}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
-                  required
-                >
-                  {savedAddresses.length > 0 &&
-                    savedAddresses.map((address, index) => (
-                      <option key={index} value={String(index)}>
-                        {formatSavedAddress(address)}
-                      </option>
-                    ))}
-
-                  {savedAddresses.length === 0 && profileAddress && (
-                    <option value="profile">
-                      {t.profile}: {profileAddress}
-                    </option>
-                  )}
-
-                  <option value="custom">
-                    {t.customAddress}
-                  </option>
-                </select>
-
-                {addressChoice === "custom" && (
-                  <textarea
-                    value={customAddress}
-                    onChange={handleCustomAddressChange}
-                    placeholder={t.enterCustomAddress}
-                    className="mt-4 w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
-                    rows="4"
-                    required
-                  />
-                )}
-
-                {addressChoice !== "custom" && formData.address && (
-                  <div className="mt-4 bg-[#E1E9E5]/85 border border-[#6FA8AA] rounded-2xl p-4">
-                    <p className="text-[#08566E] font-bold">
-                      {t.selectedAddress}
-                    </p>
-
-                    <p className="text-[#08566E]/80 mt-1">
-                      {formData.address}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.service}
-                </label>
-
-                <input
-                  type="text"
-                  name="service"
-                  readOnly
-                  value={formData.service}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.worker}
-                </label>
-
-                <input
-                  type="text"
-                  name="worker"
-                  readOnly
-                  value={formData.worker}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.urgency}
-                </label>
-
-                <select
-                  name="urgency"
-                  value={formData.urgency}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E]"
-                >
-                  <option value="Normal">{t.normal}</option>
-                  <option value="Urgent">{t.urgent}</option>
-                  <option value="Emergency">{t.emergency}</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[#08566E] font-bold mb-2">
-                  {t.bookingType}
-                </label>
-
-                <div className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] font-bold">
-                  ⚡ {t.oneClickBooking}
-                </div>
-              </div>
-
-              <div className="md:col-span-2">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
-                  <label className="block text-[#08566E] font-bold">
-                    {t.issueDescription}
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={startIssueVoiceInput}
-                    disabled={listeningIssue}
-                    className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold transition ${
-                      listeningIssue
-                        ? "bg-red-500 text-white cursor-not-allowed animate-pulse"
-                        : "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
-                    }`}
-                  >
-                    <FaMicrophone />
-                    {listeningIssue ? t.listening : t.speakIssue}
-                  </button>
-                </div>
-
-                <textarea
-                  name="issueDescription"
-                  placeholder={t.describeIssue}
-                  value={formData.issueDescription}
-                  onChange={handleChange}
-                  className="w-full p-4 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] outline-none focus:border-[#08566E] resize-none"
-                  rows="5"
-                  required
-                />
-
-                {listeningIssue && (
-                  <p className="mt-2 text-sm font-bold text-red-600 animate-pulse">
-                    🎤 {t.listening}
-                  </p>
-                )}
-
-                <p className="mt-2 text-xs text-[#08566E]/70">
-                  {t.voiceHelpText}
-                </p>
-              </div>
-
-              <div className="md:col-span-2 bg-[#08566E]/10 border border-[#08566E]/20 rounded-2xl p-4">
-                <p className="text-[#08566E] font-bold">
-                  📌 {t.note}
-                </p>
-
-                <p className="text-[#08566E]/80 text-sm mt-1">
-                  {t.bookingNote}
-                </p>
-              </div>
-
-              <div className="md:col-span-2 bg-[#E1E9E5]/85 border border-[#6FA8AA] rounded-2xl p-4">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={acceptedTerms}
-                    onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="mt-1 w-5 h-5 accent-[#08566E] cursor-pointer"
-                  />
-
-                  <span className="text-[#08566E] text-sm leading-relaxed font-semibold">
-                    {t.acceptTermsText || "I agree to E-SERVOO's"}{" "}
-                    <a
-                      href="/terms"
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="font-extrabold underline hover:text-[#06485C]"
-                    >
-                      {t.termsAndConditions}
-                    </a>
-                  </span>
-                </label>
-              </div>
-
-              <div className="md:col-span-2">
-                <button
-                  type="submit"
-                  disabled={loading || !acceptedTerms}
-                  className={`w-full py-4 rounded-2xl text-lg font-extrabold transition duration-300 ${
-                    loading || !acceptedTerms
-                      ? "bg-gray-500 text-white cursor-not-allowed opacity-70"
-                      : "bg-[#08566E] hover:bg-[#06485C] text-[#E1E9E5]"
-                  }`}
-                >
-                  {loading
-                    ? t.bookingInProgress
-                    : acceptedTerms
-                      ? `⚡ ${t.confirmBooking}`
-                      : t.acceptTermsToContinue}
-                </button>
-              </div>
-            </form>
+            <p className="text-[#06485C] font-semibold mt-2">
+              Confirm your details and describe your issue.
+            </p>
           </div>
 
+          <div className="mt-5 bg-[#08566E] rounded-3xl p-4 text-center shadow-xl">
+            <p className="text-[#B4DBDC] text-sm font-bold">
+              Booking With
+            </p>
+
+            <p className="text-[#E1E9E5] font-black text-xl mt-1">
+              {workerName}
+            </p>
+
+            <p className="text-[#B4DBDC] font-bold mt-1">
+              {workerService}
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <div className="bg-[#E1E9E5] rounded-2xl p-3">
+                <p className="text-[#6FA8AA] text-xs font-black">
+                  Visiting Charge
+                </p>
+
+                <p className="text-[#08566E] font-black">
+                  ₹{workerFare}
+                </p>
+              </div>
+
+              <div className="bg-[#E1E9E5] rounded-2xl p-3">
+                <p className="text-[#6FA8AA] text-xs font-black">
+                  Status
+                </p>
+
+                <p className="text-[#08566E] font-black">
+                  {workerStatus}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-7">
+            <div>
+              <label className="text-[#08566E] font-black text-sm">
+                Your Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] focus:outline-none focus:border-[#08566E] font-semibold"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-[#08566E] font-black text-sm">
+                Phone Number
+              </label>
+
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] focus:outline-none focus:border-[#08566E] font-semibold"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-[#08566E] font-black text-sm">
+                Address
+              </label>
+
+              <input
+                type="text"
+                name="address"
+                placeholder="Your service address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] focus:outline-none focus:border-[#08566E] font-semibold"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-[#08566E] font-black text-sm">
+                Describe Your Issue
+              </label>
+
+              <textarea
+                name="issueDescription"
+                placeholder="Example: Fan is not working, switch board issue..."
+                value={formData.issueDescription}
+                onChange={handleChange}
+                className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] focus:outline-none focus:border-[#08566E] font-semibold"
+                rows="4"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-[#08566E] font-black text-sm">
+                Urgency
+              </label>
+
+              <select
+                name="urgency"
+                value={formData.urgency}
+                onChange={handleChange}
+                className="w-full p-3 mt-2 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] focus:outline-none focus:border-[#08566E] font-bold"
+              >
+                <option value="Normal">Normal</option>
+                <option value="Urgent">Urgent</option>
+                <option value="Emergency">Emergency</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={`es-booking-cta py-4 rounded-2xl text-lg font-black transition duration-300 flex items-center justify-center gap-2 ${
+                loading
+                  ? "bg-gray-500 text-white cursor-not-allowed"
+                  : "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
+              }`}
+            >
+              {loading ? (
+                "Booking..."
+              ) : (
+                <>
+                  <FaBolt />
+                  Confirm Booking
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </div>
-    </section>
+    </>
   );
 }
 
