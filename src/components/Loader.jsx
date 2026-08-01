@@ -2,9 +2,12 @@ function Loader() {
   return (
     <div className="es-loader-screen">
       <div className="es-loader-card">
-
         <div className="es-loader-logo">
-          <span>E</span>
+          <img
+            src="/logo.png"
+            alt="E-SERVOO Logo"
+            className="w-16 h-16 object-contain"
+          />
         </div>
 
         <h1 className="es-loader-title">
@@ -24,7 +27,6 @@ function Loader() {
         <div className="es-loader-progress">
           <div></div>
         </div>
-
       </div>
     </div>
   );

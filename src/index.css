@@ -1411,3 +1411,101 @@ button:disabled,
     right: 76px;
   }
 }
+/* ========== FINAL E-SERVOO STABILITY PATCH ========== */
+
+/* Prevent accidental white / dark screen */
+html,
+body,
+#root {
+  min-height: 100vh !important;
+  background: #B4DBDC !important;
+}
+
+/* Make all page sections safe on mobile */
+section {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Better fixed bottom nav spacing */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Links in bottom nav should stay readable */
+.fixed.bottom-0 a {
+  color: #E1E9E5 !important;
+  -webkit-text-fill-color: #E1E9E5 !important;
+  text-decoration: none !important;
+  font-size: 0.9rem;
+}
+
+.fixed.bottom-0 a:hover {
+  color: #B4DBDC !important;
+  -webkit-text-fill-color: #B4DBDC !important;
+}
+
+/* Make auth switch tabs readable above login/register */
+.es-auth-tab-fix {
+  color: #08566E !important;
+  -webkit-text-fill-color: #08566E !important;
+}
+
+/* React route pages should not hide behind bottom nav */
+.es-page-safe {
+  padding-bottom: 90px;
+}
+
+/* Booking modal / popup safety */
+.es-modal-safe {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow-y: auto;
+}
+
+/* Keep customer/worker dashboard cards visible */
+.es-dashboard-card {
+  background: rgba(225, 233, 229, 0.9) !important;
+  color: #08566E !important;
+  border: 1px solid rgba(111, 168, 170, 0.7) !important;
+}
+
+/* Image cards should not break layout */
+.es-worker-image,
+.worker-image {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Better tap targets for mobile */
+button,
+a {
+  touch-action: manipulation;
+}
+
+/* Fix Tailwind + custom CTA disabled color */
+.es-primary-cta:disabled,
+.es-booking-cta:disabled,
+.es-secondary-cta:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Small screen heading safety */
+@media (max-width: 480px) {
+  h1 {
+    font-size: clamp(2.4rem, 11vw, 3.6rem) !important;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 9vw, 3rem) !important;
+  }
+
+  .fixed.bottom-0 {
+    font-size: 0.78rem;
+  }
+}

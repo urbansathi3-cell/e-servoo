@@ -67,19 +67,21 @@ function Workers({
     return () => clearInterval(interval);
   }, []);
 
-  const serviceFilters = [
-    "All",
-    "Electrician",
-    "Plumber",
-    "Carpenter",
-    "Cleaner",
-    "Cook",
-    "Painter",
-    "AC Repair",
-    "Home Tutor",
-    "Appliance Repair",
-    "CCTV Service",
-  ];
+  const serviceFilters = Array.from(
+    new Set([
+      "All",
+      "Electrician",
+      "Plumber",
+      "Carpenter",
+      "Cleaner",
+      "Cook",
+      "Painter",
+      "AC Repair",
+      "Home Tutor",
+      "Appliance Repair",
+      "CCTV Service",
+    ])
+  );
 
   const pushEvent = (eventName, extraData = {}) => {
     window.dataLayer = window.dataLayer || [];
@@ -106,15 +108,27 @@ function Workers({
   };
 
   const getWorkerId = (worker) => {
-    return getValue(worker, ["WorkerId", "WorkerID", "Worker id", "id"], "");
+    return getValue(
+      worker,
+      ["WorkerId", "WorkerID", "Worker id", "workerId", "workerid", "id", "ID"],
+      ""
+    );
   };
 
   const getWorkerName = (worker) => {
-    return getValue(worker, ["name", "Name"], "Worker");
+    return getValue(
+      worker,
+      ["name", "Name", "worker", "Worker", "workerName", "WorkerName"],
+      "Worker"
+    );
   };
 
   const getWorkerService = (worker) => {
-    return getValue(worker, ["service", "Service"], "Service");
+    return getValue(
+      worker,
+      ["service", "Service", "services", "Services", "category", "Category"],
+      "Service"
+    );
   };
 
   const getWorkerRating = (worker) => {
@@ -126,17 +140,17 @@ function Workers({
   };
 
   const getWorkerImage = (worker) => {
-    return getValue(worker, ["image", "Image"], "");
+    return getValue(worker, ["image", "Image", "photo", "Photo"], "");
   };
 
   const getWorkerStatus = (worker) => {
-    return getValue(worker, ["status", "Status"], "Available");
+    return getValue(worker, ["status", "Status", "availability"], "Available");
   };
 
   const getTrustScore = (worker) => {
     return getValue(
       worker,
-      ["TrustScore", "trustScore", "Trust Score", "trust score"],
+      ["TrustScore", "trustScore", "trustscore", "Trust Score", "trust score"],
       "90"
     );
   };
@@ -147,6 +161,14 @@ function Workers({
       ["CertificateLink", "certificateLink", "Certificate Link"],
       ""
     );
+  };
+
+  const getWorkerKey = (worker, index) => {
+    const id = String(getWorkerId(worker) || "").trim();
+    const name = String(getWorkerName(worker) || "").trim();
+    const service = String(getWorkerService(worker) || "").trim();
+
+    return `worker-${id || name || service || "item"}-${index}`;
   };
 
   const isAvailable = (worker) => {
@@ -186,17 +208,29 @@ function Workers({
   const handleBookWorker = (worker) => {
     if (!isAvailable(worker)) return;
 
-    const service = getWorkerService(worker);
+    const workerId = getWorkerId(worker);
+    const workerName = getWorkerName(worker);
+    const workerService = getWorkerService(worker);
+    const workerStatus = getWorkerStatus(worker);
 
     pushEvent("booking_started", {
-      service_name: service,
-      worker_id: getWorkerId(worker),
-      worker_service: service,
+      service_name: workerService,
+      worker_id: workerId,
+      worker_service: workerService,
     });
 
     setSelectedWorker({
       ...worker,
-      status: getWorkerStatus(worker),
+      id: workerId,
+      WorkerID: workerId,
+      workerId: workerId,
+      name: workerName,
+      worker: workerName,
+      workerName: workerName,
+      service: workerService,
+      Service: workerService,
+      status: workerStatus,
+      Status: workerStatus,
     });
   };
 
@@ -238,7 +272,6 @@ function Workers({
         <div className="relative p-5">
           <div className="flex items-start justify-between">
             <div className="w-20 h-20 rounded-3xl bg-[#08566E]/20 border-4 border-[#E1E9E5]"></div>
-
             <div className="h-7 w-24 rounded-full bg-[#08566E]/20"></div>
           </div>
 
@@ -271,8 +304,6 @@ function Workers({
       className="bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] text-[#08566E] py-20 px-5"
     >
       <div className="max-w-7xl mx-auto">
-
-        {/* TOP BAR */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
           <div>
             <button
@@ -336,7 +367,6 @@ function Workers({
           </div>
         </div>
 
-        {/* SERVICE FILTER BUTTONS */}
         <div className="mb-10 bg-[#E1E9E5]/85 backdrop-blur-xl border border-white/80 rounded-[28px] p-4 shadow-xl">
           <p className="text-[#08566E] font-black mb-4 flex items-center gap-2">
             <FaFilter />
@@ -348,9 +378,9 @@ function Workers({
           </p>
 
           <div className="flex gap-3 overflow-x-auto pb-2">
-            {serviceFilters.map((service) => (
+            {serviceFilters.map((service, index) => (
               <button
-                key={service}
+                key={`service-filter-${service}-${index}`}
                 type="button"
                 onClick={() => handleServiceFilter(service)}
                 className={`shrink-0 px-5 py-3 rounded-2xl font-black transition border ${
@@ -365,11 +395,10 @@ function Workers({
           </div>
         </div>
 
-        {/* WORKER GRID */}
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((item) => (
-              <WorkerSkeleton key={item} />
+              <WorkerSkeleton key={`worker-skeleton-${item}`} />
             ))}
           </div>
         ) : visibleWorkers.length === 0 ? (
@@ -394,7 +423,7 @@ function Workers({
 
               return (
                 <div
-                  key={getWorkerId(worker) || index}
+                  key={getWorkerKey(worker, index)}
                   onClick={() => handleBookWorker(worker)}
                   className={`group relative overflow-hidden rounded-[28px] border shadow-xl transition duration-300 ${
                     available
@@ -411,7 +440,7 @@ function Workers({
                         alt={workerName}
                         referrerPolicy="no-referrer"
                         onError={(e) => {
-                          e.target.src = "https://via.placeholder.com/150";
+                          e.currentTarget.src = "https://via.placeholder.com/150";
                         }}
                         className="w-20 h-20 rounded-3xl object-cover border-4 border-[#E1E9E5] shadow-xl"
                       />
@@ -531,7 +560,6 @@ function Workers({
             })}
           </div>
         )}
-
       </div>
     </section>
   );

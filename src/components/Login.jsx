@@ -38,22 +38,28 @@ function Login({
 
     try {
       const res = await fetch(
-        `${API_URL}?email=${encodeURIComponent(cleanEmail)}&password=${encodeURIComponent(cleanPassword)}&nocache=${Date.now()}`
+        `${API_URL}?email=${encodeURIComponent(
+          cleanEmail
+        )}&password=${encodeURIComponent(
+          cleanPassword
+        )}&nocache=${Date.now()}`
       );
 
       const data = await res.json();
 
+      console.log("Customer Login Response:", data);
+
       if (!data.success) {
-        setLoading(false);
         alert(data.message || "Invalid Email or Password");
+        setLoading(false);
         return;
       }
 
       const userData = data.user || data.customer || null;
 
       if (!userData || typeof userData !== "object") {
+        alert("Login response invalid. User data not found.");
         setLoading(false);
-        alert("Login response is invalid. User data not found.");
         return;
       }
 
@@ -61,23 +67,28 @@ function Login({
 
       if (data.token) {
         localStorage.setItem("token", data.token);
+      } else {
+        localStorage.removeItem("token");
       }
 
       pushEvent("customer_login_success", {
         user_type: "customer",
       });
 
-      setLoading(false);
+      setShowLogin(false);
+      setShowRegister(false);
       setIsLoggedIn(true);
-    } catch (error) {
-      console.log(error);
+
       setLoading(false);
+    } catch (error) {
+      console.log("Login Error:", error);
       alert("Login Failed. Please try again.");
+      setLoading(false);
     }
   };
 
   return (
-    <section className="bg-gradient-to-b from-[#E1E9E5] via-[#B4DBDC] to-[#A4D1D2] min-h-screen flex justify-center items-center px-5">
+    <section className="bg-gradient-to-b from-[#E1E9E5] via-[#B4DBDC] to-[#A4D1D2] min-h-screen flex justify-center items-center px-5 py-20">
       <div className="bg-[#E1E9E5]/90 shadow-2xl p-8 rounded-3xl w-full max-w-md border border-white/80">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-[#08566E] text-[#E1E9E5] rounded-3xl flex items-center justify-center mx-auto text-4xl font-black shadow-xl">
@@ -93,10 +104,7 @@ function Login({
           </p>
         </div>
 
-        <form
-          onSubmit={handleLogin}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
             <label className="text-[#08566E] font-black text-sm">
               Email
@@ -130,11 +138,7 @@ function Login({
           <button
             type="submit"
             disabled={loading}
-            className={`es-primary-cta py-4 rounded-2xl font-black transition ${
-              loading
-                ? "bg-gray-500 text-white cursor-not-allowed"
-                : "bg-[#08566E] text-[#E1E9E5] hover:bg-[#06485C]"
-            }`}
+            className="es-primary-cta py-4 rounded-2xl font-black transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
