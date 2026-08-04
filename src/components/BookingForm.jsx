@@ -63,20 +63,61 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     return fallback;
   };
 
+  const getWorkerId = () => {
+    return getWorkerValue(
+      [
+        "id",
+        "ID",
+        "WorkerID",
+        "WorkerId",
+        "workerID",
+        "workerId",
+        "workerid",
+        "Worker id",
+        "worker id",
+      ],
+      ""
+    );
+  };
+
+  const getWorkerName = () => {
+    return getWorkerValue(
+      [
+        "name",
+        "Name",
+        "worker",
+        "Worker",
+        "workerName",
+        "WorkerName",
+        "workername",
+        "Worker Name",
+        "worker name",
+      ],
+      ""
+    );
+  };
+
+  const getWorkerService = () => {
+    return getWorkerValue(
+      [
+        "service",
+        "Service",
+        "services",
+        "Services",
+        "category",
+        "Category",
+      ],
+      ""
+    );
+  };
+
   useEffect(() => {
     if (!selectedWorker) return;
 
     const user = getStoredUser();
 
-    const service = getWorkerValue(
-      ["service", "Service", "services", "Services", "category", "Category"],
-      ""
-    );
-
-    const worker = getWorkerValue(
-      ["name", "Name", "worker", "Worker", "workerName", "WorkerName"],
-      ""
-    );
+    const service = getWorkerService();
+    const worker = getWorkerName();
 
     setFormData({
       name: user?.name || "",
@@ -167,32 +208,39 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     setLoading(true);
 
     try {
-      const workerId = getWorkerValue(
-        ["WorkerId", "WorkerID", "Worker id", "id", "ID"],
-        ""
-      );
-
-      const finalService =
-        formData.service ||
-        getWorkerValue(["service", "Service", "services", "category"], "");
-
-      const finalWorker =
-        formData.worker ||
-        getWorkerValue(["name", "Name", "worker", "Worker"], "");
+      const workerId = getWorkerId();
+      const finalService = formData.service || getWorkerService();
+      const finalWorker = formData.worker || getWorkerName();
 
       const payload = {
         action: "booking",
         token: getStoredToken(),
-        workerId,
+
+        workerId: workerId,
+        WorkerID: workerId,
+        selectedWorkerId: workerId,
+
+        worker: finalWorker,
+        Worker: finalWorker,
+        workerName: finalWorker,
+        WorkerName: finalWorker,
+        selectedWorkerName: finalWorker,
+
+        service: finalService,
+        Service: finalService,
+        selectedService: finalService,
+        category: finalService,
+
         name: formData.name.trim(),
         phone: cleanPhone,
         address: formData.address.trim(),
         issueDescription: formData.issueDescription.trim(),
         urgency: formData.urgency,
-        service: finalService,
-        worker: finalWorker,
         acceptedTerms: true,
       };
+
+      console.log("Selected worker object:", selectedWorker);
+      console.log("Booking payload:", payload);
 
       const res = await fetch(API_URL, {
         method: "POST",
@@ -201,10 +249,16 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
       const data = await res.json();
 
+      console.log("Booking response:", data);
+
       if (data.success === false) {
         setLoading(false);
         alert(data.message || "Booking failed. Please try again.");
         return;
+      }
+
+      if (data.statusUpdated === false) {
+        console.warn("Worker status was not updated:", data);
       }
 
       const finalBookingId =
@@ -219,6 +273,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         service_name: finalService,
         urgency: formData.urgency,
         accepted_terms: true,
+        worker_status_updated: Boolean(data.statusUpdated),
       });
 
       setLoading(false);
@@ -234,31 +289,30 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     return null;
   }
 
-  const workerName = getWorkerValue(
-    ["name", "Name", "worker", "Worker", "workerName", "WorkerName"],
-    "Worker"
-  );
-
-  const workerService = getWorkerValue(
-    ["service", "Service", "services", "Services", "category", "Category"],
-    "Service"
-  );
+  const workerName = getWorkerName() || "Worker";
+  const workerService = getWorkerService() || "Service";
 
   const workerImage = getWorkerValue(["image", "Image", "photo", "Photo"], "");
+
   const workerFare = getWorkerValue(
     ["fare", "Fare", "price", "Price"],
     "Not Available"
   );
+
   const workerStatus = getWorkerValue(
     ["status", "Status", "availability"],
     "Available"
   );
+
   const workerRating = getWorkerValue(["rating", "Rating"], "4.8");
+
   const workerTrustScore = getWorkerValue(
-    ["TrustScore", "trustScore", "trustscore"],
+    ["TrustScore", "trustScore", "trustscore", "Trust Score", "trust score"],
     "95"
   );
+
   const workerLocation = getWorkerValue(["location", "Location"], "Nearby");
+
   const workerExperience = getWorkerValue(
     ["experience", "Experience"],
     "Experienced"

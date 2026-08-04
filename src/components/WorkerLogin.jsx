@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { saveJsonToStorage } from "../utils/storage";
 
 const API_URL =
   "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
 
 function WorkerLogin({ setWorkerLoggedIn }) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,8 +22,8 @@ function WorkerLogin({ setWorkerLoggedIn }) {
     });
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
@@ -33,27 +36,28 @@ function WorkerLogin({ setWorkerLoggedIn }) {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `${API_URL}?workerEmail=${encodeURIComponent(
-          cleanEmail
-        )}&workerPassword=${encodeURIComponent(
-          cleanPassword
-        )}&nocache=${Date.now()}`
-      );
+      const loginUrl = `${API_URL}?workerEmail=${encodeURIComponent(
+        cleanEmail
+      )}&workerPassword=${encodeURIComponent(
+        cleanPassword
+      )}&nocache=${Date.now()}`;
 
-      const data = await res.json();
+      const response = await fetch(loginUrl);
+      const data = await response.json();
+
+      console.log("Worker login response:", data);
 
       if (!data.success) {
-        setLoading(false);
         alert(data.message || "Invalid Worker Login");
+        setLoading(false);
         return;
       }
 
-      const workerData = data.worker || null;
+      const workerData = data.worker;
 
       if (!workerData || typeof workerData !== "object") {
-        setLoading(false);
         alert("Worker login response is invalid. Worker data not found.");
+        setLoading(false);
         return;
       }
 
@@ -61,18 +65,38 @@ function WorkerLogin({ setWorkerLoggedIn }) {
 
       if (data.token) {
         localStorage.setItem("workerToken", data.token);
+      } else {
+        localStorage.setItem(
+          "workerToken",
+          `worker-${Date.now()}-${Math.random().toString(36).slice(2)}`
+        );
       }
 
       pushEvent("worker_login_success", {
         user_type: "worker",
+        worker_email: workerData.email || cleanEmail,
+        worker_id: workerData.id || "",
       });
 
+      if (typeof setWorkerLoggedIn === "function") {
+        setWorkerLoggedIn(true);
+      }
+
       setLoading(false);
-      setWorkerLoggedIn(true);
+
+      navigate("/worker-dashboard", {
+        replace: true,
+      });
+
+      setTimeout(() => {
+        if (window.location.pathname !== "/worker-dashboard") {
+          window.location.href = "/worker-dashboard";
+        }
+      }, 300);
     } catch (error) {
-      console.log(error);
-      setLoading(false);
+      console.error("Worker login error:", error);
       alert("Worker login failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -103,7 +127,7 @@ function WorkerLogin({ setWorkerLoggedIn }) {
               type="email"
               placeholder="Enter worker email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               className="w-full p-4 rounded-2xl bg-[#E1E9E5] border border-[#6FA8AA] text-[#08566E] placeholder:text-[#6FA8AA] outline-none focus:border-[#08566E] font-semibold transition"
               required
             />
@@ -118,7 +142,7 @@ function WorkerLogin({ setWorkerLoggedIn }) {
               type="password"
               placeholder="Enter password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
               className="w-full p-4 rounded-2xl bg-[#E1E9E5] border border-[#6FA8AA] text-[#08566E] placeholder:text-[#6FA8AA] outline-none focus:border-[#08566E] font-semibold transition"
               required
             />

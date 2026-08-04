@@ -204,7 +204,6 @@ function HomePage({
   showWelcome,
   setShowWelcome,
   workerLoggedIn,
-  handleWorkerSelect,
 }) {
   if (showWelcome) {
     return <Welcome setShowWelcome={setShowWelcome} />;
@@ -305,6 +304,35 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const openCustomerLogin = () => {
+      const currentUser = getStoredUser();
+
+      if (currentUser) {
+        setIsLoggedIn(true);
+        localStorage.removeItem("openCustomerLogin");
+        return;
+      }
+
+      setShowWelcome(false);
+      setShowLoginRequired(false);
+      setPendingWorker(null);
+      setSelectedWorker(null);
+      setShowLoginScreen(true);
+      localStorage.removeItem("openCustomerLogin");
+    };
+
+    window.addEventListener("open-customer-login", openCustomerLogin);
+
+    if (localStorage.getItem("openCustomerLogin") === "true") {
+      openCustomerLogin();
+    }
+
+    return () => {
+      window.removeEventListener("open-customer-login", openCustomerLogin);
+    };
+  }, []);
+
   const changeLanguage = (lang) => {
     if (lang !== "en" && lang !== "hi" && lang !== "od") return;
 
@@ -340,6 +368,17 @@ function App() {
     }
   };
 
+  const handleWorkerLoginState = (value) => {
+    setWorkerLoggedIn(value);
+
+    if (value) {
+      setShowLoginScreen(false);
+      setShowLoginRequired(false);
+      setPendingWorker(null);
+      setSelectedWorker(null);
+    }
+  };
+
   if (appLoading) {
     return <Loader />;
   }
@@ -348,7 +387,7 @@ function App() {
     return (
       <AuthScreen
         setIsLoggedIn={handleCustomerLoginState}
-        setWorkerLoggedIn={setWorkerLoggedIn}
+        setWorkerLoggedIn={handleWorkerLoginState}
       />
     );
   }
@@ -384,12 +423,23 @@ function App() {
                 showWelcome={showWelcome}
                 setShowWelcome={setShowWelcome}
                 workerLoggedIn={workerLoggedIn}
-                handleWorkerSelect={handleWorkerSelect}
               />
             }
           />
 
-          <Route path="/profile" element={<Profile language={language} />} />
+          <Route
+            path="/profile"
+            element={
+              isLoggedIn ? (
+                <Profile language={language} />
+              ) : (
+                <AuthScreen
+                  setIsLoggedIn={handleCustomerLoginState}
+                  setWorkerLoggedIn={handleWorkerLoginState}
+                />
+              )
+            }
+          />
 
           <Route path="/contact" element={<Contact language={language} />} />
 
@@ -397,17 +447,38 @@ function App() {
 
           <Route
             path="/dashboard"
-            element={<CustomerDashboard language={language} />}
+            element={
+              isLoggedIn ? (
+                <CustomerDashboard language={language} />
+              ) : (
+                <AuthScreen
+                  setIsLoggedIn={handleCustomerLoginState}
+                  setWorkerLoggedIn={handleWorkerLoginState}
+                />
+              )
+            }
           />
 
-          <Route path="/bookings" element={<MyBookings language={language} />} />
+          <Route
+            path="/bookings"
+            element={
+              isLoggedIn ? (
+                <MyBookings language={language} />
+              ) : (
+                <AuthScreen
+                  setIsLoggedIn={handleCustomerLoginState}
+                  setWorkerLoggedIn={handleWorkerLoginState}
+                />
+              )
+            }
+          />
 
           <Route
             path="/worker-login"
             element={
               <WorkerLogin
                 language={language}
-                setWorkerLoggedIn={setWorkerLoggedIn}
+                setWorkerLoggedIn={handleWorkerLoginState}
               />
             }
           />
@@ -436,7 +507,7 @@ function App() {
           />
         </Routes>
 
-        {!selectedWorker && <FooterNav />}
+        {!selectedWorker && !showLoginScreen && <FooterNav />}
       </div>
 
       {showLoginRequired && (

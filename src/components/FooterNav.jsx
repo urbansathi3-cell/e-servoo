@@ -5,16 +5,36 @@ import {
   FaTools,
   FaClipboardList,
   FaUser,
+  FaSignInAlt,
 } from "react-icons/fa";
+import { getStoredUser } from "../utils/storage";
 
 function FooterNav() {
   const location = useLocation();
   const itemRefs = useRef([]);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getStoredUser()));
+
   const [pillStyle, setPillStyle] = useState({
     left: 0,
     width: 0,
   });
+
+  useEffect(() => {
+    const checkLogin = () => {
+      setIsLoggedIn(Boolean(getStoredUser()));
+    };
+
+    checkLogin();
+
+    window.addEventListener("storage", checkLogin);
+    window.addEventListener("focus", checkLogin);
+
+    return () => {
+      window.removeEventListener("storage", checkLogin);
+      window.removeEventListener("focus", checkLogin);
+    };
+  }, []);
 
   const navItems = useMemo(
     () => [
@@ -34,17 +54,22 @@ function FooterNav() {
         icon: <FaClipboardList />,
       },
       {
-        label: "Profile",
-        path: "/profile",
-        icon: <FaUser />,
+        label: isLoggedIn ? "Profile" : "Login",
+        path: isLoggedIn ? "/profile" : "/",
+        icon: isLoggedIn ? <FaUser /> : <FaSignInAlt />,
+        needsLoginOpen: !isLoggedIn,
       },
     ],
-    []
+    [isLoggedIn]
   );
 
   useEffect(() => {
     const updatePill = () => {
       const activeIndex = navItems.findIndex((item) => {
+        if (!isLoggedIn && item.label === "Login") {
+          return false;
+        }
+
         if (item.path === "/") {
           return location.pathname === "/";
         }
@@ -71,7 +96,17 @@ function FooterNav() {
       clearTimeout(timer);
       window.removeEventListener("resize", updatePill);
     };
-  }, [location.pathname, navItems]);
+  }, [location.pathname, navItems, isLoggedIn]);
+
+  const handleNavClick = (item) => {
+    if (item.needsLoginOpen) {
+      localStorage.setItem("openCustomerLogin", "true");
+
+      window.dispatchEvent(
+        new CustomEvent("open-customer-login")
+      );
+    }
+  };
 
   return (
     <div className="fixed left-0 right-0 bottom-4 z-[90] px-4 pointer-events-none">
@@ -100,13 +135,14 @@ function FooterNav() {
             {navItems.map((item, index) => {
               const isActive =
                 item.path === "/"
-                  ? location.pathname === "/"
+                  ? location.pathname === "/" && item.label !== "Login"
                   : location.pathname.startsWith(item.path);
 
               return (
                 <Link
-                  key={item.path}
+                  key={`${item.label}-${item.path}`}
                   to={item.path}
+                  onClick={() => handleNavClick(item)}
                   ref={(el) => {
                     itemRefs.current[index] = el;
                   }}
@@ -116,7 +152,9 @@ function FooterNav() {
                     className={`relative flex items-center justify-center gap-2 px-3 py-3 rounded-full transition-all duration-300 ${
                       isActive
                         ? "text-[#08566E] scale-[1.04]"
-                        : "text-[#08566E]/65 hover:text-[#08566E] hover:bg-white/25"
+                        : item.label === "Login"
+                          ? "text-[#08566E] hover:text-[#08566E] hover:bg-white/35"
+                          : "text-[#08566E]/65 hover:text-[#08566E] hover:bg-white/25"
                     }`}
                   >
                     <span className="text-[16px] sm:text-[17px]">
@@ -125,7 +163,7 @@ function FooterNav() {
 
                     <span
                       className={`font-black leading-none transition-all duration-300 ${
-                        isActive
+                        isActive || item.label === "Login"
                           ? "text-[12px] max-w-[70px] opacity-100"
                           : "text-[0px] sm:text-[11px] sm:max-w-[60px] max-w-0 opacity-0 sm:opacity-80"
                       }`}
