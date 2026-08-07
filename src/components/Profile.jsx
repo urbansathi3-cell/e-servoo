@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaGift, FaTicketAlt } from "react-icons/fa";
 import {
   getStoredUser,
   getStoredToken,
   saveJsonToStorage,
+  safeJsonParse,
 } from "../utils/storage";
 
 const API_URL =
@@ -16,6 +18,17 @@ function Profile() {
 
   const [address, setAddress] = useState(user?.address || "");
   const [saving, setSaving] = useState(false);
+  const [myCoupons, setMyCoupons] = useState([]);
+
+  useEffect(() => {
+    const savedCoupons = safeJsonParse(localStorage.getItem("myCoupons"), []);
+
+    if (Array.isArray(savedCoupons)) {
+      setMyCoupons(savedCoupons);
+    } else {
+      setMyCoupons([]);
+    }
+  }, []);
 
   const saveAddress = async () => {
     if (!user) {
@@ -144,7 +157,7 @@ function Profile() {
 
             <textarea
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(event) => setAddress(event.target.value)}
               className="w-full p-3 rounded-2xl bg-[#E1E9E5] text-[#08566E] border border-[#6FA8AA] font-semibold outline-none focus:border-[#08566E]"
               rows={4}
               placeholder="Enter full address"
@@ -163,6 +176,60 @@ function Profile() {
               {saving ? "Saving..." : "Save Address"}
             </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => navigate("/rewards")}
+            className="w-full text-left bg-[#E1E9E5]/90 border border-white/80 rounded-3xl p-5 shadow-xl hover:bg-white active:scale-[0.98] transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#08566E] text-[#E1E9E5] flex items-center justify-center text-xl shadow-md">
+                <FaGift />
+              </div>
+
+              <div className="flex-1">
+                <h2 className="text-2xl font-black text-[#08566E]">
+                  My Rewards
+                </h2>
+
+                <p className="text-[#06485C] text-sm font-semibold mt-1">
+                  View your saved coupons in one place.
+                </p>
+              </div>
+
+              <div className="bg-[#08566E] text-[#E1E9E5] px-3 py-1.5 rounded-full text-xs font-black">
+                {myCoupons.length}
+              </div>
+            </div>
+
+            <div className="mt-4 bg-white/75 rounded-2xl p-4 border border-[#B4DBDC]">
+              {myCoupons.length === 0 ? (
+                <div className="flex items-center gap-3">
+                  <FaTicketAlt className="text-2xl text-[#08566E]" />
+
+                  <div>
+                    <p className="font-black text-[#08566E]">
+                      No coupons yet
+                    </p>
+
+                    <p className="text-xs font-semibold text-[#06485C] mt-1">
+                      Complete a booking and confirm payment to unlock rewards.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="font-black text-[#08566E]">
+                    {myCoupons.length} coupon saved
+                  </p>
+
+                  <p className="text-xs font-semibold text-[#06485C] mt-1">
+                    Tap here to open your coupon wallet.
+                  </p>
+                </div>
+              )}
+            </div>
+          </button>
 
           <button
             type="button"

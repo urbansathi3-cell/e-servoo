@@ -18,6 +18,7 @@ import FooterNav from "./components/FooterNav";
 import AuthScreen from "./components/AuthScreen";
 
 import Profile from "./components/Profile";
+import Rewards from "./components/Rewards";
 import Contact from "./components/Contact";
 import Terms from "./components/Terms";
 
@@ -472,6 +473,8 @@ function App() {
               )
             }
           />
+
+          <Route path="/rewards" element={<Rewards />} />
 
           <Route
             path="/worker-login"
