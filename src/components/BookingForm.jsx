@@ -233,6 +233,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
         name: formData.name.trim(),
         phone: cleanPhone,
+        email: getStoredUser()?.email || "",
         address: formData.address.trim(),
         issueDescription: formData.issueDescription.trim(),
         urgency: formData.urgency,
