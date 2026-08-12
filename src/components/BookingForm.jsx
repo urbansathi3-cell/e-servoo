@@ -14,10 +14,14 @@ import {
   FaExclamationTriangle,
   FaClipboardCheck,
 } from "react-icons/fa";
+
 import { getStoredUser, getStoredToken } from "../utils/storage";
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
+// IMPORTANT:
+// Do NOT put the Google Apps Script URL here.
+//
+// BookingForm -> Vercel /api/booking -> Google Apps Script
+const API_URL = "/api/booking";
 
 function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [formData, setFormData] = useState({
@@ -46,6 +50,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
   const textareaClass =
     "w-full mt-3 bg-white text-[#043A4A] placeholder:text-[#3F7F8B] outline-none font-bold px-4 py-3 rounded-2xl border border-[#B4DBDC] focus:border-[#08566E] resize-none";
+
+  // =========================================================
+  // WORKER DATA HELPERS
+  // =========================================================
 
   const getWorkerValue = (keys, fallback = "") => {
     if (!selectedWorker) return fallback;
@@ -111,6 +119,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     );
   };
 
+  // =========================================================
+  // LOAD USER + SELECTED WORKER
+  // =========================================================
+
   useEffect(() => {
     if (!selectedWorker) return;
 
@@ -132,6 +144,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     setAcceptedTerms(false);
   }, [selectedWorker]);
 
+  // =========================================================
+  // ANALYTICS EVENT
+  // =========================================================
+
   const pushEvent = (eventName, extraData = {}) => {
     window.dataLayer = window.dataLayer || [];
 
@@ -142,19 +158,29 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     });
   };
 
+  // =========================================================
+  // FORM HANDLERS
+  // =========================================================
+
   const handleChange = (event) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
   const changeUrgency = (urgency) => {
-    setFormData({
-      ...formData,
+    setFormData((previous) => ({
+      ...previous,
       urgency,
-    });
+    }));
   };
+
+  // =========================================================
+  // RESET AFTER SUCCESS
+  // =========================================================
 
   const resetBookingForm = () => {
     setSuccess(false);
@@ -171,14 +197,23 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       service: "",
       worker: "",
     });
-
-    window.location.reload();
   };
+
+  // =========================================================
+  // SUBMIT BOOKING
+  // =========================================================
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Prevent double submission
+    if (loading) return;
+
     const cleanPhone = String(formData.phone || "").replace(/\D/g, "");
+
+    // -------------------------------------------------------
+    // VALIDATION
+    // -------------------------------------------------------
 
     if (!formData.name.trim()) {
       alert("Name is required.");
@@ -208,92 +243,261 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     setLoading(true);
 
     try {
+      // -----------------------------------------------------
+      // WORKER DETAILS
+      // -----------------------------------------------------
+
       const workerId = getWorkerId();
-      const finalService = formData.service || getWorkerService();
-      const finalWorker = formData.worker || getWorkerName();
+
+      const finalService =
+        formData.service || getWorkerService();
+
+      const finalWorker =
+        formData.worker || getWorkerName();
+
+      // -----------------------------------------------------
+      // GET CURRENT USER
+      // -----------------------------------------------------
+
+      const storedUser = getStoredUser();
+      const storedToken = getStoredToken();
+
+      // -----------------------------------------------------
+      // BOOKING PAYLOAD
+      // -----------------------------------------------------
 
       const payload = {
         action: "booking",
-        token: getStoredToken(),
 
+        // Authentication
+        token: storedToken || "",
+
+        // Worker ID
         workerId: workerId,
         WorkerID: workerId,
         selectedWorkerId: workerId,
 
+        // Worker name
         worker: finalWorker,
         Worker: finalWorker,
         workerName: finalWorker,
         WorkerName: finalWorker,
         selectedWorkerName: finalWorker,
 
+        // Service
         service: finalService,
         Service: finalService,
         selectedService: finalService,
         category: finalService,
 
+        // Customer
         name: formData.name.trim(),
         phone: cleanPhone,
-        email: getStoredUser()?.email || "",
+        email: storedUser?.email || "",
+
+        // Booking details
         address: formData.address.trim(),
         issueDescription: formData.issueDescription.trim(),
         urgency: formData.urgency,
+
+        // Terms
         acceptedTerms: true,
       };
 
-      console.log("Selected worker object:", selectedWorker);
-      console.log("Booking payload:", payload);
+      console.log(
+        "========================================"
+      );
+      console.log("E-SERVOO BOOKING");
+      console.log("========================================");
+      console.log("Selected worker:", selectedWorker);
+      console.log("Worker ID:", workerId);
+      console.log("Worker:", finalWorker);
+      console.log("Service:", finalService);
+      console.log("Payload:", payload);
+      console.log("API:", API_URL);
 
-      const res = await fetch(API_URL, {
+      // -----------------------------------------------------
+      // CALL VERCEL API
+      //
+      // IMPORTANT:
+      // This does NOT call Google Apps Script directly.
+      //
+      // Browser
+      //    ↓
+      // /api/booking
+      //    ↓
+      // Vercel Serverless Function
+      //    ↓
+      // APPS_SCRIPT_URL
+      //    ↓
+      // Google Apps Script
+      //    ↓
+      // Google Sheets
+      // -----------------------------------------------------
+
+      const response = await fetch(API_URL, {
         method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      console.log(
+        "Vercel response status:",
+        response.status
+      );
 
-      console.log("Booking response:", data);
+      // -----------------------------------------------------
+      // READ RESPONSE SAFELY
+      // -----------------------------------------------------
 
-      if (data.success === false) {
+      const responseText = await response.text();
+
+      console.log(
+        "Raw booking response:",
+        responseText
+      );
+
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error(
+          "Could not parse booking response as JSON:",
+          parseError
+        );
+
+        data = {
+          success: false,
+          message:
+            responseText ||
+            "Invalid response from booking server.",
+        };
+      }
+
+      console.log(
+        "Parsed booking response:",
+        data
+      );
+
+      // -----------------------------------------------------
+      // SERVER ERROR
+      // -----------------------------------------------------
+
+      if (!response.ok) {
         setLoading(false);
-        alert(data.message || "Booking failed. Please try again.");
+
+        alert(
+          data?.message ||
+            `Booking server returned error ${response.status}.`
+        );
+
         return;
       }
 
-      if (data.statusUpdated === false) {
-        console.warn("Worker status was not updated:", data);
+      // -----------------------------------------------------
+      // BOOKING FAILED
+      // -----------------------------------------------------
+
+      if (data?.success === false) {
+        setLoading(false);
+
+        alert(
+          data?.message ||
+            "Booking failed. Please try again."
+        );
+
+        return;
       }
 
+      // -----------------------------------------------------
+      // WORKER STATUS WARNING
+      // -----------------------------------------------------
+
+      if (data?.statusUpdated === false) {
+        console.warn(
+          "Worker status was not updated:",
+          data
+        );
+      }
+
+      // -----------------------------------------------------
+      // BOOKING ID
+      // -----------------------------------------------------
+
       const finalBookingId =
-        data.bookingId ||
-        data.BookingID ||
-        data.id ||
+        data?.bookingId ||
+        data?.BookingID ||
+        data?.bookingID ||
+        data?.id ||
         `BK-${Date.now()}`;
 
       setBookingId(finalBookingId);
 
+      // -----------------------------------------------------
+      // ANALYTICS
+      // -----------------------------------------------------
+
       pushEvent("booking_success", {
+        booking_id: finalBookingId,
         service_name: finalService,
         urgency: formData.urgency,
         accepted_terms: true,
-        worker_status_updated: Boolean(data.statusUpdated),
+        worker_status_updated:
+          Boolean(data?.statusUpdated),
       });
+
+      // -----------------------------------------------------
+      // SUCCESS
+      // -----------------------------------------------------
 
       setLoading(false);
       setSuccess(true);
+
+      console.log(
+        "Booking completed successfully:",
+        finalBookingId
+      );
     } catch (error) {
-      console.error("Booking Error:", error);
+      console.error(
+        "Booking request failed:",
+        error
+      );
+
       setLoading(false);
-      alert("Booking failed. Please try again.");
+
+      alert(
+        "Booking failed. Please check your internet connection and try again."
+      );
     }
   };
+
+  // =========================================================
+  // NO WORKER SELECTED
+  // =========================================================
 
   if (!selectedWorker) {
     return null;
   }
 
-  const workerName = getWorkerName() || "Worker";
-  const workerService = getWorkerService() || "Service";
+  // =========================================================
+  // WORKER DISPLAY DATA
+  // =========================================================
 
-  const workerImage = getWorkerValue(["image", "Image", "photo", "Photo"], "");
+  const workerName =
+    getWorkerName() || "Worker";
+
+  const workerService =
+    getWorkerService() || "Service";
+
+  const workerImage = getWorkerValue(
+    ["image", "Image", "photo", "Photo"],
+    ""
+  );
 
   const workerFare = getWorkerValue(
     ["fare", "Fare", "price", "Price"],
@@ -305,19 +509,35 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     "Available"
   );
 
-  const workerRating = getWorkerValue(["rating", "Rating"], "4.8");
+  const workerRating = getWorkerValue(
+    ["rating", "Rating"],
+    "4.8"
+  );
 
   const workerTrustScore = getWorkerValue(
-    ["TrustScore", "trustScore", "trustscore", "Trust Score", "trust score"],
+    [
+      "TrustScore",
+      "trustScore",
+      "trustscore",
+      "Trust Score",
+      "trust score",
+    ],
     "95"
   );
 
-  const workerLocation = getWorkerValue(["location", "Location"], "Nearby");
+  const workerLocation = getWorkerValue(
+    ["location", "Location"],
+    "Nearby"
+  );
 
   const workerExperience = getWorkerValue(
     ["experience", "Experience"],
     "Experienced"
   );
+
+  // =========================================================
+  // URGENCY OPTIONS
+  // =========================================================
 
   const urgencyOptions = [
     {
@@ -325,30 +545,42 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       title: "Normal",
       subtitle: "Regular time",
       icon: <FaClock />,
-      activeClass: "bg-[#08566E] text-[#E1E9E5]",
+      activeClass:
+        "bg-[#08566E] text-[#E1E9E5]",
     },
     {
       value: "Urgent",
       title: "Urgent",
       subtitle: "Faster help",
       icon: <FaBolt />,
-      activeClass: "bg-orange-500 text-white",
+      activeClass:
+        "bg-orange-500 text-white",
     },
     {
       value: "Emergency",
       title: "Emergency",
       subtitle: "Immediate",
       icon: <FaExclamationTriangle />,
-      activeClass: "bg-red-600 text-white",
+      activeClass:
+        "bg-red-600 text-white",
     },
   ];
 
+  // =========================================================
+  // RETURN UI
+  // =========================================================
+
   return (
     <>
+      {/* =====================================================
+          SUCCESS POPUP
+      ===================================================== */}
+
       {success && (
         <div className="fixed inset-0 bg-[#053D4F]/65 backdrop-blur-md flex justify-center items-center z-[140] px-5">
           <div className="relative bg-[#F8FCFA] shadow-[0_30px_90px_rgba(8,86,110,0.45)] p-7 rounded-[32px] border border-white/80 text-center max-w-md w-full overflow-hidden">
             <div className="absolute -top-20 -left-20 w-44 h-44 bg-[#9ECFD0] rounded-full blur-3xl opacity-70"></div>
+
             <div className="absolute -bottom-20 -right-20 w-52 h-52 bg-[#6FA8AA] rounded-full blur-3xl opacity-60"></div>
 
             <div className="relative">
@@ -406,10 +638,17 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         </div>
       )}
 
+      {/* =====================================================
+          BOOKING MODAL
+      ===================================================== */}
+
       <div className="fixed inset-0 bg-[#053D4F]/60 backdrop-blur-md z-[100] flex items-end lg:items-center justify-center px-2 lg:px-4">
         <div className="relative w-[calc(100vw-16px)] lg:w-[min(980px,calc(100vw-32px))] max-h-[94vh] overflow-y-auto overflow-x-hidden bg-[#F2FAF8] border border-white/80 shadow-[0_25px_90px_rgba(8,86,110,0.45)] rounded-t-[34px] lg:rounded-[34px]">
           <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#9ECFD0] rounded-full blur-3xl opacity-45"></div>
+
           <div className="absolute -bottom-28 -right-20 w-80 h-80 bg-[#6FA8AA] rounded-full blur-3xl opacity-45"></div>
+
+          {/* CLOSE BUTTON */}
 
           <button
             type="button"
@@ -421,8 +660,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
           </button>
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr]">
+            {/* =================================================
+                LEFT WORKER PANEL
+            ================================================= */}
+
             <div className="relative bg-gradient-to-br from-[#032F3D] via-[#07566E] to-[#087C86] p-6 lg:p-8 text-white overflow-hidden rounded-t-[34px] lg:rounded-l-[34px] lg:rounded-tr-none">
               <div className="absolute -top-20 -right-20 w-56 h-56 bg-white/20 rounded-full blur-3xl"></div>
+
               <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#9ECFD0]/25 rounded-full blur-3xl"></div>
 
               <div className="relative">
@@ -434,7 +678,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   className="text-3xl lg:text-4xl font-black mt-4 leading-tight drop-shadow-xl"
                   style={{
                     color: "#FFFFFF",
-                    textShadow: "0 4px 18px rgba(0,0,0,0.35)",
+                    textShadow:
+                      "0 4px 18px rgba(0,0,0,0.35)",
                   }}
                 >
                   Confirm Your Service
@@ -444,11 +689,15 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   className="font-bold mt-4 text-sm lg:text-base leading-relaxed drop-shadow-md"
                   style={{
                     color: "#FFFFFF",
-                    textShadow: "0 2px 10px rgba(0,0,0,0.28)",
+                    textShadow:
+                      "0 2px 10px rgba(0,0,0,0.28)",
                   }}
                 >
-                  Verified local worker, transparent visiting charge and quick booking.
+                  Verified local worker, transparent visiting
+                  charge and quick booking.
                 </p>
+
+                {/* WORKER CARD */}
 
                 <div className="mt-7 bg-white/15 border border-white/30 backdrop-blur-xl rounded-[28px] p-5 shadow-2xl">
                   <div className="flex items-center gap-4">
@@ -457,7 +706,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                       alt={workerName}
                       referrerPolicy="no-referrer"
                       onError={(event) => {
-                        event.currentTarget.src = "/logo.png";
+                        event.currentTarget.src =
+                          "/logo.png";
                       }}
                       className="w-24 h-24 rounded-[28px] object-cover bg-[#F8FCFA] border-4 border-white shadow-xl"
                     />
@@ -471,7 +721,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                         className="text-2xl font-black mt-1 truncate drop-shadow-md"
                         style={{
                           color: "#FFFFFF",
-                          textShadow: "0 3px 12px rgba(0,0,0,0.35)",
+                          textShadow:
+                            "0 3px 12px rgba(0,0,0,0.35)",
                         }}
                       >
                         {workerName}
@@ -483,7 +734,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                       <span
                         className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-black ${
-                          String(workerStatus).toLowerCase() === "available"
+                          String(workerStatus).toLowerCase() ===
+                          "available"
                             ? "bg-green-500 text-white"
                             : "bg-orange-500 text-white"
                         }`}
@@ -493,6 +745,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     </div>
                   </div>
 
+                  {/* WORKER STATS */}
+
                   <div className="grid grid-cols-2 gap-3 mt-5">
                     <div className="bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
                       <div className="flex items-center gap-2 text-[#08566E] text-xs font-black">
@@ -501,7 +755,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                       </div>
 
                       <p className="text-xl font-black mt-1 text-[#043A4A]">
-                        {String(workerFare).toLowerCase().includes("not")
+                        {String(workerFare)
+                          .toLowerCase()
+                          .includes("not")
                           ? workerFare
                           : `₹${workerFare}`}
                       </p>
@@ -540,6 +796,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     </div>
                   </div>
 
+                  {/* EXPERIENCE */}
+
                   <div className="mt-4 bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
                     <p className="text-xs font-black text-[#08566E]">
                       Experience
@@ -551,15 +809,22 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   </div>
                 </div>
 
+                {/* INFO */}
+
                 <div className="mt-5 flex items-center gap-3 bg-white/15 border border-white/25 rounded-3xl p-4">
                   <FaClipboardCheck className="text-2xl text-white shrink-0" />
 
                   <p className="text-sm font-bold text-[#E1E9E5]">
-                    Submit booking details. Worker status will change to Busy after confirmation.
+                    Submit booking details. Worker status will
+                    change to Busy after confirmation.
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* =================================================
+                RIGHT BOOKING FORM
+            ================================================= */}
 
             <div className="relative p-5 lg:p-8 bg-[#F2FAF8]">
               <div className="mb-6 pr-12">
@@ -572,11 +837,17 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                 </h2>
 
                 <p className="text-[#08566E] text-sm font-bold mt-2">
-                  Your saved details are pre-filled. Update only if needed.
+                  Your saved details are pre-filled. Update only
+                  if needed.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="grid gap-4">
+              <form
+                onSubmit={handleSubmit}
+                className="grid gap-4"
+              >
+                {/* NAME + PHONE */}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={inputCardClass}>
                     <label className={labelClass}>
@@ -613,6 +884,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   </div>
                 </div>
 
+                {/* ADDRESS */}
+
                 <div className={inputCardClass}>
                   <label className={labelClass}>
                     <FaHome />
@@ -630,6 +903,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   />
                 </div>
 
+                {/* URGENCY */}
+
                 <div>
                   <label className="text-[#043A4A] font-black text-sm">
                     Select Urgency
@@ -637,26 +912,38 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                   <div className="grid grid-cols-3 gap-2 mt-3">
                     {urgencyOptions.map((option) => {
-                      const isActive = formData.urgency === option.value;
+                      const isActive =
+                        formData.urgency ===
+                        option.value;
 
                       return (
                         <button
                           key={option.value}
                           type="button"
-                          onClick={() => changeUrgency(option.value)}
+                          onClick={() =>
+                            changeUrgency(
+                              option.value
+                            )
+                          }
                           className={`rounded-3xl p-3 border font-black text-left transition ${
                             isActive
                               ? `${option.activeClass} border-transparent shadow-xl scale-[1.02]`
                               : "bg-[#F8FCFA] border-[#6FA8AA]/50 text-[#043A4A] hover:bg-white"
                           }`}
                         >
-                          <div className="text-lg">{option.icon}</div>
+                          <div className="text-lg">
+                            {option.icon}
+                          </div>
 
-                          <p className="text-sm mt-2">{option.title}</p>
+                          <p className="text-sm mt-2">
+                            {option.title}
+                          </p>
 
                           <p
                             className={`text-[10px] mt-1 font-bold ${
-                              isActive ? "text-white/90" : "text-[#08566E]"
+                              isActive
+                                ? "text-white/90"
+                                : "text-[#08566E]"
                             }`}
                           >
                             {option.subtitle}
@@ -666,6 +953,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     })}
                   </div>
                 </div>
+
+                {/* ISSUE */}
 
                 <div className={inputCardClass}>
                   <label className={labelClass}>
@@ -683,6 +972,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     required
                   />
                 </div>
+
+                {/* BOOKING SUMMARY */}
 
                 <div className="bg-[#043A4A] text-white rounded-3xl p-4 shadow-xl">
                   <p className="text-[#D9F4F2] text-xs font-black">
@@ -722,13 +1013,17 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                         Charge:
                       </span>{" "}
                       <span className="font-black text-white">
-                        {String(workerFare).toLowerCase().includes("not")
+                        {String(workerFare)
+                          .toLowerCase()
+                          .includes("not")
                           ? workerFare
                           : `₹${workerFare}`}
                       </span>
                     </p>
                   </div>
                 </div>
+
+                {/* TERMS */}
 
                 <div
                   className={`rounded-3xl p-4 border shadow-sm transition ${
@@ -742,7 +1037,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                       type="checkbox"
                       checked={acceptedTerms}
                       onChange={(event) =>
-                        setAcceptedTerms(event.target.checked)
+                        setAcceptedTerms(
+                          event.target.checked
+                        )
                       }
                       className="mt-1 w-5 h-5 accent-[#08566E] shrink-0"
                     />
@@ -754,30 +1051,39 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                         target="_blank"
                         rel="noreferrer"
                         className="text-[#08566E] font-black underline hover:text-[#043A4A]"
-                        onClick={(event) => event.stopPropagation()}
+                        onClick={(event) =>
+                          event.stopPropagation()
+                        }
                       >
                         Terms and Conditions
                       </a>{" "}
-                      of E-SERVOO before booking this service.
+                      of E-SERVOO before booking this
+                      service.
                     </span>
                   </label>
 
                   {!acceptedTerms && (
                     <p className="text-red-600 text-xs font-black mt-3">
-                      Please accept Terms and Conditions to continue booking.
+                      Please accept Terms and Conditions to
+                      continue booking.
                     </p>
                   )}
 
                   {acceptedTerms && (
                     <p className="text-green-700 text-xs font-black mt-3">
-                      ✅ Terms accepted. You can now confirm booking.
+                      ✅ Terms accepted. You can now confirm
+                      booking.
                     </p>
                   )}
                 </div>
 
+                {/* SUBMIT */}
+
                 <button
                   type="submit"
-                  disabled={loading || !acceptedTerms}
+                  disabled={
+                    loading || !acceptedTerms
+                  }
                   className={`w-full py-4 rounded-3xl text-lg font-black transition duration-300 flex items-center justify-center gap-3 shadow-xl ${
                     loading || !acceptedTerms
                       ? "bg-gray-500 text-white cursor-not-allowed opacity-70"
