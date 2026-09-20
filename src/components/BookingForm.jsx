@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   FaTimes,
   FaCheckCircle,
@@ -13,14 +13,13 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaClipboardCheck,
+  FaStar,
+  FaChevronRight,
+  FaCertificate,
 } from "react-icons/fa";
 
 import { getStoredUser, getStoredToken } from "../utils/storage";
 
-// IMPORTANT:
-// Do NOT put the Google Apps Script URL here.
-//
-// BookingForm -> Vercel /api/booking -> Google Apps Script
 const API_URL = "/api/booking";
 
 function BookingForm({ selectedWorker, setSelectedWorker }) {
@@ -39,20 +38,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const [bookingId, setBookingId] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  const inputCardClass =
-    "bg-[#F8FCFA] border border-[#6FA8AA]/60 rounded-3xl p-4 shadow-sm";
-
-  const labelClass =
-    "flex items-center gap-2 text-[#043A4A] font-black text-sm";
-
-  const inputClass =
-    "w-full mt-3 bg-white text-[#043A4A] placeholder:text-[#3F7F8B] outline-none font-bold px-4 py-3 rounded-2xl border border-[#B4DBDC] focus:border-[#08566E]";
-
-  const textareaClass =
-    "w-full mt-3 bg-white text-[#043A4A] placeholder:text-[#3F7F8B] outline-none font-bold px-4 py-3 rounded-2xl border border-[#B4DBDC] focus:border-[#08566E] resize-none";
-
   // =========================================================
-  // WORKER DATA HELPERS
+  // WORKER HELPERS
   // =========================================================
 
   const getWorkerValue = (keys, fallback = "") => {
@@ -71,8 +58,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     return fallback;
   };
 
-  const getWorkerId = () => {
-    return getWorkerValue(
+  const getWorkerId = () =>
+    getWorkerValue(
       [
         "id",
         "ID",
@@ -86,10 +73,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       ],
       ""
     );
-  };
 
-  const getWorkerName = () => {
-    return getWorkerValue(
+  const getWorkerName = () =>
+    getWorkerValue(
       [
         "name",
         "Name",
@@ -103,10 +89,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       ],
       ""
     );
-  };
 
-  const getWorkerService = () => {
-    return getWorkerValue(
+  const getWorkerService = () =>
+    getWorkerValue(
       [
         "service",
         "Service",
@@ -117,10 +102,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       ],
       ""
     );
-  };
 
   // =========================================================
-  // LOAD USER + SELECTED WORKER
+  // LOAD USER
   // =========================================================
 
   useEffect(() => {
@@ -128,24 +112,21 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
     const user = getStoredUser();
 
-    const service = getWorkerService();
-    const worker = getWorkerName();
-
     setFormData({
       name: user?.name || "",
       phone: user?.phone || "",
       address: user?.address || "",
       issueDescription: "",
       urgency: "Normal",
-      service,
-      worker,
+      service: getWorkerService(),
+      worker: getWorkerName(),
     });
 
     setAcceptedTerms(false);
   }, [selectedWorker]);
 
   // =========================================================
-  // ANALYTICS EVENT
+  // ANALYTICS
   // =========================================================
 
   const pushEvent = (eventName, extraData = {}) => {
@@ -159,7 +140,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   };
 
   // =========================================================
-  // FORM HANDLERS
+  // FORM
   // =========================================================
 
   const handleChange = (event) => {
@@ -179,7 +160,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   };
 
   // =========================================================
-  // RESET AFTER SUCCESS
+  // RESET
   // =========================================================
 
   const resetBookingForm = () => {
@@ -206,14 +187,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Prevent double submission
     if (loading) return;
 
     const cleanPhone = String(formData.phone || "").replace(/\D/g, "");
-
-    // -------------------------------------------------------
-    // VALIDATION
-    // -------------------------------------------------------
 
     if (!formData.name.trim()) {
       alert("Name is required.");
@@ -243,10 +219,6 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     setLoading(true);
 
     try {
-      // -----------------------------------------------------
-      // WORKER DETAILS
-      // -----------------------------------------------------
-
       const workerId = getWorkerId();
 
       const finalService =
@@ -255,122 +227,57 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       const finalWorker =
         formData.worker || getWorkerName();
 
-      // -----------------------------------------------------
-      // GET CURRENT USER
-      // -----------------------------------------------------
-
       const storedUser = getStoredUser();
       const storedToken = getStoredToken();
-
-      // -----------------------------------------------------
-      // BOOKING PAYLOAD
-      // -----------------------------------------------------
 
       const payload = {
         action: "booking",
 
-        // Authentication
         token: storedToken || "",
 
-        // Worker ID
-        workerId: workerId,
+        workerId,
         WorkerID: workerId,
         selectedWorkerId: workerId,
 
-        // Worker name
         worker: finalWorker,
         Worker: finalWorker,
         workerName: finalWorker,
         WorkerName: finalWorker,
         selectedWorkerName: finalWorker,
 
-        // Service
         service: finalService,
         Service: finalService,
         selectedService: finalService,
         category: finalService,
 
-        // Customer
         name: formData.name.trim(),
         phone: cleanPhone,
         email: storedUser?.email || "",
 
-        // Booking details
         address: formData.address.trim(),
         issueDescription: formData.issueDescription.trim(),
         urgency: formData.urgency,
 
-        // Terms
         acceptedTerms: true,
       };
 
-      console.log(
-        "========================================"
-      );
-      console.log("E-SERVOO BOOKING");
-      console.log("========================================");
-      console.log("Selected worker:", selectedWorker);
-      console.log("Worker ID:", workerId);
-      console.log("Worker:", finalWorker);
-      console.log("Service:", finalService);
-      console.log("Payload:", payload);
-      console.log("API:", API_URL);
-
-      // -----------------------------------------------------
-      // CALL VERCEL API
-      //
-      // IMPORTANT:
-      // This does NOT call Google Apps Script directly.
-      //
-      // Browser
-      //    ↓
-      // /api/booking
-      //    ↓
-      // Vercel Serverless Function
-      //    ↓
-      // APPS_SCRIPT_URL
-      //    ↓
-      // Google Apps Script
-      //    ↓
-      // Google Sheets
-      // -----------------------------------------------------
+      console.log("E-SERVOO Booking Payload:", payload);
 
       const response = await fetch(API_URL, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify(payload),
       });
 
-      console.log(
-        "Vercel response status:",
-        response.status
-      );
-
-      // -----------------------------------------------------
-      // READ RESPONSE SAFELY
-      // -----------------------------------------------------
-
       const responseText = await response.text();
-
-      console.log(
-        "Raw booking response:",
-        responseText
-      );
 
       let data;
 
       try {
         data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error(
-          "Could not parse booking response as JSON:",
-          parseError
-        );
-
+      } catch {
         data = {
           success: false,
           message:
@@ -379,14 +286,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         };
       }
 
-      console.log(
-        "Parsed booking response:",
-        data
-      );
-
-      // -----------------------------------------------------
-      // SERVER ERROR
-      // -----------------------------------------------------
+      console.log("Booking Response:", data);
 
       if (!response.ok) {
         setLoading(false);
@@ -399,10 +299,6 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         return;
       }
 
-      // -----------------------------------------------------
-      // BOOKING FAILED
-      // -----------------------------------------------------
-
       if (data?.success === false) {
         setLoading(false);
 
@@ -414,20 +310,12 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         return;
       }
 
-      // -----------------------------------------------------
-      // WORKER STATUS WARNING
-      // -----------------------------------------------------
-
       if (data?.statusUpdated === false) {
         console.warn(
           "Worker status was not updated:",
           data
         );
       }
-
-      // -----------------------------------------------------
-      // BOOKING ID
-      // -----------------------------------------------------
 
       const finalBookingId =
         data?.bookingId ||
@@ -438,10 +326,6 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
       setBookingId(finalBookingId);
 
-      // -----------------------------------------------------
-      // ANALYTICS
-      // -----------------------------------------------------
-
       pushEvent("booking_success", {
         booking_id: finalBookingId,
         service_name: finalService,
@@ -451,22 +335,15 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
           Boolean(data?.statusUpdated),
       });
 
-      // -----------------------------------------------------
-      // SUCCESS
-      // -----------------------------------------------------
-
       setLoading(false);
       setSuccess(true);
 
       console.log(
-        "Booking completed successfully:",
+        "Booking completed:",
         finalBookingId
       );
     } catch (error) {
-      console.error(
-        "Booking request failed:",
-        error
-      );
+      console.error("Booking request failed:", error);
 
       setLoading(false);
 
@@ -475,10 +352,6 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       );
     }
   };
-
-  // =========================================================
-  // NO WORKER SELECTED
-  // =========================================================
 
   if (!selectedWorker) {
     return null;
@@ -535,40 +408,48 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     "Experienced"
   );
 
+  const certificateLink = getWorkerValue(
+    [
+      "CertificateLink",
+      "certificateLink",
+      "Certificate Link",
+    ],
+    ""
+  );
+
+  const isAvailable =
+    String(workerStatus).toLowerCase() === "available";
+
   // =========================================================
-  // URGENCY OPTIONS
+  // URGENCY
   // =========================================================
 
   const urgencyOptions = [
     {
       value: "Normal",
       title: "Normal",
-      subtitle: "Regular time",
+      subtitle: "Regular help",
       icon: <FaClock />,
-      activeClass:
-        "bg-[#08566E] text-[#E1E9E5]",
+      active:
+        "bg-[#08566E] text-white border-[#08566E]",
     },
     {
       value: "Urgent",
       title: "Urgent",
       subtitle: "Faster help",
       icon: <FaBolt />,
-      activeClass:
-        "bg-orange-500 text-white",
+      active:
+        "bg-orange-500 text-white border-orange-500",
     },
     {
       value: "Emergency",
       title: "Emergency",
       subtitle: "Immediate",
       icon: <FaExclamationTriangle />,
-      activeClass:
-        "bg-red-600 text-white",
+      active:
+        "bg-red-600 text-white border-red-600",
     },
   ];
-
-  // =========================================================
-  // RETURN UI
-  // =========================================================
 
   return (
     <>
@@ -577,61 +458,61 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       ===================================================== */}
 
       {success && (
-        <div className="fixed inset-0 bg-[#053D4F]/65 backdrop-blur-md flex justify-center items-center z-[140] px-5">
-          <div className="relative bg-[#F8FCFA] shadow-[0_30px_90px_rgba(8,86,110,0.45)] p-7 rounded-[32px] border border-white/80 text-center max-w-md w-full overflow-hidden">
-            <div className="absolute -top-20 -left-20 w-44 h-44 bg-[#9ECFD0] rounded-full blur-3xl opacity-70"></div>
+        <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-md flex items-center justify-center px-4">
+          <div className="relative w-full max-w-[390px] bg-[#F8FCFA] rounded-[30px] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.4)] text-center overflow-hidden">
 
-            <div className="absolute -bottom-20 -right-20 w-52 h-52 bg-[#6FA8AA] rounded-full blur-3xl opacity-60"></div>
+            <div className="absolute -top-20 -left-20 w-44 h-44 bg-[#9ECFD0] rounded-full blur-3xl"></div>
+
+            <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-[#6FA8AA] rounded-full blur-3xl"></div>
 
             <div className="relative">
-              <div className="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl">
+
+              <div className="w-20 h-20 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl shadow-xl">
                 <FaCheckCircle />
               </div>
 
-              <h2 className="text-3xl font-black text-[#043A4A] mt-5">
+              <h2 className="text-2xl font-black text-[#043A4A] mt-5">
                 Booking Successful
               </h2>
 
-              <p className="mt-2 text-sm font-bold text-[#08566E]">
+              <p className="text-sm font-semibold text-[#08566E] mt-2">
                 Your service request has been placed.
               </p>
 
-              <p className="mt-4 text-lg font-black text-[#043A4A] bg-white rounded-2xl px-4 py-3 border border-[#B4DBDC]">
-                Booking ID: {bookingId}
-              </p>
-
-              <div className="mt-5 bg-white rounded-3xl p-4 text-left border border-[#B4DBDC]">
-                <p className="text-[#043A4A] font-bold">
-                  Worker: {formData.worker}
+              <div className="mt-5 bg-white rounded-2xl border border-[#B4DBDC] p-4">
+                <p className="text-xs text-[#6FA8AA] font-black">
+                  BOOKING ID
                 </p>
 
-                <p className="text-[#043A4A] font-bold mt-2">
-                  Service: {formData.service}
-                </p>
-
-                <p className="text-[#043A4A] font-bold mt-2">
-                  Priority: {formData.urgency}
-                </p>
-
-                <p className="text-[#08566E] font-semibold mt-2">
-                  Issue: {formData.issueDescription}
-                </p>
-
-                <p className="text-green-700 font-black mt-3">
-                  ✅ Terms & Conditions accepted
+                <p className="text-xl font-black text-[#043A4A] mt-1">
+                  {bookingId}
                 </p>
               </div>
 
-              <p className="mt-4 text-[#08566E] font-semibold">
+              <div className="mt-4 bg-white rounded-2xl border border-[#B4DBDC] p-4 text-left">
+                <p className="font-black text-[#043A4A]">
+                  {formData.worker}
+                </p>
+
+                <p className="text-sm font-bold text-[#08566E] mt-1">
+                  {formData.service}
+                </p>
+
+                <p className="text-sm font-semibold text-[#08566E] mt-2">
+                  Priority: {formData.urgency}
+                </p>
+              </div>
+
+              <p className="text-sm font-semibold text-[#08566E] mt-4">
                 Our team will contact you shortly.
               </p>
 
               <button
                 type="button"
                 onClick={resetBookingForm}
-                className="mt-6 w-full bg-[#08566E] text-[#E1E9E5] px-6 py-3.5 rounded-2xl font-black shadow-xl hover:bg-[#06485C] transition"
+                className="w-full mt-5 py-3.5 rounded-2xl bg-[#08566E] text-white font-black shadow-xl"
               >
-                Close
+                Done
               </button>
             </div>
           </div>
@@ -639,221 +520,276 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       )}
 
       {/* =====================================================
-          BOOKING MODAL
+          MOBILE SHOPPING STYLE MODAL
       ===================================================== */}
 
-      <div className="fixed inset-0 bg-[#053D4F]/60 backdrop-blur-md z-[100] flex items-end lg:items-center justify-center px-2 lg:px-4">
-        <div className="relative w-[calc(100vw-16px)] lg:w-[min(980px,calc(100vw-32px))] max-h-[94vh] overflow-y-auto overflow-x-hidden bg-[#F2FAF8] border border-white/80 shadow-[0_25px_90px_rgba(8,86,110,0.45)] rounded-t-[34px] lg:rounded-[34px]">
-          <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#9ECFD0] rounded-full blur-3xl opacity-45"></div>
+      <div className="fixed inset-0 z-[200] bg-[#EEF4F3]">
 
-          <div className="absolute -bottom-28 -right-20 w-80 h-80 bg-[#6FA8AA] rounded-full blur-3xl opacity-45"></div>
+        {/* MOBILE APP CONTAINER */}
 
-          {/* CLOSE BUTTON */}
+        <div className="relative mx-auto w-full max-w-[430px] h-[100dvh] bg-[#F7FAF9] overflow-hidden shadow-2xl">
 
-          <button
-            type="button"
-            onClick={() => setSelectedWorker(null)}
-            className="absolute top-4 right-4 z-30 w-11 h-11 bg-white text-[#043A4A] border border-[#B4DBDC] rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 transition"
-            aria-label="Close booking form"
-          >
-            <FaTimes />
-          </button>
+          {/* =================================================
+              TOP BAR
+          ================================================= */}
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="absolute top-0 left-0 right-0 z-[50] h-[62px] bg-white/95 backdrop-blur-xl border-b border-gray-200 flex items-center justify-between px-4">
+
+            <button
+              type="button"
+              onClick={() => setSelectedWorker(null)}
+              className="w-10 h-10 rounded-full bg-[#F1F5F4] flex items-center justify-center text-[#043A4A]"
+            >
+              <FaTimes />
+            </button>
+
+            <div className="text-center">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#6FA8AA]">
+                E-SERVOO
+              </p>
+
+              <p className="text-sm font-black text-[#043A4A]">
+                Worker Details
+              </p>
+            </div>
+
+            <div className="w-10 h-10 rounded-full bg-[#EAF6F5] flex items-center justify-center text-[#08566E]">
+              <FaShieldAlt />
+            </div>
+          </div>
+
+          {/* =================================================
+              SCROLLABLE CONTENT
+          ================================================= */}
+
+          <div className="h-full overflow-y-auto pb-28 pt-[62px]">
+
             {/* =================================================
-                LEFT WORKER PANEL
+                WORKER HERO
             ================================================= */}
 
-            <div className="relative bg-gradient-to-br from-[#032F3D] via-[#07566E] to-[#087C86] p-6 lg:p-8 text-white overflow-hidden rounded-t-[34px] lg:rounded-l-[34px] lg:rounded-tr-none">
-              <div className="absolute -top-20 -right-20 w-56 h-56 bg-white/20 rounded-full blur-3xl"></div>
+            <div className="bg-white">
 
-              <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#9ECFD0]/25 rounded-full blur-3xl"></div>
+              <div className="relative w-full h-[260px] bg-[#DDEBE9]">
 
-              <div className="relative">
-                <p className="text-xs font-black uppercase tracking-[0.25em] text-[#E1E9E5]">
-                  E-SERVOO Booking
-                </p>
-
-                <h2
-                  className="text-3xl lg:text-4xl font-black mt-4 leading-tight drop-shadow-xl"
-                  style={{
-                    color: "#FFFFFF",
-                    textShadow:
-                      "0 4px 18px rgba(0,0,0,0.35)",
+                <img
+                  src={workerImage || "/logo.png"}
+                  alt={workerName}
+                  referrerPolicy="no-referrer"
+                  onError={(event) => {
+                    event.currentTarget.src = "/logo.png";
                   }}
-                >
-                  Confirm Your Service
-                </h2>
+                  className="w-full h-full object-cover"
+                />
 
-                <p
-                  className="font-bold mt-4 text-sm lg:text-base leading-relaxed drop-shadow-md"
-                  style={{
-                    color: "#FFFFFF",
-                    textShadow:
-                      "0 2px 10px rgba(0,0,0,0.28)",
-                  }}
-                >
-                  Verified local worker, transparent visiting
-                  charge and quick booking.
-                </p>
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 to-transparent"></div>
 
-                {/* WORKER CARD */}
+                <div className="absolute left-4 bottom-4 right-4 flex items-end justify-between">
 
-                <div className="mt-7 bg-white/15 border border-white/30 backdrop-blur-xl rounded-[28px] p-5 shadow-2xl">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={workerImage || "/logo.png"}
-                      alt={workerName}
-                      referrerPolicy="no-referrer"
-                      onError={(event) => {
-                        event.currentTarget.src =
-                          "/logo.png";
-                      }}
-                      className="w-24 h-24 rounded-[28px] object-cover bg-[#F8FCFA] border-4 border-white shadow-xl"
-                    />
+                  <div className="text-white">
 
-                    <div className="min-w-0">
-                      <p className="text-[#E1E9E5] text-xs font-black">
-                        Booking With
-                      </p>
-
-                      <h3
-                        className="text-2xl font-black mt-1 truncate drop-shadow-md"
-                        style={{
-                          color: "#FFFFFF",
-                          textShadow:
-                            "0 3px 12px rgba(0,0,0,0.35)",
-                        }}
-                      >
-                        {workerName}
-                      </h3>
-
-                      <p className="text-[#E1E9E5] font-bold mt-1">
-                        {workerService}
-                      </p>
+                    <div className="flex items-center gap-2">
 
                       <span
-                        className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-black ${
-                          String(workerStatus).toLowerCase() ===
-                          "available"
-                            ? "bg-green-500 text-white"
-                            : "bg-orange-500 text-white"
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                          isAvailable
+                            ? "bg-green-500"
+                            : "bg-red-500"
                         }`}
                       >
-                        {workerStatus}
+                        {isAvailable
+                          ? "AVAILABLE"
+                          : "BUSY"}
                       </span>
+
+                      <span className="bg-white/90 text-[#043A4A] px-2.5 py-1 rounded-full text-[10px] font-black">
+                        VERIFIED
+                      </span>
+
                     </div>
+
+                    <h1 className="text-2xl font-black mt-2 drop-shadow-lg">
+                      {workerName}
+                    </h1>
+
+                    <p className="text-sm font-bold text-white/90">
+                      {workerService}
+                    </p>
+
                   </div>
 
-                  {/* WORKER STATS */}
+                </div>
+              </div>
 
-                  <div className="grid grid-cols-2 gap-3 mt-5">
-                    <div className="bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
-                      <div className="flex items-center gap-2 text-[#08566E] text-xs font-black">
-                        <FaRupeeSign />
-                        Charge
-                      </div>
+              {/* RATING BAR */}
 
-                      <p className="text-xl font-black mt-1 text-[#043A4A]">
-                        {String(workerFare)
-                          .toLowerCase()
-                          .includes("not")
-                          ? workerFare
-                          : `₹${workerFare}`}
-                      </p>
-                    </div>
+              <div className="px-4 py-4 border-b border-gray-200">
 
-                    <div className="bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
-                      <div className="flex items-center gap-2 text-[#08566E] text-xs font-black">
-                        <FaShieldAlt />
-                        Trust
-                      </div>
+                <div className="flex items-center gap-3">
 
-                      <p className="text-xl font-black mt-1 text-[#043A4A]">
-                        {workerTrustScore}
-                      </p>
-                    </div>
-
-                    <div className="bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
-                      <div className="flex items-center gap-2 text-[#08566E] text-xs font-black">
-                        ⭐ Rating
-                      </div>
-
-                      <p className="text-xl font-black mt-1 text-[#043A4A]">
-                        {workerRating}
-                      </p>
-                    </div>
-
-                    <div className="bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
-                      <div className="flex items-center gap-2 text-[#08566E] text-xs font-black">
-                        <FaMapMarkerAlt />
-                        Area
-                      </div>
-
-                      <p className="text-sm font-black mt-1 truncate text-[#043A4A]">
-                        {workerLocation}
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-1 bg-green-600 text-white px-3 py-2 rounded-xl font-black">
+                    {workerRating}
+                    <FaStar className="text-xs" />
                   </div>
 
-                  {/* EXPERIENCE */}
+                  <div className="h-5 w-px bg-gray-300"></div>
 
-                  <div className="mt-4 bg-[#F8FCFA] text-[#043A4A] rounded-3xl p-4 border border-white shadow-md">
-                    <p className="text-xs font-black text-[#08566E]">
+                  <div>
+                    <p className="text-xs text-gray-500 font-semibold">
+                      Trust Score
+                    </p>
+
+                    <p className="text-sm font-black text-[#043A4A]">
+                      {workerTrustScore}%
+                    </p>
+                  </div>
+
+                  <div className="h-5 w-px bg-gray-300"></div>
+
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-500 font-semibold">
                       Experience
                     </p>
 
-                    <p className="font-black mt-1 text-[#043A4A]">
+                    <p className="text-sm font-black text-[#043A4A] truncate">
                       {workerExperience}
                     </p>
                   </div>
+
                 </div>
 
-                {/* INFO */}
-
-                <div className="mt-5 flex items-center gap-3 bg-white/15 border border-white/25 rounded-3xl p-4">
-                  <FaClipboardCheck className="text-2xl text-white shrink-0" />
-
-                  <p className="text-sm font-bold text-[#E1E9E5]">
-                    Submit booking details. Worker status will
-                    change to Busy after confirmation.
-                  </p>
-                </div>
               </div>
             </div>
 
             {/* =================================================
-                RIGHT BOOKING FORM
+                PRICE SECTION
             ================================================= */}
 
-            <div className="relative p-5 lg:p-8 bg-[#F2FAF8]">
-              <div className="mb-6 pr-12">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#0A7F88]">
-                  Service Form
-                </p>
+            <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
 
-                <h2 className="text-3xl lg:text-4xl font-black text-[#043A4A] mt-1">
-                  Book Now
-                </h2>
+              <p className="text-xs font-black text-gray-500">
+                ESTIMATED VISITING CHARGE
+              </p>
 
-                <p className="text-[#08566E] text-sm font-bold mt-2">
-                  Your saved details are pre-filled. Update only
-                  if needed.
-                </p>
+              <div className="flex items-end gap-2 mt-1">
+
+                <FaRupeeSign className="text-2xl text-[#08566E] mb-1" />
+
+                <span className="text-3xl font-black text-[#043A4A]">
+                  {String(workerFare)
+                    .toLowerCase()
+                    .includes("not")
+                    ? workerFare
+                    : workerFare}
+                </span>
+
               </div>
 
-              <form
-                onSubmit={handleSubmit}
-                className="grid gap-4"
-              >
-                {/* NAME + PHONE */}
+              <p className="text-xs text-gray-500 font-semibold mt-1">
+                Final amount may depend on inspection and actual work.
+              </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className={inputCardClass}>
-                    <label className={labelClass}>
-                      <FaUser />
-                      Your Name
-                    </label>
+            </div>
+
+            {/* =================================================
+                LOCATION / SERVICE INFO
+            ================================================= */}
+
+            <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+
+              <h3 className="text-lg font-black text-[#043A4A]">
+                Service Information
+              </h3>
+
+              <div className="mt-4 space-y-3">
+
+                <div className="flex items-center gap-3">
+
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E]">
+                    <FaMapMarkerAlt />
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] text-gray-500 font-bold">
+                      SERVICE AREA
+                    </p>
+
+                    <p className="text-sm font-black text-[#043A4A]">
+                      {workerLocation}
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="flex items-center gap-3">
+
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E]">
+                    <FaTools />
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] text-gray-500 font-bold">
+                      SERVICE
+                    </p>
+
+                    <p className="text-sm font-black text-[#043A4A]">
+                      {workerService}
+                    </p>
+                  </div>
+
+                </div>
+
+                {certificateLink && (
+                  <a
+                    href={certificateLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between bg-[#F5FAF9] border border-[#B4DBDC] rounded-2xl p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FaCertificate className="text-[#08566E]" />
+
+                      <span className="text-sm font-black text-[#043A4A]">
+                        Verified Skill Certificate
+                      </span>
+                    </div>
+
+                    <FaChevronRight className="text-[#6FA8AA]" />
+                  </a>
+                )}
+
+              </div>
+
+            </div>
+
+            {/* =================================================
+                BOOKING FORM
+            ================================================= */}
+
+            <form
+              onSubmit={handleSubmit}
+              className="mt-2"
+            >
+
+              {/* CUSTOMER DETAILS */}
+
+              <div className="bg-white px-4 py-5 border-y border-gray-200">
+
+                <div className="flex items-center justify-between">
+
+                  <h3 className="text-lg font-black text-[#043A4A]">
+                    Your Details
+                  </h3>
+
+                  <FaUser className="text-[#6FA8AA]" />
+
+                </div>
+
+                <div className="space-y-3 mt-4">
+
+                  <div className="relative">
+
+                    <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6FA8AA]" />
 
                     <input
                       type="text"
@@ -861,16 +797,15 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                       placeholder="Your Name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={inputClass}
+                      className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[#F5FAF9] border border-[#D3E5E2] text-[#043A4A] font-bold outline-none focus:border-[#08566E]"
                       required
                     />
+
                   </div>
 
-                  <div className={inputCardClass}>
-                    <label className={labelClass}>
-                      <FaPhoneAlt />
-                      Phone Number
-                    </label>
+                  <div className="relative">
+
+                    <FaPhoneAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6FA8AA]" />
 
                     <input
                       type="tel"
@@ -878,232 +813,293 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                       placeholder="Phone Number"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={inputClass}
+                      className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[#F5FAF9] border border-[#D3E5E2] text-[#043A4A] font-bold outline-none focus:border-[#08566E]"
                       required
                     />
+
                   </div>
-                </div>
 
-                {/* ADDRESS */}
+                  <div className="relative">
 
-                <div className={inputCardClass}>
-                  <label className={labelClass}>
-                    <FaHome />
-                    Service Address
-                  </label>
+                    <FaHome className="absolute left-4 top-4 text-[#6FA8AA]" />
 
-                  <input
-                    type="text"
-                    name="address"
-                    placeholder="Your service address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className={inputClass}
-                    required
-                  />
-                </div>
-
-                {/* URGENCY */}
-
-                <div>
-                  <label className="text-[#043A4A] font-black text-sm">
-                    Select Urgency
-                  </label>
-
-                  <div className="grid grid-cols-3 gap-2 mt-3">
-                    {urgencyOptions.map((option) => {
-                      const isActive =
-                        formData.urgency ===
-                        option.value;
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() =>
-                            changeUrgency(
-                              option.value
-                            )
-                          }
-                          className={`rounded-3xl p-3 border font-black text-left transition ${
-                            isActive
-                              ? `${option.activeClass} border-transparent shadow-xl scale-[1.02]`
-                              : "bg-[#F8FCFA] border-[#6FA8AA]/50 text-[#043A4A] hover:bg-white"
-                          }`}
-                        >
-                          <div className="text-lg">
-                            {option.icon}
-                          </div>
-
-                          <p className="text-sm mt-2">
-                            {option.title}
-                          </p>
-
-                          <p
-                            className={`text-[10px] mt-1 font-bold ${
-                              isActive
-                                ? "text-white/90"
-                                : "text-[#08566E]"
-                            }`}
-                          >
-                            {option.subtitle}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* ISSUE */}
-
-                <div className={inputCardClass}>
-                  <label className={labelClass}>
-                    <FaTools />
-                    Describe Your Issue
-                  </label>
-
-                  <textarea
-                    name="issueDescription"
-                    placeholder="Example: Fan is not working, switch board issue..."
-                    value={formData.issueDescription}
-                    onChange={handleChange}
-                    className={textareaClass}
-                    rows="4"
-                    required
-                  />
-                </div>
-
-                {/* BOOKING SUMMARY */}
-
-                <div className="bg-[#043A4A] text-white rounded-3xl p-4 shadow-xl">
-                  <p className="text-[#D9F4F2] text-xs font-black">
-                    Booking Summary
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-sm">
-                    <p>
-                      <span className="text-[#D9F4F2] font-bold">
-                        Worker:
-                      </span>{" "}
-                      <span className="font-black text-white">
-                        {workerName}
-                      </span>
-                    </p>
-
-                    <p>
-                      <span className="text-[#D9F4F2] font-bold">
-                        Service:
-                      </span>{" "}
-                      <span className="font-black text-white">
-                        {workerService}
-                      </span>
-                    </p>
-
-                    <p>
-                      <span className="text-[#D9F4F2] font-bold">
-                        Urgency:
-                      </span>{" "}
-                      <span className="font-black text-white">
-                        {formData.urgency}
-                      </span>
-                    </p>
-
-                    <p>
-                      <span className="text-[#D9F4F2] font-bold">
-                        Charge:
-                      </span>{" "}
-                      <span className="font-black text-white">
-                        {String(workerFare)
-                          .toLowerCase()
-                          .includes("not")
-                          ? workerFare
-                          : `₹${workerFare}`}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* TERMS */}
-
-                <div
-                  className={`rounded-3xl p-4 border shadow-sm transition ${
-                    acceptedTerms
-                      ? "bg-green-50 border-green-500"
-                      : "bg-[#F8FCFA] border-[#6FA8AA]/60"
-                  }`}
-                >
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={acceptedTerms}
-                      onChange={(event) =>
-                        setAcceptedTerms(
-                          event.target.checked
-                        )
-                      }
-                      className="mt-1 w-5 h-5 accent-[#08566E] shrink-0"
+                    <textarea
+                      name="address"
+                      placeholder="Service Address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      rows="3"
+                      className="w-full pl-11 pr-4 pt-3 rounded-2xl bg-[#F5FAF9] border border-[#D3E5E2] text-[#043A4A] font-bold outline-none focus:border-[#08566E] resize-none"
+                      required
                     />
 
-                    <span className="text-[#043A4A] text-sm font-bold leading-relaxed">
-                      I agree to the{" "}
-                      <a
-                        href="/terms"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[#08566E] font-black underline hover:text-[#043A4A]"
-                        onClick={(event) =>
-                          event.stopPropagation()
-                        }
-                      >
-                        Terms and Conditions
-                      </a>{" "}
-                      of E-SERVOO before booking this
-                      service.
-                    </span>
-                  </label>
+                  </div>
 
-                  {!acceptedTerms && (
-                    <p className="text-red-600 text-xs font-black mt-3">
-                      Please accept Terms and Conditions to
-                      continue booking.
-                    </p>
-                  )}
-
-                  {acceptedTerms && (
-                    <p className="text-green-700 text-xs font-black mt-3">
-                      ✅ Terms accepted. You can now confirm
-                      booking.
-                    </p>
-                  )}
                 </div>
 
-                {/* SUBMIT */}
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={
-                    loading || !acceptedTerms
-                  }
-                  className={`w-full py-4 rounded-3xl text-lg font-black transition duration-300 flex items-center justify-center gap-3 shadow-xl ${
-                    loading || !acceptedTerms
-                      ? "bg-gray-500 text-white cursor-not-allowed opacity-70"
-                      : "bg-gradient-to-r from-[#043A4A] via-[#08566E] to-[#0A7F88] text-white hover:scale-[1.01]"
-                  }`}
-                >
-                  {loading ? (
-                    "Booking..."
-                  ) : !acceptedTerms ? (
-                    "Accept Terms to Continue"
-                  ) : (
-                    <>
-                      <FaBolt />
-                      Confirm Booking
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
+              {/* =================================================
+                  URGENCY
+              ================================================= */}
+
+              <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+
+                <h3 className="text-lg font-black text-[#043A4A]">
+                  How quickly do you need help?
+                </h3>
+
+                <div className="grid grid-cols-3 gap-2 mt-4">
+
+                  {urgencyOptions.map((option) => {
+
+                    const active =
+                      formData.urgency === option.value;
+
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() =>
+                          changeUrgency(option.value)
+                        }
+                        className={`rounded-2xl p-3 border transition ${
+                          active
+                            ? option.active
+                            : "bg-[#F5FAF9] border-[#D3E5E2] text-[#043A4A]"
+                        }`}
+                      >
+                        <div className="text-lg">
+                          {option.icon}
+                        </div>
+
+                        <p className="text-xs font-black mt-2">
+                          {option.title}
+                        </p>
+
+                        <p
+                          className={`text-[9px] font-bold mt-1 ${
+                            active
+                              ? "text-white/90"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {option.subtitle}
+                        </p>
+                      </button>
+                    );
+                  })}
+
+                </div>
+
+              </div>
+
+              {/* =================================================
+                  ISSUE
+              ================================================= */}
+
+              <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+
+                <h3 className="text-lg font-black text-[#043A4A]">
+                  What do you need help with?
+                </h3>
+
+                <textarea
+                  name="issueDescription"
+                  placeholder="Describe your issue..."
+                  value={formData.issueDescription}
+                  onChange={handleChange}
+                  rows="4"
+                  className="w-full mt-4 rounded-2xl bg-[#F5FAF9] border border-[#D3E5E2] p-4 text-[#043A4A] font-bold outline-none focus:border-[#08566E] resize-none"
+                  required
+                />
+
+              </div>
+
+              {/* =================================================
+                  SUMMARY
+              ================================================= */}
+
+              <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+
+                <h3 className="text-lg font-black text-[#043A4A]">
+                  Booking Summary
+                </h3>
+
+                <div className="mt-4 rounded-2xl bg-[#F3F9F8] border border-[#D3E5E2] overflow-hidden">
+
+                  <div className="flex justify-between px-4 py-3 border-b border-[#D3E5E2]">
+                    <span className="text-sm text-gray-500 font-semibold">
+                      Worker
+                    </span>
+
+                    <span className="text-sm font-black text-[#043A4A]">
+                      {workerName}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between px-4 py-3 border-b border-[#D3E5E2]">
+                    <span className="text-sm text-gray-500 font-semibold">
+                      Service
+                    </span>
+
+                    <span className="text-sm font-black text-[#043A4A]">
+                      {workerService}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between px-4 py-3 border-b border-[#D3E5E2]">
+                    <span className="text-sm text-gray-500 font-semibold">
+                      Priority
+                    </span>
+
+                    <span className="text-sm font-black text-[#043A4A]">
+                      {formData.urgency}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between px-4 py-3">
+                    <span className="text-sm text-gray-500 font-semibold">
+                      Visiting Charge
+                    </span>
+
+                    <span className="text-base font-black text-[#08566E]">
+                      {String(workerFare)
+                        .toLowerCase()
+                        .includes("not")
+                        ? workerFare
+                        : `₹${workerFare}`}
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* =================================================
+                  TERMS
+              ================================================= */}
+
+              <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+
+                <label className="flex items-start gap-3 cursor-pointer">
+
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(event) =>
+                      setAcceptedTerms(
+                        event.target.checked
+                      )
+                    }
+                    className="mt-1 w-5 h-5 accent-[#08566E] shrink-0"
+                  />
+
+                  <span className="text-xs font-bold text-[#043A4A] leading-relaxed">
+
+                    I agree to the{" "}
+
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#08566E] font-black underline"
+                    >
+                      Terms and Conditions
+                    </a>{" "}
+
+                    of E-SERVOO before booking.
+
+                  </span>
+
+                </label>
+
+                {acceptedTerms ? (
+                  <p className="text-green-700 text-xs font-black mt-3">
+                    ✓ Terms accepted
+                  </p>
+                ) : (
+                  <p className="text-red-600 text-xs font-black mt-3">
+                    Accept Terms to continue.
+                  </p>
+                )}
+
+              </div>
+
+              {/* EXTRA SPACE FOR STICKY BUTTON */}
+
+              <div className="h-6"></div>
+
+            </form>
           </div>
+
+          {/* =================================================
+              FIXED SHOPPING APP BOTTOM BAR
+          ================================================= */}
+
+          <div className="absolute bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-xl border-t border-gray-200 px-3 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+
+            <div className="flex gap-2 items-center">
+
+              <button
+                type="button"
+                onClick={() => setSelectedWorker(null)}
+                className="w-12 h-12 shrink-0 rounded-2xl border border-[#B4DBDC] bg-[#F5FAF9] flex items-center justify-center text-[#08566E]"
+              >
+                <FaTimes />
+              </button>
+
+              <div className="flex-1 min-w-0 px-2">
+
+                <p className="text-[10px] text-gray-500 font-black uppercase">
+                  Visiting Charge
+                </p>
+
+                <p className="text-lg font-black text-[#043A4A] truncate">
+                  {String(workerFare)
+                    .toLowerCase()
+                    .includes("not")
+                    ? workerFare
+                    : `₹${workerFare}`}
+                </p>
+
+              </div>
+
+              <button
+                type="button"
+                disabled={
+                  loading ||
+                  !acceptedTerms ||
+                  !isAvailable
+                }
+                onClick={() => {
+                  document
+                    .querySelector(
+                      'form button[type="submit"]'
+                    )
+                    ?.click();
+                }}
+                className={`h-12 px-5 rounded-2xl font-black text-sm shadow-lg transition ${
+                  loading ||
+                  !acceptedTerms ||
+                  !isAvailable
+                    ? "bg-gray-400 text-white"
+                    : "bg-[#FFD814] text-[#043A4A] hover:bg-[#F7C900]"
+                }`}
+              >
+                {loading
+                  ? "Booking..."
+                  : !isAvailable
+                    ? "Worker Busy"
+                    : !acceptedTerms
+                      ? "Accept Terms"
+                      : "Confirm Booking"}
+              </button>
+
+            </div>
+
+          </div>
+
         </div>
       </div>
     </>
