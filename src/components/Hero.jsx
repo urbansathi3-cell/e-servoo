@@ -13,127 +13,77 @@ import {
   FaHeadset,
   FaRoute,
   FaFire,
-  FaSearch,
-  FaHome,
   FaClipboardList,
   FaGift,
-  FaChevronRight,
-  FaCrosshairs,
+  FaUser,
+  FaHome,
 } from "react-icons/fa";
 
 function Hero({ language = "en" }) {
   const navigate = useNavigate();
   const t = translations[language] || translations.en;
 
-  /* =========================================================
-     TEXT
-  ========================================================= */
-
   const text = {
     badge: t.heroBadge || "Smart Local Services Hub",
 
-    title:
-      language === "hi"
-        ? "Services Near You"
-        : language === "od"
-          ? "ଆପଣଙ୍କ ନିକଟରେ ସେବା"
-          : "Services Near You",
+    title: "E-SERVOO",
 
     subtitle:
       language === "hi"
-        ? "Verified local professionals. Smart assignment. Easy booking."
+        ? "Right Professional. Right Service. Right When You Need It."
         : language === "od"
-          ? "Verified local professionals. Smart assignment. Easy booking."
-          : "Verified local professionals. Smart assignment. Easy booking.",
+          ? "Right Professional. Right Service. Right When You Need It."
+          : "Right Professional. Right Service. Right When You Need It.",
 
     description:
       language === "hi"
-        ? "E-SERVOO आपके लिए सही professional को location, skill, availability और trust के आधार पर assign करता है।"
+        ? "Verified local professionals, smart assignment और trusted service support — एक ही platform पर।"
         : language === "od"
-          ? "E-SERVOO location, skill, availability ଏବଂ trust ଆଧାରରେ ଆପଣଙ୍କ ପାଇଁ ସଠିକ୍ professional assign କରେ।"
-          : "E-SERVOO assigns the right professional based on location, skill, availability and trust.",
+          ? "Verified local professionals, smart assignment ଏବଂ trusted service support — ସବୁ ଗୋଟିଏ platform ରେ।"
+          : "Verified local professionals, smart assignment and trusted service support — all in one platform.",
 
-    bookNow:
+    book:
       language === "hi"
         ? "Book Service"
         : language === "od"
-          ? "ସେବା Book କରନ୍ତୁ"
+          ? "Book Service"
           : "Book Service",
 
-    search:
-      language === "hi"
-        ? "आपको किस service की जरूरत है?"
-        : language === "od"
-          ? "ଆପଣଙ୍କୁ କେଉଁ ସେବା ଦରକାର?"
-          : "What service do you need?",
-
-    verified: t.verifiedWorkers || "Verified Workers",
-
-    hyperlocal: t.hyperlocal || "Hyperlocal",
-
-    trusted: t.trustedService || "Trusted Service",
-
-    electrician: t.electrician || "Electrician",
-
-    services: t.services || "Services",
-
-    bookings: t.bookings || "Bookings",
-
-    rewards: t.rewards || "Rewards",
-
-    trackBooking:
-      language === "hi"
-        ? "Track Booking"
-        : language === "od"
-          ? "Booking Track"
-          : "Track Booking",
-
-    smartMatch:
-      language === "hi"
-        ? "Smart Match"
-        : language === "od"
-          ? "Smart Match"
-          : "Smart Match",
-
-    allServices:
+    services:
       language === "hi"
         ? "All Services"
         : language === "od"
           ? "All Services"
           : "All Services",
 
-    inspection:
+    workers:
       language === "hi"
-        ? "Inspection-based pricing"
+        ? "Professionals"
         : language === "od"
-          ? "Inspection-based pricing"
-          : "Inspection-based pricing",
+          ? "Professionals"
+          : "Professionals",
 
-    location:
+    bookings:
       language === "hi"
-        ? "Near your location"
+        ? "My Bookings"
         : language === "od"
-          ? "ଆପଣଙ୍କ location ନିକଟରେ"
-          : "Near your location",
+          ? "My Bookings"
+          : "My Bookings",
 
-    ready:
+    rewards:
       language === "hi"
-        ? "Ready to serve"
+        ? "Rewards"
         : language === "od"
-          ? "ସେବା ପାଇଁ ପ୍ରସ୍ତୁତ"
-          : "Ready to serve",
+          ? "Rewards"
+          : "Rewards",
 
-    support:
+    profile:
       language === "hi"
-        ? "24/7 Support"
+        ? "Profile"
         : language === "od"
-          ? "24/7 Support"
-          : "24/7 Support",
+          ? "Profile"
+          : "Profile",
   };
-
-  /* =========================================================
-     ANALYTICS
-  ========================================================= */
 
   const pushEvent = (eventName, extraData = {}) => {
     window.dataLayer = window.dataLayer || [];
@@ -144,10 +94,6 @@ function Hero({ language = "en" }) {
       ...extraData,
     });
   };
-
-  /* =========================================================
-     ACTIONS
-  ========================================================= */
 
   const handleBookNow = () => {
     pushEvent("hero_cta_click", {
@@ -160,24 +106,6 @@ function Hero({ language = "en" }) {
   const handleServices = () => {
     pushEvent("hero_navigation_click", {
       navigation_name: "services",
-    });
-
-    const servicesSection =
-      document.getElementById("services");
-
-    if (servicesSection) {
-      servicesSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    } else {
-      navigate("/services");
-    }
-  };
-
-  const handleSmartMatch = () => {
-    pushEvent("hero_navigation_click", {
-      navigation_name: "smart_match",
     });
 
     navigate("/services");
@@ -199,543 +127,621 @@ function Hero({ language = "en" }) {
     navigate("/rewards");
   };
 
-  /* =========================================================
-     UI
-  ========================================================= */
+  const handleProfile = () => {
+    pushEvent("hero_navigation_click", {
+      navigation_name: "profile",
+    });
+
+    navigate("/profile");
+  };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#EAF4F2] flex items-center justify-center px-3 py-8 md:px-6">
+    <section className="relative overflow-hidden min-h-screen bg-[#DDE8E8] px-4 pt-20 pb-28 sm:px-6">
 
       {/* =====================================================
           BACKGROUND
-      ===================================================== */}
+      ====================================================== */}
 
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#08566E]/10 blur-3xl" />
 
-        <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-[#B4DBDC] blur-3xl opacity-80"></div>
+        <div className="absolute top-1/3 -right-32 w-96 h-96 rounded-full bg-[#6FA8AA]/25 blur-3xl" />
 
-        <div className="absolute top-1/3 -right-32 w-96 h-96 rounded-full bg-[#6FA8AA]/30 blur-3xl"></div>
-
-        <div className="absolute bottom-[-150px] left-1/3 w-96 h-96 rounded-full bg-[#08566E]/15 blur-3xl"></div>
-
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 rounded-full bg-white/50 blur-3xl" />
       </div>
 
       {/* =====================================================
-          MOBILE APP FRAME
-          9:16 STYLE
-      ===================================================== */}
+          MAIN CONTAINER
+      ====================================================== */}
 
-      <div className="relative z-10 w-full max-w-[430px] min-h-[calc(100vh-32px)] md:min-h-[760px] md:max-h-[900px] md:h-[850px] rounded-[42px] md:rounded-[52px] overflow-hidden bg-[#F7FBFA] border border-white shadow-[0_35px_100px_rgba(8,86,110,0.28)]">
+      <div className="relative z-10 max-w-7xl mx-auto">
 
-        {/* =================================================
-            APP TOP AREA
-        ================================================= */}
+        {/* ===================================================
+            DESKTOP INTRO
+        ==================================================== */}
 
-        <div className="relative px-5 pt-5 pb-4 bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0]">
+        <div className="text-center max-w-3xl mx-auto mb-10">
 
-          {/* top glow */}
-
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/40 rounded-full blur-3xl"></div>
-
-          <div className="relative">
-
-            {/* header */}
-
-            <div className="flex items-center justify-between">
-
-              <div>
-
-                <div className="flex items-center gap-2">
-
-                  <div className="w-10 h-10 rounded-2xl bg-[#08566E] text-white flex items-center justify-center shadow-lg">
-                    <FaBolt />
-                  </div>
-
-                  <div>
-
-                    <p className="text-[#08566E] text-xl font-black tracking-tight leading-none">
-                      E-SERVOO
-                    </p>
-
-                    <p className="text-[#06485C] text-[10px] font-black uppercase tracking-widest mt-1">
-                      {text.badge}
-                    </p>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <button
-                type="button"
-                onClick={() => navigate("/profile")}
-                className="w-11 h-11 rounded-full bg-white/80 backdrop-blur-xl border border-white flex items-center justify-center text-[#08566E] shadow-md"
-                aria-label="Profile"
-              >
-                <FaUserCheck />
-              </button>
-
-            </div>
-
-            {/* location */}
-
-            <button
-              type="button"
-              onClick={handleBookNow}
-              className="w-full mt-5 bg-white/90 backdrop-blur-xl border border-white rounded-2xl p-3 flex items-center gap-3 text-left shadow-[0_8px_25px_rgba(8,86,110,0.12)]"
-            >
-
-              <div className="w-10 h-10 rounded-xl bg-[#E8F5F3] text-[#08566E] flex items-center justify-center shrink-0">
-                <FaMapMarkerAlt />
-              </div>
-
-              <div className="min-w-0 flex-1">
-
-                <p className="text-[9px] uppercase tracking-widest font-black text-[#6FA8AA]">
-                  Service Location
-                </p>
-
-                <p className="text-sm font-black text-[#08566E] truncate">
-                  {text.location}
-                </p>
-
-              </div>
-
-              <FaChevronRight className="text-[#6FA8AA] text-xs" />
-
-            </button>
-
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/75 backdrop-blur-xl border border-white shadow-lg text-[#08566E] text-xs sm:text-sm font-black">
+            <FaBolt />
+            {text.badge}
           </div>
+
+          <h1 className="mt-5 text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-[#08566E]">
+            {text.title}
+          </h1>
+
+          <p className="mt-3 text-lg sm:text-2xl font-black text-[#043A4A]">
+            {text.subtitle}
+          </p>
+
+          <p className="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-[#315D67] font-semibold leading-relaxed">
+            {text.description}
+          </p>
+
         </div>
 
-        {/* =================================================
-            MAIN CONTENT
-        ================================================= */}
+        {/* ===================================================
+            PHONE PREVIEW AREA
+        ==================================================== */}
 
-        <div className="px-5 pt-5 pb-32 overflow-y-auto h-[calc(100vh-180px)] md:h-[650px] scrollbar-hide">
+        <div className="flex justify-center">
 
-          {/* heading */}
+          {/* PHONE OUTER SHELL */}
 
-          <div>
+          <div className="relative w-full max-w-[430px]">
 
-            <div className="inline-flex items-center gap-2 bg-[#E8F5F3] border border-[#B4DBDC] rounded-full px-3 py-1.5">
+            {/* Floating Verified Badge */}
 
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <div className="absolute -top-5 -left-3 sm:-left-8 z-40 bg-white/95 backdrop-blur-xl border border-white rounded-2xl px-3 py-2 shadow-[0_15px_40px_rgba(8,86,110,0.20)]">
 
-              <span className="text-[#08566E] text-[10px] font-black uppercase tracking-wider">
-                LIVE SERVICE NETWORK
-              </span>
+              <div className="flex items-center gap-2">
 
-            </div>
-
-            <h1 className="mt-4 text-[38px] md:text-5xl font-black text-[#08566E] leading-[0.98] tracking-tight">
-              {text.title}
-            </h1>
-
-            <p className="mt-4 text-[#06485C] text-base font-bold leading-relaxed">
-              {text.subtitle}
-            </p>
-
-          </div>
-
-          {/* =================================================
-              SEARCH / SERVICE INPUT
-          ================================================= */}
-
-          <button
-            type="button"
-            onClick={handleBookNow}
-            className="w-full mt-5 bg-white border border-[#D7E7E5] rounded-2xl p-3.5 flex items-center gap-3 shadow-[0_8px_25px_rgba(8,86,110,0.08)] text-left"
-          >
-
-            <FaSearch className="text-[#6FA8AA] shrink-0" />
-
-            <span className="text-[#8BA5A5] text-sm font-semibold flex-1 truncate">
-              {text.search}
-            </span>
-
-            <div className="w-8 h-8 rounded-xl bg-[#08566E] text-white flex items-center justify-center">
-              <FaArrowRight className="text-xs" />
-            </div>
-
-          </button>
-
-          {/* =================================================
-              QUICK SERVICES
-          ================================================= */}
-
-          <div className="mt-6">
-
-            <div className="flex items-center justify-between mb-3">
-
-              <h2 className="text-lg font-black text-[#08566E]">
-                Popular Services
-              </h2>
-
-              <button
-                type="button"
-                onClick={handleServices}
-                className="text-xs font-black text-[#6FA8AA]"
-              >
-                View All
-              </button>
-
-            </div>
-
-            <div className="grid grid-cols-4 gap-2.5">
-
-              {/* electrician */}
-
-              <button
-                type="button"
-                onClick={handleBookNow}
-                className="bg-white border border-[#E0ECEA] rounded-2xl p-3 shadow-sm active:scale-95 transition"
-              >
-                <div className="w-10 h-10 mx-auto rounded-xl bg-[#E8F5F3] text-[#08566E] flex items-center justify-center text-lg">
-                  <FaBolt />
-                </div>
-
-                <p className="text-[10px] font-black text-[#08566E] mt-2 truncate">
-                  Electrician
-                </p>
-              </button>
-
-              {/* tools */}
-
-              <button
-                type="button"
-                onClick={handleBookNow}
-                className="bg-white border border-[#E0ECEA] rounded-2xl p-3 shadow-sm active:scale-95 transition"
-              >
-                <div className="w-10 h-10 mx-auto rounded-xl bg-[#E8F5F3] text-[#08566E] flex items-center justify-center text-lg">
-                  <FaTools />
-                </div>
-
-                <p className="text-[10px] font-black text-[#08566E] mt-2 truncate">
-                  Plumber
-                </p>
-              </button>
-
-              {/* verified */}
-
-              <button
-                type="button"
-                onClick={handleBookNow}
-                className="bg-white border border-[#E0ECEA] rounded-2xl p-3 shadow-sm active:scale-95 transition"
-              >
-                <div className="w-10 h-10 mx-auto rounded-xl bg-[#E8F5F3] text-[#08566E] flex items-center justify-center text-lg">
+                <div className="w-9 h-9 rounded-xl bg-[#08566E] text-white flex items-center justify-center">
                   <FaUserCheck />
                 </div>
 
-                <p className="text-[10px] font-black text-[#08566E] mt-2 truncate">
-                  Cleaner
-                </p>
-              </button>
+                <div>
+                  <p className="text-[11px] font-black text-[#08566E]">
+                    VERIFIED
+                  </p>
 
-              {/* all */}
-
-              <button
-                type="button"
-                onClick={handleServices}
-                className="bg-[#08566E] border border-[#08566E] rounded-2xl p-3 shadow-sm active:scale-95 transition"
-              >
-                <div className="w-10 h-10 mx-auto rounded-xl bg-white/15 text-white flex items-center justify-center text-lg">
-                  <FaArrowRight />
+                  <p className="text-[10px] font-bold text-[#6FA8AA]">
+                    Professionals
+                  </p>
                 </div>
-
-                <p className="text-[10px] font-black text-white mt-2 truncate">
-                  All
-                </p>
-              </button>
-
-            </div>
-
-          </div>
-
-          {/* =================================================
-              SMART ASSIGNMENT CARD
-          ================================================= */}
-
-          <div className="mt-6 relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#043A4A] via-[#08566E] to-[#0A7F88] p-5 shadow-[0_18px_45px_rgba(8,86,110,0.25)]">
-
-            <div className="absolute -top-20 -right-20 w-52 h-52 bg-white/10 rounded-full blur-3xl"></div>
-
-            <div className="absolute -bottom-20 -left-20 w-52 h-52 bg-[#9ECFD0]/15 rounded-full blur-3xl"></div>
-
-            <div className="relative">
-
-              {/* label */}
-
-              <div className="flex items-center justify-between">
-
-                <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1">
-
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-
-                  <span className="text-[9px] text-[#E1E9E5] font-black tracking-wider">
-                    SMART ASSIGNMENT
-                  </span>
-
-                </div>
-
-                <FaShieldAlt className="text-[#B4DBDC]" />
 
               </div>
 
-              <h2 className="text-2xl font-black text-white mt-4 leading-tight">
-                Right Professional.
-                <br />
-                Right Place.
-              </h2>
+            </div>
 
-              <p className="text-[#B4DBDC] text-xs font-semibold mt-2 leading-relaxed">
-                {text.description}
-              </p>
+            {/* Floating Live Badge */}
 
-              {/* worker preview */}
+            <div className="absolute top-28 -right-3 sm:-right-8 z-40 bg-[#08566E] text-white rounded-2xl px-3 py-2 shadow-xl">
 
-              <div className="mt-4 bg-[#E1E9E5] rounded-2xl p-3.5">
+              <div className="flex items-center gap-2">
 
-                <div className="flex items-center gap-3">
+                <span className="relative flex w-2.5 h-2.5">
+                  <span className="absolute inline-flex w-full h-full rounded-full bg-green-300 animate-ping" />
+                  <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-green-400" />
+                </span>
 
-                  <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-[#08566E] to-[#6FA8AA] text-white flex items-center justify-center shrink-0 shadow-md">
+                <span className="text-[10px] font-black">
+                  LIVE MATCHING
+                </span>
 
-                    <FaTools />
+              </div>
 
-                    <span className="absolute -right-1 -bottom-1 w-5 h-5 bg-green-500 text-white border-2 border-white rounded-full flex items-center justify-center text-[8px]">
-                      ✓
-                    </span>
+            </div>
+
+            {/* =================================================
+                9:16 PHONE
+            ================================================== */}
+
+            <div
+              className="
+                relative
+                w-full
+                aspect-[9/16]
+                max-h-[760px]
+                rounded-[42px]
+                sm:rounded-[50px]
+                bg-[#F8FBFA]
+                border-[7px]
+                border-[#043A4A]
+                shadow-[0_35px_100px_rgba(8,86,110,0.35)]
+                overflow-hidden
+              "
+            >
+
+              {/* Phone Inner */}
+
+              <div className="absolute inset-0 bg-[#F7FAF9] overflow-hidden">
+
+                {/* ===========================================
+                    TOP APP BAR
+                ============================================ */}
+
+                <div className="relative z-20 px-5 pt-5 pb-3">
+
+                  <div className="flex items-center justify-between">
+
+                    <div>
+
+                      <p className="text-[10px] text-[#6FA8AA] font-black uppercase tracking-widest">
+                        Welcome to
+                      </p>
+
+                      <h2 className="text-xl sm:text-2xl font-black text-[#08566E]">
+                        E-SERVOO
+                      </h2>
+
+                    </div>
+
+                    <div className="w-10 h-10 rounded-2xl bg-[#08566E] text-white flex items-center justify-center shadow-lg">
+                      <FaUser />
+                    </div>
 
                   </div>
 
-                  <div className="min-w-0 flex-1">
+                </div>
 
-                    <p className="text-[9px] text-[#6FA8AA] font-black uppercase">
-                      {text.verified}
-                    </p>
+                {/* ===========================================
+                    LOCATION BAR
+                ============================================ */}
 
-                    <h3 className="text-[#08566E] font-black text-base">
-                      Verified {text.electrician}
-                    </h3>
+                <div className="px-5">
 
-                    <div className="flex items-center gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/services")}
+                    className="w-full flex items-center gap-3 bg-white border border-[#DCE9E8] rounded-2xl px-4 py-3 shadow-sm text-left"
+                  >
 
-                      <span className="text-[#08566E] text-xs font-black flex items-center gap-1">
-                        <FaStar className="text-yellow-500" />
-                        4.9
-                      </span>
+                    <div className="w-9 h-9 rounded-xl bg-[#E5F3F2] flex items-center justify-center text-[#08566E]">
+                      <FaMapMarkerAlt />
+                    </div>
 
-                      <span className="text-[#6FA8AA] text-[10px] font-bold">
-                        •
-                      </span>
+                    <div className="min-w-0 flex-1">
 
-                      <span className="text-[#6FA8AA] text-[10px] font-bold">
-                        {text.ready}
-                      </span>
+                      <p className="text-[9px] uppercase tracking-wider text-[#8AA7AA] font-black">
+                        Service Location
+                      </p>
+
+                      <p className="text-xs sm:text-sm text-[#043A4A] font-black truncate">
+                        Select your location
+                      </p>
+
+                    </div>
+
+                    <FaArrowRight className="text-[#6FA8AA] text-xs" />
+
+                  </button>
+
+                </div>
+
+                {/* ===========================================
+                    HERO CARD
+                ============================================ */}
+
+                <div className="px-5 mt-4">
+
+                  <div className="relative overflow-hidden rounded-[30px] bg-gradient-to-br from-[#043A4A] via-[#08566E] to-[#0A7F88] p-5 shadow-xl">
+
+                    <div className="absolute -top-20 -right-16 w-48 h-48 rounded-full bg-white/10 blur-3xl" />
+
+                    <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-[#9ECFD0]/20 blur-3xl" />
+
+                    <div className="relative">
+
+                      <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-[#E1E9E5] text-[9px] font-black">
+                        <FaBolt />
+                        SMART SERVICE
+                      </div>
+
+                      <h3 className="mt-4 text-2xl sm:text-3xl font-black text-white leading-tight">
+                        Service when
+                        <br />
+                        you need it.
+                      </h3>
+
+                      <p className="mt-2 text-xs text-[#B4DBDC] font-semibold leading-relaxed">
+                        Tell us your problem. E-SERVOO helps connect you with the right professional.
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={handleBookNow}
+                        className="mt-5 w-full bg-[#E1E9E5] text-[#08566E] rounded-2xl py-3.5 font-black text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition"
+                      >
+                        <FaBolt />
+                        {text.book}
+                        <FaArrowRight className="text-xs" />
+                      </button>
 
                     </div>
 
                   </div>
 
-                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-[9px] font-black">
-                    ACTIVE
-                  </span>
+                </div>
+
+                {/* ===========================================
+                    QUICK NAVIGATION
+                ============================================ */}
+
+                <div className="px-5 mt-5">
+
+                  <div className="flex items-center justify-between">
+
+                    <h3 className="text-sm font-black text-[#043A4A]">
+                      Quick Access
+                    </h3>
+
+                    <span className="text-[9px] text-[#6FA8AA] font-black">
+                      EXPLORE
+                    </span>
+
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5 mt-3">
+
+                    <button
+                      type="button"
+                      onClick={handleServices}
+                      className="bg-white border border-[#E0EBEA] rounded-2xl p-3 shadow-sm active:scale-95 transition"
+                    >
+                      <div className="w-9 h-9 mx-auto rounded-xl bg-[#E5F3F2] text-[#08566E] flex items-center justify-center">
+                        <FaTools />
+                      </div>
+
+                      <p className="mt-2 text-[9px] font-black text-[#08566E]">
+                        Services
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleBookings}
+                      className="bg-white border border-[#E0EBEA] rounded-2xl p-3 shadow-sm active:scale-95 transition"
+                    >
+                      <div className="w-9 h-9 mx-auto rounded-xl bg-[#E5F3F2] text-[#08566E] flex items-center justify-center">
+                        <FaClipboardList />
+                      </div>
+
+                      <p className="mt-2 text-[9px] font-black text-[#08566E]">
+                        Bookings
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleRewards}
+                      className="bg-white border border-[#E0EBEA] rounded-2xl p-3 shadow-sm active:scale-95 transition"
+                    >
+                      <div className="w-9 h-9 mx-auto rounded-xl bg-[#FFF2DE] text-[#D98520] flex items-center justify-center">
+                        <FaGift />
+                      </div>
+
+                      <p className="mt-2 text-[9px] font-black text-[#08566E]">
+                        Rewards
+                      </p>
+                    </button>
+
+                  </div>
 
                 </div>
 
-              </div>
+                {/* ===========================================
+                    SMART MATCH CARD
+                ============================================ */}
 
-              {/* metrics */}
+                <div className="px-5 mt-5">
 
-              <div className="grid grid-cols-3 gap-2.5 mt-3">
+                  <div className="flex items-center justify-between mb-3">
 
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-3 text-center">
+                    <h3 className="text-sm font-black text-[#043A4A]">
+                      Smart Assignment
+                    </h3>
 
-                  <FaShieldAlt className="mx-auto text-[#B4DBDC] text-sm" />
+                    <span className="text-[9px] font-black text-green-600">
+                      ACTIVE
+                    </span>
 
-                  <p className="text-white font-black text-sm mt-1">
-                    96%
-                  </p>
+                  </div>
 
-                  <p className="text-[#B4DBDC] text-[8px] font-bold">
-                    Trust
-                  </p>
+                  <div className="bg-white rounded-[24px] border border-[#DCE9E8] p-4 shadow-sm">
+
+                    <div className="flex items-center gap-3">
+
+                      <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-[#08566E] to-[#6FA8AA] flex items-center justify-center text-white text-lg shrink-0">
+
+                        <FaTools />
+
+                        <span className="absolute -right-1 -bottom-1 w-5 h-5 bg-green-500 text-white rounded-full border-2 border-white flex items-center justify-center text-[8px]">
+                          ✓
+                        </span>
+
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+
+                        <p className="text-[9px] text-[#6FA8AA] font-black uppercase">
+                          Best Match
+                        </p>
+
+                        <p className="text-sm font-black text-[#08566E] truncate">
+                          Verified Professional
+                        </p>
+
+                        <div className="flex items-center gap-2 mt-1">
+
+                          <span className="flex items-center gap-1 text-[9px] font-bold text-[#777]">
+                            <FaStar className="text-yellow-500" />
+                            4.9
+                          </span>
+
+                          <span className="text-[#CCC]">
+                            •
+                          </span>
+
+                          <span className="text-[9px] font-bold text-[#777]">
+                            Nearby
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                      <div className="text-right">
+
+                        <p className="text-[9px] text-[#999] font-bold">
+                          Trust
+                        </p>
+
+                        <p className="text-sm font-black text-[#08566E]">
+                          96%
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 mt-4">
+
+                      <div className="rounded-xl bg-[#F2F8F7] p-2 text-center">
+                        <FaMapMarkerAlt className="mx-auto text-[#08566E] text-xs" />
+                        <p className="text-[8px] font-black text-[#6FA8AA] mt-1">
+                          Nearby
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-[#F2F8F7] p-2 text-center">
+                        <FaClock className="mx-auto text-[#08566E] text-xs" />
+                        <p className="text-[8px] font-black text-[#6FA8AA] mt-1">
+                          Quick ETA
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-[#F2F8F7] p-2 text-center">
+                        <FaShieldAlt className="mx-auto text-[#08566E] text-xs" />
+                        <p className="text-[8px] font-black text-[#6FA8AA] mt-1">
+                          Verified
+                        </p>
+                      </div>
+
+                    </div>
+
+                  </div>
 
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-3 text-center">
+                {/* ===========================================
+                    TRUST STRIP
+                ============================================ */}
 
-                  <FaClock className="mx-auto text-[#B4DBDC] text-sm" />
+                <div className="px-5 mt-5">
 
-                  <p className="text-white font-black text-sm mt-1">
-                    20m
-                  </p>
+                  <div className="rounded-2xl bg-[#E9F4F3] border border-[#CFE4E2] p-3 flex items-center gap-3">
 
-                  <p className="text-[#B4DBDC] text-[8px] font-bold">
-                    ETA
-                  </p>
+                    <div className="w-9 h-9 rounded-xl bg-[#08566E] text-white flex items-center justify-center shrink-0">
+                      <FaShieldAlt />
+                    </div>
+
+                    <div className="min-w-0">
+
+                      <p className="text-[10px] font-black text-[#08566E]">
+                        Safe & Trusted Service
+                      </p>
+
+                      <p className="text-[8px] text-[#6A888D] font-semibold mt-0.5">
+                        Verified professionals • Smart assignment • Support
+                      </p>
+
+                    </div>
+
+                    <FaCheckCircle className="ml-auto text-green-500 shrink-0" />
+
+                  </div>
 
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-3 text-center">
+                {/* ===========================================
+                    3-LINE / COMPACT NAVIGATION
+                ============================================ */}
 
-                  <FaRoute className="mx-auto text-[#B4DBDC] text-sm" />
+                <div className="px-5 mt-5">
 
-                  <p className="text-white font-black text-sm mt-1">
-                    1.8 km
-                  </p>
+                  <div className="grid grid-cols-2 gap-2">
 
-                  <p className="text-[#B4DBDC] text-[8px] font-bold">
-                    Distance
-                  </p>
+                    <button
+                      type="button"
+                      onClick={handleServices}
+                      className="flex items-center gap-2 bg-white border border-[#E1EBEA] rounded-xl px-3 py-2.5 text-left"
+                    >
+                      <FaTools className="text-[#08566E] text-xs" />
+                      <span className="text-[9px] font-black text-[#315D67]">
+                        {text.services}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleBookings}
+                      className="flex items-center gap-2 bg-white border border-[#E1EBEA] rounded-xl px-3 py-2.5 text-left"
+                    >
+                      <FaClipboardList className="text-[#08566E] text-xs" />
+                      <span className="text-[9px] font-black text-[#315D67]">
+                        {text.bookings}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleRewards}
+                      className="flex items-center gap-2 bg-white border border-[#E1EBEA] rounded-xl px-3 py-2.5 text-left"
+                    >
+                      <FaGift className="text-[#D98520] text-xs" />
+                      <span className="text-[9px] font-black text-[#315D67]">
+                        {text.rewards}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleProfile}
+                      className="flex items-center gap-2 bg-white border border-[#E1EBEA] rounded-xl px-3 py-2.5 text-left"
+                    >
+                      <FaUser className="text-[#08566E] text-xs" />
+                      <span className="text-[9px] font-black text-[#315D67]">
+                        {text.profile}
+                      </span>
+                    </button>
+
+                  </div>
 
                 </div>
 
-              </div>
+                {/* ===========================================
+                    PHONE BOTTOM NAV
+                ============================================ */}
 
-              {/* pricing */}
+                <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 pt-3 bg-white/90 backdrop-blur-xl border-t border-[#E4ECEB]">
 
-              <div className="mt-3 bg-white/10 border border-white/15 rounded-2xl p-3 flex items-center gap-3">
+                  <div className="flex items-center justify-between">
 
-                <div className="w-9 h-9 rounded-xl bg-[#E1E9E5] text-[#08566E] flex items-center justify-center">
-                  <FaCheckCircle />
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/")}
+                      className="flex flex-col items-center gap-1 w-12 text-[#08566E]"
+                    >
+                      <FaHome className="text-sm" />
+                      <span className="text-[7px] font-black">
+                        Home
+                      </span>
+                    </button>
 
-                <div>
+                    <button
+                      type="button"
+                      onClick={handleServices}
+                      className="flex flex-col items-center gap-1 w-12 text-[#6FA8AA]"
+                    >
+                      <FaTools className="text-sm" />
+                      <span className="text-[7px] font-black">
+                        Services
+                      </span>
+                    </button>
 
-                  <p className="text-white text-xs font-black">
-                    {text.inspection}
-                  </p>
+                    <button
+                      type="button"
+                      onClick={handleBookNow}
+                      className="relative -mt-8 w-14 h-14 rounded-full bg-[#08566E] border-[5px] border-[#F7FAF9] shadow-[0_8px_25px_rgba(8,86,110,0.35)] text-white flex items-center justify-center"
+                    >
+                      <FaBolt />
+                    </button>
 
-                  <p className="text-[#B4DBDC] text-[10px] font-semibold mt-0.5">
-                    Final amount after service inspection
-                  </p>
+                    <button
+                      type="button"
+                      onClick={handleBookings}
+                      className="flex flex-col items-center gap-1 w-12 text-[#6FA8AA]"
+                    >
+                      <FaClipboardList className="text-sm" />
+                      <span className="text-[7px] font-black">
+                        Bookings
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleProfile}
+                      className="flex flex-col items-center gap-1 w-12 text-[#6FA8AA]"
+                    >
+                      <FaUser className="text-sm" />
+                      <span className="text-[7px] font-black">
+                        Profile
+                      </span>
+                    </button>
+
+                  </div>
 
                 </div>
 
               </div>
 
             </div>
+
+            {/* Phone shadow */}
+
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[75%] h-12 bg-[#08566E]/20 blur-2xl rounded-full" />
+
           </div>
-
-          {/* =================================================
-              TRUST STRIP
-          ================================================= */}
-
-          <div className="grid grid-cols-3 gap-2.5 mt-5">
-
-            <div className="bg-white border border-[#E0ECEA] rounded-2xl p-3 text-center">
-
-              <FaShieldAlt className="mx-auto text-[#08566E]" />
-
-              <p className="text-[#08566E] text-[10px] font-black mt-1">
-                Verified
-              </p>
-
-            </div>
-
-            <div className="bg-white border border-[#E0ECEA] rounded-2xl p-3 text-center">
-
-              <FaMapMarkerAlt className="mx-auto text-[#08566E]" />
-
-              <p className="text-[#08566E] text-[10px] font-black mt-1">
-                Hyperlocal
-              </p>
-
-            </div>
-
-            <div className="bg-white border border-[#E0ECEA] rounded-2xl p-3 text-center">
-
-              <FaHeadset className="mx-auto text-[#08566E]" />
-
-              <p className="text-[#08566E] text-[10px] font-black mt-1">
-                24/7 Support
-              </p>
-
-            </div>
-
-          </div>
-
-          {/* =================================================
-              MAIN CTA
-          ================================================= */}
-
-          <button
-            type="button"
-            onClick={handleBookNow}
-            className="w-full mt-5 bg-[#08566E] hover:bg-[#06485C] active:scale-[0.98] text-[#E1E9E5] py-4 rounded-2xl font-black flex items-center justify-center gap-3 shadow-[0_12px_30px_rgba(8,86,110,0.25)] transition"
-          >
-
-            <FaBolt />
-
-            {text.bookNow}
-
-            <FaArrowRight className="text-sm" />
-
-          </button>
 
         </div>
 
-        {/* =================================================
-            3-BUTTON APP NAVIGATION
-        ================================================= */}
+        {/* ===================================================
+            OUTSIDE QUICK FEATURES
+        ==================================================== */}
 
-        <div className="absolute left-3 right-3 bottom-3 z-50">
+        <div className="mt-12 max-w-3xl mx-auto grid grid-cols-3 gap-3">
 
-          <div className="bg-white/90 backdrop-blur-2xl border border-white rounded-[26px] shadow-[0_15px_45px_rgba(8,86,110,0.20)] p-2">
+          <div className="bg-white/75 backdrop-blur-xl rounded-2xl p-4 text-center border border-white shadow-sm">
 
-            <div className="grid grid-cols-3 gap-1">
+            <FaShieldAlt className="mx-auto text-[#08566E]" />
 
-              {/* SERVICES */}
+            <p className="mt-2 text-xs font-black text-[#08566E]">
+              Verified
+            </p>
 
-              <button
-                type="button"
-                onClick={handleServices}
-                className="group flex flex-col items-center justify-center gap-1 py-2.5 rounded-2xl bg-[#E8F5F3] text-[#08566E] active:scale-95 transition"
-              >
+            <p className="text-[9px] text-[#6A888D] font-semibold mt-1">
+              Professionals
+            </p>
 
-                <FaTools className="text-base" />
+          </div>
 
-                <span className="text-[9px] font-black">
-                  {text.allServices}
-                </span>
+          <div className="bg-white/75 backdrop-blur-xl rounded-2xl p-4 text-center border border-white shadow-sm">
 
-              </button>
+            <FaRoute className="mx-auto text-[#08566E]" />
 
-              {/* SMART MATCH */}
+            <p className="mt-2 text-xs font-black text-[#08566E]">
+              Hyperlocal
+            </p>
 
-              <button
-                type="button"
-                onClick={handleSmartMatch}
-                className="group flex flex-col items-center justify-center gap-1 py-2.5 rounded-2xl bg-[#08566E] text-white active:scale-95 transition shadow-md"
-              >
+            <p className="text-[9px] text-[#6A888D] font-semibold mt-1">
+              Nearby service
+            </p>
 
-                <FaUserCheck className="text-base" />
+          </div>
 
-                <span className="text-[9px] font-black">
-                  {text.smartMatch}
-                </span>
+          <div className="bg-white/75 backdrop-blur-xl rounded-2xl p-4 text-center border border-white shadow-sm">
 
-              </button>
+            <FaHeadset className="mx-auto text-[#08566E]" />
 
-              {/* BOOKINGS */}
+            <p className="mt-2 text-xs font-black text-[#08566E]">
+              Support
+            </p>
 
-              <button
-                type="button"
-                onClick={handleBookings}
-                className="group flex flex-col items-center justify-center gap-1 py-2.5 rounded-2xl bg-[#E8F5F3] text-[#08566E] active:scale-95 transition"
-              >
-
-                <FaClipboardList className="text-base" />
-
-                <span className="text-[9px] font-black">
-                  {text.bookings}
-                </span>
-
-              </button>
-
-            </div>
+            <p className="text-[9px] text-[#6A888D] font-semibold mt-1">
+              Service assistance
+            </p>
 
           </div>
 
