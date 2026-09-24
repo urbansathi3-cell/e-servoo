@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { getStoredUser, getStoredWorker } from "./utils/storage";
 
 import Navbar from "./components/Navbar";
@@ -92,9 +92,9 @@ function TopCommandBar({
     <div className="sticky top-[72px] z-30 px-4 py-4">
       <div className="max-w-6xl mx-auto">
         <div className="relative overflow-hidden rounded-3xl bg-[#E1E9E5]/85 backdrop-blur-xl border border-white/80 shadow-2xl">
-          <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#9ECFD0] rounded-full blur-2xl opacity-70"></div>
+          <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#9ECFD0] rounded-full blur-2xl opacity-70" />
 
-          <div className="absolute -bottom-14 -right-12 w-40 h-40 bg-[#6FA8AA] rounded-full blur-2xl opacity-50"></div>
+          <div className="absolute -bottom-14 -right-12 w-40 h-40 bg-[#6FA8AA] rounded-full blur-2xl opacity-50" />
 
           <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
             <div>
@@ -155,9 +155,9 @@ function LoginRequiredModal({
   return (
     <div className="fixed inset-0 z-[200] bg-black/55 backdrop-blur-md flex items-center justify-center px-4">
       <div className="relative w-full max-w-md overflow-hidden rounded-[32px] bg-[#E1E9E5] border border-white/80 shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
-        <div className="absolute -top-16 -left-16 w-40 h-40 bg-[#9ECFD0] rounded-full blur-3xl opacity-80"></div>
+        <div className="absolute -top-16 -left-16 w-40 h-40 bg-[#9ECFD0] rounded-full blur-3xl opacity-80" />
 
-        <div className="absolute -bottom-20 -right-16 w-52 h-52 bg-[#6FA8AA] rounded-full blur-3xl opacity-70"></div>
+        <div className="absolute -bottom-20 -right-16 w-52 h-52 bg-[#6FA8AA] rounded-full blur-3xl opacity-70" />
 
         <div className="relative p-7 text-center">
           <div className="w-20 h-20 mx-auto rounded-3xl bg-[#08566E] text-[#E1E9E5] flex items-center justify-center text-4xl shadow-xl">
@@ -169,8 +169,9 @@ function LoginRequiredModal({
           </h2>
 
           <p className="text-[#08566E] font-bold mt-3 leading-relaxed">
-            Worker booking ke liye pehle customer login required hai. Login ke
-            baad selected worker ka booking form automatically open ho jayega.
+            Worker booking ke liye pehle customer login required hai. Login
+            ke baad selected worker ka booking form automatically open ho
+            jayega.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mt-7">
@@ -207,17 +208,30 @@ function HomePage({
   showWelcome,
   setShowWelcome,
   workerLoggedIn,
-
-  // NEW
   customerLocation,
   setCustomerLocation,
 }) {
-  if (showWelcome) {
-    return <Welcome setShowWelcome={setShowWelcome} />;
-  }
+  /*
+   * ============================================================
+   * WORKER MODE
+   * ============================================================
+   *
+   * This is an additional safety layer.
+   *
+   * App.jsx already handles worker mode globally,
+   * but keeping this check here makes HomePage safe too.
+   */
 
   if (workerLoggedIn) {
-    return <WorkerDashboard language={language} />;
+    return (
+      <div className="min-h-screen w-full bg-[#B4DBDC]">
+        <WorkerDashboard language={language} />
+      </div>
+    );
+  }
+
+  if (showWelcome) {
+    return <Welcome setShowWelcome={setShowWelcome} />;
   }
 
   return (
@@ -228,8 +242,6 @@ function HomePage({
         <BookingForm
           selectedWorker={selectedWorker}
           setSelectedWorker={setSelectedWorker}
-
-          // NEW
           customerLocation={customerLocation}
           setCustomerLocation={setCustomerLocation}
         />
@@ -247,8 +259,6 @@ function HomePage({
           <RevealOnScroll delay={120}>
             <Hero
               language={language}
-
-              // NEW
               customerLocation={customerLocation}
               setCustomerLocation={setCustomerLocation}
             />
@@ -321,24 +331,6 @@ function App() {
    * ============================================================
    * CUSTOMER LOCATION
    * ============================================================
-   *
-   * This state will be shared with:
-   *
-   * Hero
-   * Workers
-   * BookingForm
-   * SmartRecommendations
-   *
-   * Later we will also use it for distance calculation.
-   *
-   * Example:
-   *
-   * {
-   *   address: "Rajgangpur, Odisha",
-   *   latitude: 22.267,
-   *   longitude: 84.897,
-   *   accuracy: 20
-   * }
    */
 
   const [customerLocation, setCustomerLocation] = useState(() => {
@@ -397,10 +389,8 @@ function App() {
 
   /*
    * Save customer location locally.
-   *
-   * This means if the user refreshes the website,
-   * we don't immediately lose the last confirmed location.
    */
+
   useEffect(() => {
     try {
       if (
@@ -421,21 +411,9 @@ function App() {
   }, [customerLocation]);
 
   /*
-   * Listen for location updates from LocationPicker
-   * or any future location component.
-   *
-   * Other components can dispatch:
-   *
-   * window.dispatchEvent(
-   *   new CustomEvent("eservoo-location-updated", {
-   *     detail: {
-   *       address: "...",
-   *       latitude: 22,
-   *       longitude: 84
-   *     }
-   *   })
-   * );
+   * Listen for location updates.
    */
+
   useEffect(() => {
     const handleLocationUpdated = (event) => {
       const location = event?.detail;
@@ -472,6 +450,12 @@ function App() {
     };
   }, []);
 
+  /*
+   * ============================================================
+   * APP LOADING
+   * ============================================================
+   */
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setAppLoading(false);
@@ -480,9 +464,23 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  /*
+   * ============================================================
+   * CUSTOMER LOGIN EVENT
+   * ============================================================
+   */
+
   useEffect(() => {
     const openCustomerLogin = () => {
       const currentUser = getStoredUser();
+
+      /*
+       * IMPORTANT:
+       * Worker mode should never open customer login.
+       */
+      if (getStoredWorker()) {
+        return;
+      }
 
       if (currentUser) {
         setIsLoggedIn(true);
@@ -518,6 +516,12 @@ function App() {
     };
   }, []);
 
+  /*
+   * ============================================================
+   * LANGUAGE
+   * ============================================================
+   */
+
   const changeLanguage = (lang) => {
     if (
       lang !== "en" &&
@@ -531,7 +535,20 @@ function App() {
     localStorage.setItem("lang", lang);
   };
 
+  /*
+   * ============================================================
+   * WORKER SELECTION
+   * ============================================================
+   */
+
   const handleWorkerSelect = (worker) => {
+    /*
+     * Worker cannot book another worker.
+     */
+    if (workerLoggedIn) {
+      return;
+    }
+
     if (!isLoggedIn) {
       setPendingWorker(worker);
       setShowLoginRequired(true);
@@ -541,12 +558,32 @@ function App() {
     setSelectedWorker(worker);
   };
 
+  /*
+   * ============================================================
+   * CUSTOMER LOGIN SCREEN
+   * ============================================================
+   */
+
   const openLoginScreen = () => {
     setShowLoginRequired(false);
     setShowLoginScreen(true);
   };
 
+  /*
+   * ============================================================
+   * CUSTOMER LOGIN STATE
+   * ============================================================
+   */
+
   const handleCustomerLoginState = (value) => {
+    /*
+     * Never allow customer login state to replace
+     * an already authenticated worker session.
+     */
+    if (getStoredWorker()) {
+      return;
+    }
+
     setIsLoggedIn(value);
 
     if (value) {
@@ -559,20 +596,93 @@ function App() {
     }
   };
 
+  /*
+   * ============================================================
+   * WORKER LOGIN STATE
+   * ============================================================
+   */
+
   const handleWorkerLoginState = (value) => {
-    setWorkerLoggedIn(value);
+    setWorkerLoggedIn(Boolean(value));
 
     if (value) {
+      /*
+       * WORKER MODE RESET
+       *
+       * Remove every customer-only UI state.
+       */
       setShowLoginScreen(false);
       setShowLoginRequired(false);
+
       setPendingWorker(null);
       setSelectedWorker(null);
+
+      setShowWelcome(false);
+
+      /*
+       * Customer state is intentionally not used
+       * while worker mode is active.
+       */
+      setIsLoggedIn(false);
+
+      /*
+       * Make sure customer login trigger cannot
+       * reopen immediately after worker login.
+       */
+      localStorage.removeItem("openCustomerLogin");
     }
   };
+
+  /*
+   * ============================================================
+   * LOADER
+   * ============================================================
+   */
 
   if (appLoading) {
     return <Loader />;
   }
+
+  /*
+   * ============================================================
+   * WORKER MODE — COMPLETE ISOLATION
+   * ============================================================
+   *
+   * THIS IS THE MAIN FIX.
+   *
+   * If worker is logged in, we return here BEFORE:
+   *
+   * AIAssistant
+   * Navbar
+   * Routes
+   * FooterNav
+   * LoginRequiredModal
+   * Customer UI
+   *
+   * can render.
+   */
+
+  if (workerLoggedIn) {
+    return (
+      <div
+        data-theme="light"
+        className="min-h-screen w-full bg-[#B4DBDC] text-[#08566E] overflow-x-hidden"
+        style={{
+          colorScheme: "only light",
+          backgroundColor: "#B4DBDC",
+          color: "#08566E",
+        }}
+      >
+        <WorkerDashboard language={language} />
+      </div>
+    );
+  }
+
+  /*
+   * ============================================================
+   * CUSTOMER AUTH SCREEN
+   * ============================================================
+   */
 
   if (showLoginScreen) {
     return (
@@ -582,6 +692,12 @@ function App() {
       />
     );
   }
+
+  /*
+   * ============================================================
+   * CUSTOMER APP
+   * ============================================================
+   */
 
   return (
     <>
@@ -599,6 +715,10 @@ function App() {
         }}
       >
         <Routes>
+          {/* ================================================= */}
+          {/* HOME */}
+          {/* ================================================= */}
+
           <Route
             path="/"
             element={
@@ -614,13 +734,15 @@ function App() {
                 showWelcome={showWelcome}
                 setShowWelcome={setShowWelcome}
                 workerLoggedIn={workerLoggedIn}
-
-                // NEW
                 customerLocation={customerLocation}
                 setCustomerLocation={setCustomerLocation}
               />
             }
           />
+
+          {/* ================================================= */}
+          {/* CUSTOMER PROFILE */}
+          {/* ================================================= */}
 
           <Route
             path="/profile"
@@ -636,15 +758,27 @@ function App() {
             }
           />
 
+          {/* ================================================= */}
+          {/* CONTACT */}
+          {/* ================================================= */}
+
           <Route
             path="/contact"
             element={<Contact language={language} />}
           />
 
+          {/* ================================================= */}
+          {/* TERMS */}
+          {/* ================================================= */}
+
           <Route
             path="/terms"
             element={<Terms language={language} />}
           />
+
+          {/* ================================================= */}
+          {/* CUSTOMER DASHBOARD */}
+          {/* ================================================= */}
 
           <Route
             path="/dashboard"
@@ -663,6 +797,10 @@ function App() {
             }
           />
 
+          {/* ================================================= */}
+          {/* CUSTOMER BOOKINGS */}
+          {/* ================================================= */}
+
           <Route
             path="/bookings"
             element={
@@ -680,10 +818,18 @@ function App() {
             }
           />
 
+          {/* ================================================= */}
+          {/* REWARDS */}
+          {/* ================================================= */}
+
           <Route
             path="/rewards"
             element={<Rewards />}
           />
+
+          {/* ================================================= */}
+          {/* WORKER LOGIN */}
+          {/* ================================================= */}
 
           <Route
             path="/worker-login"
@@ -695,14 +841,27 @@ function App() {
             }
           />
 
+          {/* ================================================= */}
+          {/* WORKER DASHBOARD */}
+          {/* ================================================= */}
+
           <Route
             path="/worker-dashboard"
             element={
-              <WorkerDashboard
-                language={language}
-              />
+              workerLoggedIn ? (
+                <WorkerDashboard language={language} />
+              ) : (
+                <Navigate
+                  to="/worker-login"
+                  replace
+                />
+              )
             }
           />
+
+          {/* ================================================= */}
+          {/* SERVICES / WORKERS */}
+          {/* ================================================= */}
 
           <Route
             path="/services"
@@ -711,8 +870,6 @@ function App() {
                 <BookingForm
                   selectedWorker={selectedWorker}
                   setSelectedWorker={setSelectedWorker}
-
-                  // NEW
                   customerLocation={customerLocation}
                   setCustomerLocation={setCustomerLocation}
                 />
@@ -721,8 +878,6 @@ function App() {
                   language={language}
                   setSelectedWorker={handleWorkerSelect}
                   selectedService={selectedService}
-
-                  // NEW
                   customerLocation={customerLocation}
                 />
               )
@@ -730,12 +885,20 @@ function App() {
           />
         </Routes>
 
+        {/* =================================================== */}
+        {/* CUSTOMER FOOTER ONLY */}
+        {/* =================================================== */}
+
         {!selectedWorker && !showLoginScreen && (
           <FooterNav />
         )}
       </div>
 
-      {showLoginRequired && (
+      {/* ===================================================== */}
+      {/* CUSTOMER LOGIN REQUIRED MODAL ONLY */}
+      {/* ===================================================== */}
+
+      {showLoginRequired && !workerLoggedIn && (
         <LoginRequiredModal
           onClose={() => {
             setShowLoginRequired(false);
