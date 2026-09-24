@@ -38,7 +38,6 @@ function Workers({
   );
 
   const [loading, setLoading] = useState(true);
-
   const [detailsWorker, setDetailsWorker] = useState(null);
 
   /* =====================================================
@@ -74,7 +73,6 @@ function Workers({
           console.error("Workers fetch error:", error);
 
           setWorkers([]);
-
           setLoading(false);
         });
     };
@@ -345,7 +343,7 @@ function Workers({
   };
 
   /* =====================================================
-     PREPARE WORKER FOR BOOKING FORM
+     PREPARE WORKER FOR BOOKING
   ====================================================== */
 
   const prepareWorkerForBooking = (worker) => {
@@ -492,14 +490,14 @@ function Workers({
   const WorkerSkeleton = () => {
     return (
       <div className="relative aspect-square overflow-hidden rounded-[24px] border border-white/70 bg-[#E1E9E5]/70 shadow-xl animate-pulse">
-        <div className="absolute top-0 left-0 right-0 h-[52%] bg-[#08566E]/25"></div>
+        <div className="absolute top-0 left-0 right-0 h-[52%] bg-[#08566E]/25" />
 
         <div className="absolute left-3 right-3 bottom-3">
-          <div className="h-5 w-3/4 rounded-full bg-[#08566E]/20"></div>
+          <div className="h-5 w-3/4 rounded-full bg-[#08566E]/20" />
 
-          <div className="h-4 w-1/2 rounded-full bg-[#08566E]/20 mt-2"></div>
+          <div className="h-4 w-1/2 rounded-full bg-[#08566E]/20 mt-2" />
 
-          <div className="h-4 w-2/3 rounded-full bg-[#08566E]/20 mt-3"></div>
+          <div className="h-4 w-2/3 rounded-full bg-[#08566E]/20 mt-3" />
         </div>
       </div>
     );
@@ -517,9 +515,9 @@ function Workers({
       >
         {/* BACKGROUND GLOW */}
 
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#08566E]/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#08566E]/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#6FA8AA]/30 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#6FA8AA]/30 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-7xl mx-auto">
 
@@ -748,24 +746,14 @@ function Workers({
 
               {visibleWorkers.map((worker, index) => {
 
-                const workerName =
-                  getWorkerName(worker);
-
-                const workerService =
-                  getWorkerService(worker);
-
-                const workerImage =
-                  getWorkerImage(worker);
-
-                const available =
-                  isAvailable(worker);
+                const workerName = getWorkerName(worker);
+                const workerService = getWorkerService(worker);
+                const workerImage = getWorkerImage(worker);
+                const available = isAvailable(worker);
 
                 return (
                   <button
-                    key={getWorkerKey(
-                      worker,
-                      index
-                    )}
+                    key={getWorkerKey(worker, index)}
                     type="button"
                     onClick={() =>
                       openWorkerDetails(worker)
@@ -808,7 +796,7 @@ function Workers({
 
                     {/* IMAGE GRADIENT */}
 
-                    <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
+                    <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
                     {/* STATUS */}
 
@@ -851,9 +839,7 @@ function Workers({
                       </h3>
 
                       <p className="text-[#D9F4F2] text-xs md:text-sm font-bold mt-1 line-clamp-1">
-                        {getServiceText(
-                          workerService
-                        )}
+                        {getServiceText(workerService)}
                       </p>
 
                       <div className="flex items-center gap-1 text-[10px] md:text-xs text-white/90 font-semibold mt-1">
@@ -893,7 +879,7 @@ function Workers({
             aria-label="Close worker details"
             onClick={closeWorkerDetails}
             className="absolute inset-0 cursor-default"
-          ></button>
+          />
 
           {/* MODAL */}
 
@@ -940,7 +926,7 @@ function Workers({
 
               )}
 
-              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent"></div>
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent" />
 
               {/* WORKER NAME */}
 
@@ -990,9 +976,7 @@ function Workers({
 
             <div className="p-5 pb-7">
 
-              {/* =================================================
-                  RATING / TRUST / LOCATION
-              ================================================== */}
+              {/* RATING / TRUST / LOCATION */}
 
               <div className="grid grid-cols-3 gap-2">
 
@@ -1005,9 +989,7 @@ function Workers({
                   </p>
 
                   <p className="font-black text-[#08566E]">
-                    {getWorkerRating(
-                      detailsWorker
-                    )}
+                    {getWorkerRating(detailsWorker)}
                   </p>
 
                 </div>
@@ -1021,9 +1003,7 @@ function Workers({
                   </p>
 
                   <p className="font-black text-[#08566E]">
-                    {getTrustScore(
-                      detailsWorker
-                    )}
+                    {getTrustScore(detailsWorker)}
                     %
                   </p>
 
@@ -1038,18 +1018,14 @@ function Workers({
                   </p>
 
                   <p className="font-black text-[#08566E] text-xs truncate">
-                    {getWorkerLocation(
-                      detailsWorker
-                    )}
+                    {getWorkerLocation(detailsWorker)}
                   </p>
 
                 </div>
 
               </div>
 
-              {/* =================================================
-                  PROFESSIONAL DETAILS
-              ================================================== */}
+              {/* PROFESSIONAL DETAILS */}
 
               <div className="mt-4 bg-white rounded-3xl p-4 border border-[#B4DBDC] shadow-sm">
 
@@ -1085,9 +1061,7 @@ function Workers({
 
                     <span className="text-[#08566E] font-black text-sm text-right">
                       {getServiceText(
-                        getWorkerService(
-                          detailsWorker
-                        )
+                        getWorkerService(detailsWorker)
                       )}
                     </span>
 
@@ -1095,9 +1069,7 @@ function Workers({
 
                   {/* EXPERIENCE */}
 
-                  {getExperience(
-                    detailsWorker
-                  ) && (
+                  {getExperience(detailsWorker) && (
 
                     <div className="flex items-center justify-between gap-3">
 
@@ -1106,10 +1078,7 @@ function Workers({
                       </span>
 
                       <span className="text-[#08566E] font-black text-sm">
-                        {getExperience(
-                          detailsWorker
-                        )}{" "}
-                        years
+                        {getExperience(detailsWorker)} years
                       </span>
 
                     </div>
@@ -1125,9 +1094,7 @@ function Workers({
                     </span>
 
                     <span className="text-[#08566E] font-black text-sm text-right">
-                      {getWorkerLocation(
-                        detailsWorker
-                      )}
+                      {getWorkerLocation(detailsWorker)}
                     </span>
 
                   </div>
@@ -1142,16 +1109,12 @@ function Workers({
 
                     <span
                       className={`font-black text-sm ${
-                        isAvailable(
-                          detailsWorker
-                        )
+                        isAvailable(detailsWorker)
                           ? "text-green-600"
                           : "text-red-500"
                       }`}
                     >
-                      {isAvailable(
-                        detailsWorker
-                      )
+                      {isAvailable(detailsWorker)
                         ? "Available Now"
                         : "Currently Busy"}
                     </span>
@@ -1229,38 +1192,27 @@ function Workers({
                   CERTIFICATE
               ================================================== */}
 
-              {getCertificateLink(
-                detailsWorker
-              ) && (
+              {getCertificateLink(detailsWorker) && (
 
                 <a
-                  href={getCertificateLink(
-                    detailsWorker
-                  )}
+                  href={getCertificateLink(detailsWorker)}
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => {
                     pushEvent(
                       "worker_certificate_click",
                       {
-                        worker_id:
-                          getWorkerId(
-                            detailsWorker
-                          ),
+                        worker_id: getWorkerId(detailsWorker),
                         worker_service:
-                          getWorkerService(
-                            detailsWorker
-                          ),
+                          getWorkerService(detailsWorker),
                       }
                     );
                   }}
                   className="mt-4 w-full bg-white border border-[#B4DBDC] rounded-2xl px-4 py-3 flex items-center justify-center gap-2 text-[#08566E] font-black shadow-sm hover:bg-[#F4FAF9] transition"
                 >
-
                   <FaCertificate />
 
                   View Verified Skill Certificate
-
                 </a>
 
               )}
@@ -1271,13 +1223,9 @@ function Workers({
 
               <button
                 type="button"
-                disabled={
-                  !isAvailable(detailsWorker)
-                }
+                disabled={!isAvailable(detailsWorker)}
                 onClick={() =>
-                  handleBookWorker(
-                    detailsWorker
-                  )
+                  handleBookWorker(detailsWorker)
                 }
                 className={`mt-5 w-full py-4 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-2 transition ${
                   isAvailable(detailsWorker)
@@ -1285,13 +1233,11 @@ function Workers({
                     : "bg-gray-400 text-white cursor-not-allowed"
                 }`}
               >
-
                 <FaBolt />
 
                 {isAvailable(detailsWorker)
                   ? "Book Now"
                   : "Worker Currently Busy"}
-
               </button>
 
               {/* FOOTNOTE */}
