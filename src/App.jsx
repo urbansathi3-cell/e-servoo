@@ -26,6 +26,147 @@ import Welcome from "./components/Welcome";
 import WorkerLogin from "./components/WorkerLogin";
 import WorkerDashboard from "./components/WorkerDashboard";
 
+
+// =====
+// LOCATION CONFIG
+// =====
+
+const LOCATION_STORAGE_KEY = "e-servoo-user-location";
+
+
+// =====
+// SAVE USER LOCATION
+// =====
+
+function saveUserLocation(position) {
+  if (!position?.coords) return;
+
+  const latitude = Number(position.coords.latitude);
+  const longitude = Number(position.coords.longitude);
+  const accuracy = Number(position.coords.accuracy || 0);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
+    return;
+  }
+
+  const locationData = {
+    latitude,
+    longitude,
+    accuracy,
+    timestamp: Date.now(),
+  };
+
+  localStorage.setItem(
+    LOCATION_STORAGE_KEY,
+    JSON.stringify(locationData)
+  );
+
+  window.dispatchEvent(
+    new CustomEvent("location-updated", {
+      detail: locationData,
+    })
+  );
+}
+
+
+// =====
+// REQUEST USER LOCATION
+// =====
+
+async function requestUserLocation() {
+  if (!navigator.geolocation) {
+    console.warn(
+      "E-SERVOO: Geolocation is not supported by this browser."
+    );
+
+    window.dispatchEvent(
+      new CustomEvent("location-unavailable")
+    );
+
+    return;
+  }
+
+  const requestLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log(
+          "E-SERVOO: User location received."
+        );
+
+        saveUserLocation(position);
+      },
+
+      (error) => {
+        console.warn(
+          "E-SERVOO: Location permission/error:",
+          error
+        );
+
+        window.dispatchEvent(
+          new CustomEvent("location-error", {
+            detail: error,
+          })
+        );
+      },
+
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 5 * 60 * 1000,
+      }
+    );
+  };
+
+  if (navigator.permissions?.query) {
+    try {
+      const permission =
+        await navigator.permissions.query({
+          name: "geolocation",
+        });
+
+      if (
+        permission.state === "granted" ||
+        permission.state === "prompt"
+      ) {
+        requestLocation();
+        return;
+      }
+
+      if (permission.state === "denied") {
+        console.warn(
+          "E-SERVOO: Location permission is denied."
+        );
+
+        window.dispatchEvent(
+          new CustomEvent(
+            "location-permission-denied"
+          )
+        );
+
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        "E-SERVOO: Permission API unavailable.",
+        error
+      );
+
+      requestLocation();
+      return;
+    }
+  }
+
+  requestLocation();
+}
+
+
+// =====
+// REVEAL ON SCROLL
+// =====
+
 function RevealOnScroll({
   children,
   delay = 0,
@@ -76,77 +217,10 @@ function RevealOnScroll({
   );
 }
 
-function TopCommandBar({
-  language,
-  changeLanguage,
-  seniorMode,
-  setSeniorMode,
-}) {
-  const langButtons = [
-    { id: "en", label: "EN" },
-    { id: "hi", label: "HI" },
-    { id: "od", label: "OD" },
-  ];
 
-  return (
-    <div className="sticky top-[72px] z-30 px-4 py-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="relative overflow-hidden rounded-3xl bg-[#E1E9E5]/85 backdrop-blur-xl border border-white/80 shadow-2xl">
-          <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#9ECFD0] rounded-full blur-2xl opacity-70" />
-
-          <div className="absolute -bottom-14 -right-12 w-40 h-40 bg-[#6FA8AA] rounded-full blur-2xl opacity-50" />
-
-          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
-            <div>
-              <p className="text-[#08566E] text-sm font-black">
-                ⚡ Quick Controls
-              </p>
-
-              <p className="text-[#06485C] text-xs md:text-sm font-bold mt-1">
-                Choose language and accessibility mode instantly.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-              <div className="flex items-center gap-2 bg-white/70 border border-[#B4DBDC] rounded-2xl p-2 shadow-md">
-                <span className="text-[#08566E] font-black text-sm px-2">
-                  🌐
-                </span>
-
-                {langButtons.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => changeLanguage(item.id)}
-                    className={`px-4 py-2 rounded-xl font-black text-sm transition ${
-                      language === item.id
-                        ? "bg-[#08566E] text-[#E1E9E5] shadow-lg"
-                        : "bg-transparent text-[#08566E] hover:bg-[#B4DBDC]"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSeniorMode(!seniorMode)}
-                className={`px-5 py-3 rounded-2xl font-black shadow-lg transition ${
-                  seniorMode
-                    ? "bg-[#08566E] text-[#E1E9E5]"
-                    : "bg-[#F6F8F7] text-[#08566E] border border-[#6FA8AA]"
-                }`}
-              >
-                👴 {seniorMode ? "Normal Mode" : "Senior Mode"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// =====
+// LOGIN REQUIRED MODAL
+// =====
 
 function LoginRequiredModal({
   onClose,
@@ -155,11 +229,13 @@ function LoginRequiredModal({
   return (
     <div className="fixed inset-0 z-[200] bg-black/55 backdrop-blur-md flex items-center justify-center px-4">
       <div className="relative w-full max-w-md overflow-hidden rounded-[32px] bg-[#E1E9E5] border border-white/80 shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
+
         <div className="absolute -top-16 -left-16 w-40 h-40 bg-[#9ECFD0] rounded-full blur-3xl opacity-80" />
 
         <div className="absolute -bottom-20 -right-16 w-52 h-52 bg-[#6FA8AA] rounded-full blur-3xl opacity-70" />
 
         <div className="relative p-7 text-center">
+
           <div className="w-20 h-20 mx-auto rounded-3xl bg-[#08566E] text-[#E1E9E5] flex items-center justify-center text-4xl shadow-xl">
             🔐
           </div>
@@ -169,12 +245,13 @@ function LoginRequiredModal({
           </h2>
 
           <p className="text-[#08566E] font-bold mt-3 leading-relaxed">
-            Worker booking ke liye pehle customer login required hai. Login
-            ke baad selected worker ka booking form automatically open ho
-            jayega.
+            Worker booking ke liye pehle customer login required
+            hai. Login ke baad selected worker ka booking form
+            automatically open ho jayega.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mt-7">
+
             <button
               type="button"
               onClick={onClose}
@@ -190,477 +267,40 @@ function LoginRequiredModal({
             >
               Login
             </button>
+
           </div>
+
         </div>
       </div>
     </div>
   );
 }
 
+
+// =====
+// HOME PAGE
+// =====
+
 function HomePage({
   seniorMode,
   setSeniorMode,
   setSelectedService,
+  selectedService,
   selectedWorker,
   setSelectedWorker,
   language,
-  changeLanguage,
   showWelcome,
   setShowWelcome,
   workerLoggedIn,
   customerLocation,
   setCustomerLocation,
+  changeLanguage,
+  handleWorkerSelect,
 }) {
-  /*
-   * ============================================================
-   * WORKER MODE
-   * ============================================================
-   *
-   * This is an additional safety layer.
-   *
-   * App.jsx already handles worker mode globally,
-   * but keeping this check here makes HomePage safe too.
-   */
 
-  if (workerLoggedIn) {
-    return (
-      <div className="min-h-screen w-full bg-[#B4DBDC]">
-        <WorkerDashboard language={language} />
-      </div>
-    );
-  }
-
-  if (showWelcome) {
-    return <Welcome setShowWelcome={setShowWelcome} />;
-  }
-
-  return (
-    <>
-      <Navbar />
-
-      {selectedWorker ? (
-        <BookingForm
-          selectedWorker={selectedWorker}
-          setSelectedWorker={setSelectedWorker}
-          customerLocation={customerLocation}
-          setCustomerLocation={setCustomerLocation}
-        />
-      ) : (
-        <>
-          <RevealOnScroll delay={0}>
-            <TopCommandBar
-              language={language}
-              changeLanguage={changeLanguage}
-              seniorMode={seniorMode}
-              setSeniorMode={setSeniorMode}
-            />
-          </RevealOnScroll>
-
-          <RevealOnScroll delay={120}>
-            <Hero
-              language={language}
-              customerLocation={customerLocation}
-              setCustomerLocation={setCustomerLocation}
-            />
-          </RevealOnScroll>
-
-          <RevealOnScroll delay={180}>
-            <Stats />
-          </RevealOnScroll>
-
-          <RevealOnScroll delay={240}>
-            <WorkerOfMonth language={language} />
-          </RevealOnScroll>
-
-          <RevealOnScroll delay={300}>
-            <Services
-              language={language}
-              setSelectedService={setSelectedService}
-            />
-          </RevealOnScroll>
-
-          <RevealOnScroll delay={360}>
-            <WhatsappButton />
-          </RevealOnScroll>
-        </>
-      )}
-    </>
-  );
-}
-
-function App() {
-  const savedUser = getStoredUser();
-  const savedWorker = getStoredWorker();
-
-  const [appLoading, setAppLoading] = useState(true);
-
-  const [selectedService, setSelectedService] = useState("All");
-  const [selectedWorker, setSelectedWorker] = useState(null);
-  const [pendingWorker, setPendingWorker] = useState(null);
-
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [showLoginScreen, setShowLoginScreen] = useState(false);
-  const [showLoginRequired, setShowLoginRequired] = useState(false);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return Boolean(savedUser);
-  });
-
-  const [workerLoggedIn, setWorkerLoggedIn] = useState(() => {
-    return Boolean(savedWorker);
-  });
-
-  const [seniorMode, setSeniorMode] = useState(false);
-
-  const [language, setLanguage] = useState(() => {
-    const savedLang = localStorage.getItem("lang");
-
-    if (
-      savedLang === "en" ||
-      savedLang === "hi" ||
-      savedLang === "od"
-    ) {
-      return savedLang;
-    }
-
-    localStorage.setItem("lang", "en");
-    return "en";
-  });
-
-  /*
-   * ============================================================
-   * CUSTOMER LOCATION
-   * ============================================================
-   */
-
-  const [customerLocation, setCustomerLocation] = useState(() => {
-    try {
-      const savedLocation = localStorage.getItem(
-        "eservoo_customer_location"
-      );
-
-      if (!savedLocation) {
-        return {
-          address: "",
-          latitude: null,
-          longitude: null,
-          accuracy: null,
-        };
-      }
-
-      const parsed = JSON.parse(savedLocation);
-
-      if (
-        typeof parsed !== "object" ||
-        parsed === null
-      ) {
-        throw new Error("Invalid saved location");
-      }
-
-      return {
-        address: parsed.address || "",
-        latitude:
-          typeof parsed.latitude === "number"
-            ? parsed.latitude
-            : null,
-        longitude:
-          typeof parsed.longitude === "number"
-            ? parsed.longitude
-            : null,
-        accuracy:
-          typeof parsed.accuracy === "number"
-            ? parsed.accuracy
-            : null,
-      };
-    } catch (error) {
-      console.warn(
-        "Unable to restore customer location:",
-        error
-      );
-
-      return {
-        address: "",
-        latitude: null,
-        longitude: null,
-        accuracy: null,
-      };
-    }
-  });
-
-  /*
-   * Save customer location locally.
-   */
-
-  useEffect(() => {
-    try {
-      if (
-        customerLocation &&
-        typeof customerLocation === "object"
-      ) {
-        localStorage.setItem(
-          "eservoo_customer_location",
-          JSON.stringify(customerLocation)
-        );
-      }
-    } catch (error) {
-      console.warn(
-        "Unable to save customer location:",
-        error
-      );
-    }
-  }, [customerLocation]);
-
-  /*
-   * Listen for location updates.
-   */
-
-  useEffect(() => {
-    const handleLocationUpdated = (event) => {
-      const location = event?.detail;
-
-      if (!location) return;
-
-      setCustomerLocation({
-        address: location.address || "",
-        latitude:
-          typeof location.latitude === "number"
-            ? location.latitude
-            : null,
-        longitude:
-          typeof location.longitude === "number"
-            ? location.longitude
-            : null,
-        accuracy:
-          typeof location.accuracy === "number"
-            ? location.accuracy
-            : null,
-      });
-    };
-
-    window.addEventListener(
-      "eservoo-location-updated",
-      handleLocationUpdated
-    );
-
-    return () => {
-      window.removeEventListener(
-        "eservoo-location-updated",
-        handleLocationUpdated
-      );
-    };
-  }, []);
-
-  /*
-   * ============================================================
-   * APP LOADING
-   * ============================================================
-   */
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAppLoading(false);
-    }, 1800);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  /*
-   * ============================================================
-   * CUSTOMER LOGIN EVENT
-   * ============================================================
-   */
-
-  useEffect(() => {
-    const openCustomerLogin = () => {
-      const currentUser = getStoredUser();
-
-      /*
-       * IMPORTANT:
-       * Worker mode should never open customer login.
-       */
-      if (getStoredWorker()) {
-        return;
-      }
-
-      if (currentUser) {
-        setIsLoggedIn(true);
-        localStorage.removeItem("openCustomerLogin");
-        return;
-      }
-
-      setShowWelcome(false);
-      setShowLoginRequired(false);
-      setPendingWorker(null);
-      setSelectedWorker(null);
-      setShowLoginScreen(true);
-
-      localStorage.removeItem("openCustomerLogin");
-    };
-
-    window.addEventListener(
-      "open-customer-login",
-      openCustomerLogin
-    );
-
-    if (
-      localStorage.getItem("openCustomerLogin") === "true"
-    ) {
-      openCustomerLogin();
-    }
-
-    return () => {
-      window.removeEventListener(
-        "open-customer-login",
-        openCustomerLogin
-      );
-    };
-  }, []);
-
-  /*
-   * ============================================================
-   * LANGUAGE
-   * ============================================================
-   */
-
-  const changeLanguage = (lang) => {
-    if (
-      lang !== "en" &&
-      lang !== "hi" &&
-      lang !== "od"
-    ) {
-      return;
-    }
-
-    setLanguage(lang);
-    localStorage.setItem("lang", lang);
-  };
-
-  /*
-   * ============================================================
-   * WORKER SELECTION
-   * ============================================================
-   */
-
-  const handleWorkerSelect = (worker) => {
-    /*
-     * Worker cannot book another worker.
-     */
-    if (workerLoggedIn) {
-      return;
-    }
-
-    if (!isLoggedIn) {
-      setPendingWorker(worker);
-      setShowLoginRequired(true);
-      return;
-    }
-
-    setSelectedWorker(worker);
-  };
-
-  /*
-   * ============================================================
-   * CUSTOMER LOGIN SCREEN
-   * ============================================================
-   */
-
-  const openLoginScreen = () => {
-    setShowLoginRequired(false);
-    setShowLoginScreen(true);
-  };
-
-  /*
-   * ============================================================
-   * CUSTOMER LOGIN STATE
-   * ============================================================
-   */
-
-  const handleCustomerLoginState = (value) => {
-    /*
-     * Never allow customer login state to replace
-     * an already authenticated worker session.
-     */
-    if (getStoredWorker()) {
-      return;
-    }
-
-    setIsLoggedIn(value);
-
-    if (value) {
-      setShowLoginScreen(false);
-
-      if (pendingWorker) {
-        setSelectedWorker(pendingWorker);
-        setPendingWorker(null);
-      }
-    }
-  };
-
-  /*
-   * ============================================================
-   * WORKER LOGIN STATE
-   * ============================================================
-   */
-
-  const handleWorkerLoginState = (value) => {
-    setWorkerLoggedIn(Boolean(value));
-
-    if (value) {
-      /*
-       * WORKER MODE RESET
-       *
-       * Remove every customer-only UI state.
-       */
-      setShowLoginScreen(false);
-      setShowLoginRequired(false);
-
-      setPendingWorker(null);
-      setSelectedWorker(null);
-
-      setShowWelcome(false);
-
-      /*
-       * Customer state is intentionally not used
-       * while worker mode is active.
-       */
-      setIsLoggedIn(false);
-
-      /*
-       * Make sure customer login trigger cannot
-       * reopen immediately after worker login.
-       */
-      localStorage.removeItem("openCustomerLogin");
-    }
-  };
-
-  /*
-   * ============================================================
-   * LOADER
-   * ============================================================
-   */
-
-  if (appLoading) {
-    return <Loader />;
-  }
-
-  /*
-   * ============================================================
-   * WORKER MODE — COMPLETE ISOLATION
-   * ============================================================
-   *
-   * THIS IS THE MAIN FIX.
-   *
-   * If worker is logged in, we return here BEFORE:
-   *
-   * AIAssistant
-   * Navbar
-   * Routes
-   * FooterNav
-   * LoginRequiredModal
-   * Customer UI
-   *
-   * can render.
-   */
+  // ===
+  // WORKER SAFETY
+  // ===
 
   if (workerLoggedIn) {
     return (
@@ -678,46 +318,775 @@ function App() {
     );
   }
 
-  /*
-   * ============================================================
-   * CUSTOMER AUTH SCREEN
-   * ============================================================
-   */
 
-  if (showLoginScreen) {
+  // ===
+  // WELCOME
+  // ===
+
+  if (showWelcome) {
     return (
-      <AuthScreen
-        setIsLoggedIn={handleCustomerLoginState}
-        setWorkerLoggedIn={handleWorkerLoginState}
+      <Welcome
+        setShowWelcome={setShowWelcome}
       />
     );
   }
 
-  /*
-   * ============================================================
-   * CUSTOMER APP
-   * ============================================================
-   */
+
+  // ===
+  // BOOKING
+  // ===
+
+  if (selectedWorker) {
+    return (
+      <>
+        <Navbar />
+
+        <BookingForm
+          selectedWorker={selectedWorker}
+          setSelectedWorker={setSelectedWorker}
+          customerLocation={customerLocation}
+          setCustomerLocation={setCustomerLocation}
+        />
+      </>
+    );
+  }
+
+
+  // ===
+  // CUSTOMER HOME
+  // ===
 
   return (
     <>
-      <AIAssistant language={language} />
+      <Navbar />
 
+      <RevealOnScroll delay={0}>
+        <Hero
+          language={language}
+          customerLocation={customerLocation}
+          setCustomerLocation={setCustomerLocation}
+        />
+      </RevealOnScroll>
+
+      <RevealOnScroll delay={100}>
+        <Stats />
+      </RevealOnScroll>
+
+      <RevealOnScroll delay={160}>
+        <WorkerOfMonth
+          language={language}
+        />
+      </RevealOnScroll>
+
+      <RevealOnScroll delay={220}>
+        <Services
+          language={language}
+          setSelectedService={setSelectedService}
+        />
+      </RevealOnScroll>
+
+      <RevealOnScroll delay={280}>
+        <Workers
+          language={language}
+          setSelectedWorker={handleWorkerSelect}
+          selectedService={selectedService}
+          customerLocation={customerLocation}
+        />
+      </RevealOnScroll>
+
+      <RevealOnScroll delay={340}>
+        <WhatsappButton />
+      </RevealOnScroll>
+    </>
+  );
+}
+
+
+// =====
+// APP
+// =====
+
+function App() {
+
+  const savedUser = getStoredUser();
+  const savedWorker = getStoredWorker();
+
+
+  // ===
+  // APP LOADING
+  // ===
+
+  const [appLoading, setAppLoading] =
+    useState(true);
+
+
+  // ===
+  // BOOKING STATE
+  // ===
+
+  const [selectedService, setSelectedService] =
+    useState("All");
+
+  const [selectedWorker, setSelectedWorker] =
+    useState(null);
+
+  const [pendingWorker, setPendingWorker] =
+    useState(null);
+
+
+  // ===
+  // SCREEN STATE
+  // ===
+
+  const [showWelcome, setShowWelcome] =
+    useState(false);
+
+  const [showLoginScreen, setShowLoginScreen] =
+    useState(false);
+
+  const [showLoginRequired, setShowLoginRequired] =
+    useState(false);
+
+
+  // ===
+  // CUSTOMER LOGIN
+  // ===
+
+  const [isLoggedIn, setIsLoggedIn] =
+    useState(Boolean(savedUser));
+
+
+  // ===
+  // WORKER LOGIN
+  // ===
+
+  const [workerLoggedIn, setWorkerLoggedIn] =
+    useState(Boolean(savedWorker));
+
+
+  // ===
+  // SENIOR MODE
+  // ===
+
+  const [seniorMode, setSeniorMode] =
+    useState(() => {
+      return (
+        localStorage.getItem("seniorMode") === "true"
+      );
+    });
+
+
+  // ===
+  // LANGUAGE
+  // ===
+
+  const [language, setLanguage] =
+    useState(() => {
+
+      const savedLanguage =
+        localStorage.getItem("language") ||
+        localStorage.getItem("lang");
+
+      if (
+        savedLanguage === "en" ||
+        savedLanguage === "hi" ||
+        savedLanguage === "od"
+      ) {
+        return savedLanguage;
+      }
+
+      localStorage.setItem(
+        "language",
+        "en"
+      );
+
+      localStorage.setItem(
+        "lang",
+        "en"
+      );
+
+      return "en";
+    });
+
+
+  // ===
+  // CUSTOMER LOCATION
+  // ===
+
+  const [customerLocation, setCustomerLocation] =
+    useState(() => {
+
+      try {
+
+        const savedLocation =
+          localStorage.getItem(
+            "eservoo_customer_location"
+          );
+
+        if (!savedLocation) {
+          return {
+            address: "",
+            latitude: null,
+            longitude: null,
+            accuracy: null,
+          };
+        }
+
+        const parsed =
+          JSON.parse(savedLocation);
+
+        if (
+          typeof parsed !== "object" ||
+          parsed === null
+        ) {
+          throw new Error(
+            "Invalid saved location"
+          );
+        }
+
+        return {
+          address: parsed.address || "",
+          latitude:
+            typeof parsed.latitude === "number"
+              ? parsed.latitude
+              : null,
+          longitude:
+            typeof parsed.longitude === "number"
+              ? parsed.longitude
+              : null,
+          accuracy:
+            typeof parsed.accuracy === "number"
+              ? parsed.accuracy
+              : null,
+        };
+
+      } catch (error) {
+
+        console.warn(
+          "Unable to restore customer location:",
+          error
+        );
+
+        return {
+          address: "",
+          latitude: null,
+          longitude: null,
+          accuracy: null,
+        };
+      }
+    });
+
+
+  // ===
+  // SAVE CUSTOMER LOCATION
+  // ===
+
+  useEffect(() => {
+
+    try {
+
+      if (
+        customerLocation &&
+        typeof customerLocation === "object"
+      ) {
+        localStorage.setItem(
+          "eservoo_customer_location",
+          JSON.stringify(customerLocation)
+        );
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Unable to save customer location:",
+        error
+      );
+    }
+
+  }, [customerLocation]);
+
+
+  // ===
+  // LOCATION EVENTS
+  // ===
+
+  useEffect(() => {
+
+    const handleLocationUpdated = (event) => {
+
+      const location =
+        event?.detail;
+
+      if (!location) return;
+
+      setCustomerLocation({
+        address:
+          location.address || "",
+
+        latitude:
+          typeof location.latitude === "number"
+            ? location.latitude
+            : null,
+
+        longitude:
+          typeof location.longitude === "number"
+            ? location.longitude
+            : null,
+
+        accuracy:
+          typeof location.accuracy === "number"
+            ? location.accuracy
+            : null,
+      });
+    };
+
+
+    window.addEventListener(
+      "eservoo-location-updated",
+      handleLocationUpdated
+    );
+
+
+    return () => {
+
+      window.removeEventListener(
+        "eservoo-location-updated",
+        handleLocationUpdated
+      );
+
+    };
+
+  }, []);
+
+
+  // ===
+  // STARTUP LOCATION
+  // ===
+
+  useEffect(() => {
+
+    let cancelled = false;
+
+    const startLocationRequest =
+      async () => {
+
+        if (cancelled) return;
+
+        await requestUserLocation();
+      };
+
+    startLocationRequest();
+
+    return () => {
+      cancelled = true;
+    };
+
+  }, []);
+
+
+  // ===
+  // APP LOADER
+  // ===
+
+  useEffect(() => {
+
+    const timer =
+      setTimeout(() => {
+        setAppLoading(false);
+      }, 1800);
+
+    return () => {
+      clearTimeout(timer);
+    };
+
+  }, []);
+
+
+  // ===
+  // CUSTOMER LOGIN EVENT
+  // ===
+
+  useEffect(() => {
+
+    const openCustomerLogin = () => {
+
+      const currentUser =
+        getStoredUser();
+
+
+      // Worker mode must never open customer login
+      if (getStoredWorker()) {
+        return;
+      }
+
+
+      if (currentUser) {
+
+        setIsLoggedIn(true);
+
+        localStorage.removeItem(
+          "openCustomerLogin"
+        );
+
+        return;
+      }
+
+
+      setShowWelcome(false);
+      setShowLoginRequired(false);
+      setPendingWorker(null);
+      setSelectedWorker(null);
+      setShowLoginScreen(true);
+
+      localStorage.removeItem(
+        "openCustomerLogin"
+      );
+    };
+
+
+    window.addEventListener(
+      "open-customer-login",
+      openCustomerLogin
+    );
+
+
+    if (
+      localStorage.getItem(
+        "openCustomerLogin"
+      ) === "true"
+    ) {
+      openCustomerLogin();
+    }
+
+
+    return () => {
+
+      window.removeEventListener(
+        "open-customer-login",
+        openCustomerLogin
+      );
+
+    };
+
+  }, []);
+
+
+  // ===
+  // LANGUAGE + SENIOR MODE EVENTS
+  // ===
+
+  useEffect(() => {
+
+    const handleLanguageChanged =
+      (event) => {
+
+        const newLanguage =
+          event.detail;
+
+        if (
+          newLanguage !== "en" &&
+          newLanguage !== "hi" &&
+          newLanguage !== "od"
+        ) {
+          return;
+        }
+
+        setLanguage(newLanguage);
+
+        localStorage.setItem(
+          "language",
+          newLanguage
+        );
+
+        localStorage.setItem(
+          "lang",
+          newLanguage
+        );
+      };
+
+
+    const handleSeniorModeChanged =
+      (event) => {
+
+        const newValue =
+          Boolean(event.detail);
+
+        setSeniorMode(newValue);
+
+        localStorage.setItem(
+          "seniorMode",
+          String(newValue)
+        );
+      };
+
+
+    window.addEventListener(
+      "language-changed",
+      handleLanguageChanged
+    );
+
+    window.addEventListener(
+      "senior-mode-changed",
+      handleSeniorModeChanged
+    );
+
+
+    return () => {
+
+      window.removeEventListener(
+        "language-changed",
+        handleLanguageChanged
+      );
+
+      window.removeEventListener(
+        "senior-mode-changed",
+        handleSeniorModeChanged
+      );
+
+    };
+
+  }, []);
+
+
+  // ===
+  // CHANGE LANGUAGE
+  // ===
+
+  const changeLanguage = (lang) => {
+
+    if (
+      lang !== "en" &&
+      lang !== "hi" &&
+      lang !== "od"
+    ) {
+      return;
+    }
+
+    setLanguage(lang);
+
+    localStorage.setItem(
+      "language",
+      lang
+    );
+
+    localStorage.setItem(
+      "lang",
+      lang
+    );
+
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "language-changed",
+        {
+          detail: lang,
+        }
+      )
+    );
+  };
+
+
+  // ===
+  // WORKER SELECT
+  // ===
+
+  const handleWorkerSelect =
+    (worker) => {
+
+      // Worker cannot book another worker
+      if (workerLoggedIn) {
+        return;
+      }
+
+
+      if (!isLoggedIn) {
+
+        setPendingWorker(worker);
+        setShowLoginRequired(true);
+
+        return;
+      }
+
+
+      setSelectedWorker(worker);
+    };
+
+
+  // ===
+  // OPEN CUSTOMER LOGIN
+  // ===
+
+  const openLoginScreen = () => {
+
+    setShowLoginRequired(false);
+    setShowLoginScreen(true);
+
+  };
+
+
+  // ===
+  // CUSTOMER LOGIN STATE
+  // ===
+
+  const handleCustomerLoginState =
+    (value) => {
+
+      // Do not replace worker session
+      if (getStoredWorker()) {
+        return;
+      }
+
+      setIsLoggedIn(Boolean(value));
+
+
+      if (value) {
+
+        setShowLoginScreen(false);
+
+
+        if (pendingWorker) {
+
+          setSelectedWorker(
+            pendingWorker
+          );
+
+          setPendingWorker(null);
+        }
+      }
+    };
+
+
+  // ===
+  // WORKER LOGIN STATE
+  // ===
+
+  const handleWorkerLoginState =
+    (value) => {
+
+      const loggedIn =
+        Boolean(value);
+
+      setWorkerLoggedIn(loggedIn);
+
+
+      if (loggedIn) {
+
+        // Worker mode resets customer UI
+        setShowLoginScreen(false);
+        setShowLoginRequired(false);
+
+        setPendingWorker(null);
+        setSelectedWorker(null);
+
+        setShowWelcome(false);
+
+        setIsLoggedIn(false);
+
+        localStorage.removeItem(
+          "openCustomerLogin"
+        );
+      }
+    };
+
+
+  // ===
+  // LOADER
+  // ===
+
+  if (appLoading) {
+    return <Loader />;
+  }
+
+
+  // ===
+  // WORKER MODE — COMPLETE ISOLATION
+  // ===
+  //
+  // IMPORTANT:
+  // Worker dashboard returns BEFORE customer UI.
+  //
+  // No:
+  // AIAssistant
+  // Navbar
+  // FooterNav
+  // LoginRequiredModal
+  // Customer Routes
+  //
+  // will render in worker mode.
+  // ===
+
+  if (workerLoggedIn) {
+
+    return (
       <div
         data-theme="light"
-        className={`es-light-lock bg-[#B4DBDC] text-[#08566E] min-h-screen pb-32 overflow-x-hidden ${
-          seniorMode ? "senior-mode" : ""
-        }`}
+        className="min-h-screen w-full bg-[#B4DBDC] text-[#08566E] overflow-x-hidden"
         style={{
           colorScheme: "only light",
           backgroundColor: "#B4DBDC",
           color: "#08566E",
         }}
       >
+        <WorkerDashboard
+          language={language}
+        />
+      </div>
+    );
+  }
+
+
+  // ===
+  // CUSTOMER AUTH SCREEN
+  // ===
+
+  if (showLoginScreen) {
+
+    return (
+      <AuthScreen
+        setIsLoggedIn={
+          handleCustomerLoginState
+        }
+        setWorkerLoggedIn={
+          handleWorkerLoginState
+        }
+      />
+    );
+  }
+
+
+  // ===
+  // CUSTOMER APP
+  // ===
+
+  return (
+    <>
+      <AIAssistant
+        language={language}
+      />
+
+      <div
+        data-theme="light"
+        className={`
+          es-light-lock
+          bg-[#B4DBDC]
+          text-[#08566E]
+          min-h-screen
+          pb-32
+          overflow-x-hidden
+          ${seniorMode ? "senior-mode" : ""}
+        `}
+        style={{
+          colorScheme: "only light",
+          backgroundColor: "#B4DBDC",
+          color: "#08566E",
+        }}
+      >
+
         <Routes>
-          {/* ================================================= */}
-          {/* HOME */}
-          {/* ================================================= */}
+
+          {/* =
+              HOME
+          = */}
 
           <Route
             path="/"
@@ -725,60 +1094,113 @@ function App() {
               <HomePage
                 seniorMode={seniorMode}
                 setSeniorMode={setSeniorMode}
-                selectedService={selectedService}
-                setSelectedService={setSelectedService}
-                selectedWorker={selectedWorker}
-                setSelectedWorker={setSelectedWorker}
+
+                selectedService={
+                  selectedService
+                }
+
+                setSelectedService={
+                  setSelectedService
+                }
+
+                selectedWorker={
+                  selectedWorker
+                }
+
+                setSelectedWorker={
+                  setSelectedWorker
+                }
+
                 language={language}
-                changeLanguage={changeLanguage}
-                showWelcome={showWelcome}
-                setShowWelcome={setShowWelcome}
-                workerLoggedIn={workerLoggedIn}
-                customerLocation={customerLocation}
-                setCustomerLocation={setCustomerLocation}
+
+                changeLanguage={
+                  changeLanguage
+                }
+
+                showWelcome={
+                  showWelcome
+                }
+
+                setShowWelcome={
+                  setShowWelcome
+                }
+
+                workerLoggedIn={
+                  workerLoggedIn
+                }
+
+                customerLocation={
+                  customerLocation
+                }
+
+                setCustomerLocation={
+                  setCustomerLocation
+                }
+
+                handleWorkerSelect={
+                  handleWorkerSelect
+                }
               />
             }
           />
 
-          {/* ================================================= */}
-          {/* CUSTOMER PROFILE */}
-          {/* ================================================= */}
+
+          {/* =
+              PROFILE
+          = */}
 
           <Route
             path="/profile"
             element={
               isLoggedIn ? (
-                <Profile language={language} />
+                <Profile
+                  language={language}
+                />
               ) : (
                 <AuthScreen
-                  setIsLoggedIn={handleCustomerLoginState}
-                  setWorkerLoggedIn={handleWorkerLoginState}
+                  setIsLoggedIn={
+                    handleCustomerLoginState
+                  }
+                  setWorkerLoggedIn={
+                    handleWorkerLoginState
+                  }
                 />
               )
             }
           />
 
-          {/* ================================================= */}
-          {/* CONTACT */}
-          {/* ================================================= */}
+
+          {/* =
+              CONTACT
+          = */}
 
           <Route
             path="/contact"
-            element={<Contact language={language} />}
+            element={
+              <Contact
+                language={language}
+              />
+            }
           />
 
-          {/* ================================================= */}
-          {/* TERMS */}
-          {/* ================================================= */}
+
+          {/* =
+              TERMS
+          = */}
 
           <Route
             path="/terms"
-            element={<Terms language={language} />}
+            element={
+              <Terms
+                language={language}
+              />
+            }
           />
 
-          {/* ================================================= */}
-          {/* CUSTOMER DASHBOARD */}
-          {/* ================================================= */}
+
+          {/* =
+              CUSTOMER DASHBOARD
+          = */}
 
           <Route
             path="/dashboard"
@@ -786,20 +1208,27 @@ function App() {
               isLoggedIn ? (
                 <CustomerDashboard
                   language={language}
-                  customerLocation={customerLocation}
+                  customerLocation={
+                    customerLocation
+                  }
                 />
               ) : (
                 <AuthScreen
-                  setIsLoggedIn={handleCustomerLoginState}
-                  setWorkerLoggedIn={handleWorkerLoginState}
+                  setIsLoggedIn={
+                    handleCustomerLoginState
+                  }
+                  setWorkerLoggedIn={
+                    handleWorkerLoginState
+                  }
                 />
               )
             }
           />
 
-          {/* ================================================= */}
-          {/* CUSTOMER BOOKINGS */}
-          {/* ================================================= */}
+
+          {/* =
+              CUSTOMER BOOKINGS
+          = */}
 
           <Route
             path="/bookings"
@@ -807,49 +1236,64 @@ function App() {
               isLoggedIn ? (
                 <MyBookings
                   language={language}
-                  customerLocation={customerLocation}
+                  customerLocation={
+                    customerLocation
+                  }
                 />
               ) : (
                 <AuthScreen
-                  setIsLoggedIn={handleCustomerLoginState}
-                  setWorkerLoggedIn={handleWorkerLoginState}
+                  setIsLoggedIn={
+                    handleCustomerLoginState
+                  }
+                  setWorkerLoggedIn={
+                    handleWorkerLoginState
+                  }
                 />
               )
             }
           />
 
-          {/* ================================================= */}
-          {/* REWARDS */}
-          {/* ================================================= */}
+
+          {/* =
+              REWARDS
+          = */}
 
           <Route
             path="/rewards"
-            element={<Rewards />}
+            element={
+              <Rewards />
+            }
           />
 
-          {/* ================================================= */}
-          {/* WORKER LOGIN */}
-          {/* ================================================= */}
+
+          {/* =
+              WORKER LOGIN
+          = */}
 
           <Route
             path="/worker-login"
             element={
               <WorkerLogin
                 language={language}
-                setWorkerLoggedIn={handleWorkerLoginState}
+                setWorkerLoggedIn={
+                  handleWorkerLoginState
+                }
               />
             }
           />
 
-          {/* ================================================= */}
-          {/* WORKER DASHBOARD */}
-          {/* ================================================= */}
+
+          {/* =
+              WORKER DASHBOARD
+          = */}
 
           <Route
             path="/worker-dashboard"
             element={
               workerLoggedIn ? (
-                <WorkerDashboard language={language} />
+                <WorkerDashboard
+                  language={language}
+                />
               ) : (
                 <Navigate
                   to="/worker-login"
@@ -859,56 +1303,91 @@ function App() {
             }
           />
 
-          {/* ================================================= */}
-          {/* SERVICES / WORKERS */}
-          {/* ================================================= */}
+
+          {/* =
+              SERVICES / WORKERS
+          = */}
 
           <Route
             path="/services"
             element={
               selectedWorker ? (
                 <BookingForm
-                  selectedWorker={selectedWorker}
-                  setSelectedWorker={setSelectedWorker}
-                  customerLocation={customerLocation}
-                  setCustomerLocation={setCustomerLocation}
+                  selectedWorker={
+                    selectedWorker
+                  }
+                  setSelectedWorker={
+                    setSelectedWorker
+                  }
+                  customerLocation={
+                    customerLocation
+                  }
+                  setCustomerLocation={
+                    setCustomerLocation
+                  }
                 />
               ) : (
                 <Workers
                   language={language}
-                  setSelectedWorker={handleWorkerSelect}
-                  selectedService={selectedService}
-                  customerLocation={customerLocation}
+                  setSelectedWorker={
+                    handleWorkerSelect
+                  }
+                  selectedService={
+                    selectedService
+                  }
+                  customerLocation={
+                    customerLocation
+                  }
                 />
               )
             }
           />
+
         </Routes>
 
-        {/* =================================================== */}
-        {/* CUSTOMER FOOTER ONLY */}
-        {/* =================================================== */}
 
-        {!selectedWorker && !showLoginScreen && (
-          <FooterNav />
-        )}
+        {/* =
+            CUSTOMER FOOTER ONLY
+        = */}
+
+        {!selectedWorker &&
+          !showLoginScreen && (
+            <FooterNav />
+          )}
+
       </div>
 
-      {/* ===================================================== */}
-      {/* CUSTOMER LOGIN REQUIRED MODAL ONLY */}
-      {/* ===================================================== */}
 
-      {showLoginRequired && !workerLoggedIn && (
-        <LoginRequiredModal
-          onClose={() => {
-            setShowLoginRequired(false);
-            setPendingWorker(null);
-          }}
-          onLogin={openLoginScreen}
-        />
-      )}
+      {/* =
+          LOGIN REQUIRED MODAL
+      = */}
+
+      {showLoginRequired &&
+        !workerLoggedIn && (
+          <LoginRequiredModal
+
+            onClose={() => {
+
+              setShowLoginRequired(
+                false
+              );
+
+              setPendingWorker(
+                null
+              );
+
+            }}
+
+            onLogin={
+              openLoginScreen
+            }
+
+          />
+        )}
+
     </>
   );
 }
+
 
 export default App;

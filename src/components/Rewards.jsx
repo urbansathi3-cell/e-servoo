@@ -32,9 +32,9 @@ function Rewards() {
     }
   }, []);
 
-  /* =========================================================
+  /* =
      DATE
-  ========================================================= */
+  = */
 
   const formatDate = (dateValue) => {
     if (!dateValue) return "Not available";
@@ -54,9 +54,9 @@ function Rewards() {
     });
   };
 
-  /* =========================================================
+  /* =
      DISCOUNT TEXT
-  ========================================================= */
+  = */
 
   const getDiscountText = (coupon) => {
     const type = String(
@@ -93,9 +93,9 @@ function Rewards() {
     return coupon?.couponTitle || "SPECIAL OFFER";
   };
 
-  /* =========================================================
+  /* =
      BRAND
-  ========================================================= */
+  = */
 
   const getBrandName = (coupon) => {
     return (
@@ -115,9 +115,9 @@ function Rewards() {
     );
   };
 
-  /* =========================================================
+  /* =
      ACTION
-  ========================================================= */
+  = */
 
   const getActionText = (coupon, index) => {
     if (coupon?.actionText) {
@@ -134,9 +134,9 @@ function Rewards() {
     return actions[index % actions.length];
   };
 
-  /* =========================================================
+  /* =
      COPY COUPON
-  ========================================================= */
+  = */
 
   const copyCoupon = async (coupon) => {
     const code = String(
@@ -158,9 +158,9 @@ function Rewards() {
     }
   };
 
-  /* =========================================================
+  /* =
      SORT
-  ========================================================= */
+  = */
 
   const visibleCoupons = useMemo(() => {
     return Array.isArray(coupons) ? coupons : [];
@@ -169,9 +169,9 @@ function Rewards() {
   return (
     <section className="min-h-screen bg-[#FAFAFA] text-[#222] pb-32 overflow-x-hidden">
 
-      {/* =====================================================
+      {/* ====
           HERO
-      ===================================================== */}
+      ==== */}
 
       <div className="relative overflow-hidden bg-[#45180F] rounded-b-[52px] min-h-[355px] md:min-h-[430px]">
 
@@ -276,17 +276,17 @@ function Rewards() {
         </div>
       </div>
 
-      {/* =====================================================
+      {/* ====
           REWARD CARDS
-      ===================================================== */}
+      ==== */}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-5 md:px-8 pt-8">
 
         {visibleCoupons.length === 0 ? (
 
-          /* =================================================
+          /* 
              EMPTY STATE
-          ================================================= */
+           */
 
           <div className="max-w-md mx-auto bg-white border border-[#E7E7E7] rounded-[28px] p-8 text-center shadow-[0_12px_35px_rgba(0,0,0,0.08)]">
 
@@ -314,9 +314,9 @@ function Rewards() {
 
         ) : (
 
-          /* =================================================
+          /* 
              COUPON GRID
-          ================================================= */
+           */
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
 
@@ -437,9 +437,9 @@ function Rewards() {
 
       </div>
 
-      {/* =====================================================
+      {/* ====
           COUPON MODAL
-      ===================================================== */}
+      ==== */}
 
       {selectedCoupon && (
 

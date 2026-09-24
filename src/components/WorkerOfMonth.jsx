@@ -22,7 +22,7 @@ function WorkerOfMonth({ language = "en" }) {
       language === "hi"
         ? "महीने का सर्वश्रेष्ठ वर्कर"
         : language === "od"
-          ? "ମାସର ସର୍ବଶ୍ରେଷ୍ଠ worker"
+          ? "ମାସର ସର୍ବଶ୍ରେଷ୍ଠ Worker"
           : "Worker of the Month",
 
     title:
@@ -32,29 +32,24 @@ function WorkerOfMonth({ language = "en" }) {
           ? "E-SERVOO Top Performer"
           : "E-SERVOO Top Performer",
 
-    subtitle:
-      language === "hi"
-        ? "Rating, trust score और availability के आधार पर चुना गया best worker."
-        : language === "od"
-          ? "Rating, trust score ଏବଂ availability ଆଧାରରେ ଚୟନ ହୋଇଥିବା best worker."
-          : "Selected using rating, trust score, and service performance.",
-
-    loading:
-      language === "hi"
-        ? "Top worker load हो रहा है..."
-        : language === "od"
-          ? "Top worker load ହେଉଛି..."
-          : "Loading top worker...",
-
-    noData:
-      language === "hi"
-        ? "Top worker data जल्द ही update होगा"
-        : language === "od"
-          ? "Top worker data ଶୀଘ୍ର update ହେବ"
-          : "Top worker data will update soon",
+    workerId: "Worker ID",
 
     verified:
-      t.verifiedProfessional || "Verified Professional",
+      t.verifiedProfessional || "Verified",
+
+    name:
+      language === "hi"
+        ? "Name"
+        : language === "od"
+          ? "ନାମ"
+          : "Name",
+
+    service:
+      language === "hi"
+        ? "Service"
+        : language === "od"
+          ? "ସେବା"
+          : "Service",
 
     rating: t.ratingLabel || "Rating",
 
@@ -62,13 +57,25 @@ function WorkerOfMonth({ language = "en" }) {
 
     area: t.localArea || "Area",
 
-    certificate:
-      t.verifiedSkillCertificate || "Verified Skill Certificate",
+    noData:
+      language === "hi"
+        ? "Worker data जल्द ही update होगा"
+        : language === "od"
+          ? "Worker data ଶୀଘ୍ର update ହେବ"
+          : "Worker data will update soon",
   };
+
+  // ====
+  // HELPERS
+  // ====
 
   const getValue = (obj, keys, fallback = "") => {
     for (const key of keys) {
-      if (obj?.[key] !== undefined && obj?.[key] !== null && obj?.[key] !== "") {
+      if (
+        obj?.[key] !== undefined &&
+        obj?.[key] !== null &&
+        obj?.[key] !== ""
+      ) {
         return obj[key];
       }
     }
@@ -77,88 +84,192 @@ function WorkerOfMonth({ language = "en" }) {
   };
 
   const toNumber = (value, fallback = 0) => {
-    const num = parseFloat(String(value || "").replace(/[^\d.]/g, ""));
+    const num = parseFloat(
+      String(value || "").replace(/[^\d.]/g, "")
+    );
 
-    if (Number.isNaN(num)) {
-      return fallback;
-    }
-
-    return num;
+    return Number.isNaN(num) ? fallback : num;
   };
 
   const normalizeWorker = (worker) => {
     return {
-      id: getValue(worker, ["WorkerId", "WorkerID", "Worker id", "id"], ""),
-      name: getValue(worker, ["name", "Name"], ""),
-      service: getValue(worker, ["service", "Service"], ""),
-      rating: toNumber(getValue(worker, ["rating", "Rating"], 0), 0),
-      trustScore: toNumber(
-        getValue(worker, ["TrustScore", "trustScore", "Trust Score"], 0),
-        0
+      id: getValue(
+        worker,
+        [
+          "WorkerId",
+          "WorkerID",
+          "Worker id",
+          "workerId",
+          "id",
+        ],
+        ""
       ),
-      location: getValue(worker, ["location", "Location"], "Local Area"),
-      image: getValue(worker, ["image", "Image"], ""),
-      status: getValue(worker, ["status", "Status"], "Available"),
-      verified: getValue(worker, ["Verified", "verified"], "Yes"),
+
+      name: getValue(
+        worker,
+        ["name", "Name"],
+        ""
+      ),
+
+      service: getValue(
+        worker,
+        ["service", "Service"],
+        ""
+      ),
+
+      rating: toNumber(
+        getValue(
+          worker,
+          ["rating", "Rating"],
+          0
+        )
+      ),
+
+      trustScore: toNumber(
+        getValue(
+          worker,
+          [
+            "TrustScore",
+            "trustScore",
+            "Trust Score",
+          ],
+          0
+        )
+      ),
+
+      location: getValue(
+        worker,
+        ["location", "Location"],
+        "Local Area"
+      ),
+
+      image: getValue(
+        worker,
+        ["image", "Image"],
+        ""
+      ),
+
+      status: getValue(
+        worker,
+        ["status", "Status"],
+        "Available"
+      ),
+
+      verified: getValue(
+        worker,
+        ["Verified", "verified"],
+        "Yes"
+      ),
+
       certificate: getValue(
         worker,
-        ["CertificateLink", "certificateLink", "Certificate Link"],
+        [
+          "CertificateLink",
+          "certificateLink",
+          "Certificate Link",
+        ],
         ""
       ),
     };
   };
 
-  const getServiceText = (service) => {
-    const serviceName = String(service || "").trim().toLowerCase();
+  // ====
+  // SERVICE NAME
+  // ====
 
-    if (serviceName === "electrician") return t.electrician || service;
-    if (serviceName === "plumber") return t.plumber || service;
-    if (serviceName === "carpenter") return t.carpenter || service;
-    if (serviceName === "cleaner") return t.cleaner || service;
-    if (serviceName === "cook") return t.cook || service;
-    if (serviceName === "painter") return t.painter || service;
-    if (serviceName === "ac repair") return t.acRepair || service;
-    if (serviceName === "home tutor") return t.tutor || service;
-    if (serviceName === "appliance repair") return t.applianceRepair || service;
-    if (serviceName === "cctv service") return t.cctvService || service;
+  const getServiceText = (service) => {
+    const value = String(service || "")
+      .trim()
+      .toLowerCase();
+
+    if (value === "electrician")
+      return t.electrician || service;
+
+    if (value === "plumber")
+      return t.plumber || service;
+
+    if (value === "carpenter")
+      return t.carpenter || service;
+
+    if (value === "cleaner")
+      return t.cleaner || service;
+
+    if (value === "cook")
+      return t.cook || service;
+
+    if (value === "painter")
+      return t.painter || service;
+
+    if (value === "ac repair")
+      return t.acRepair || service;
+
+    if (value === "home tutor")
+      return t.tutor || service;
+
+    if (value === "appliance repair")
+      return t.applianceRepair || service;
+
+    if (value === "cctv service")
+      return t.cctvService || service;
 
     return service || "Service Expert";
   };
+
+  // ====
+  // FETCH WORKER
+  // ====
 
   useEffect(() => {
     const fetchTopWorker = async () => {
       try {
         setLoading(true);
 
-        const res = await fetch(`${API_URL}?nocache=${Date.now()}`);
-        const data = await res.json();
+        const response = await fetch(
+          `${API_URL}?nocache=${Date.now()}`
+        );
 
-        if (!Array.isArray(data) || data.length === 0) {
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data) || !data.length) {
           setBestWorker(null);
-          setLoading(false);
           return;
         }
 
-        const cleanWorkers = data
-          .map((worker) => normalizeWorker(worker))
-          .filter((worker) => worker.name || worker.service);
+        const workers = data
+          .map(normalizeWorker)
+          .filter(
+            (worker) =>
+              worker.name || worker.service
+          );
 
-        if (cleanWorkers.length === 0) {
+        if (!workers.length) {
           setBestWorker(null);
-          setLoading(false);
           return;
         }
 
-        const sortedWorkers = cleanWorkers.sort((a, b) => {
-          const scoreA = a.rating * 20 + a.trustScore;
-          const scoreB = b.rating * 20 + b.trustScore;
+        const sorted = workers.sort((a, b) => {
+          const scoreA =
+            a.rating * 20 + a.trustScore;
+
+          const scoreB =
+            b.rating * 20 + b.trustScore;
 
           return scoreB - scoreA;
         });
 
-        setBestWorker(sortedWorkers[0]);
+        setBestWorker(sorted[0]);
       } catch (error) {
-        console.log("Worker of Month Error:", error);
+        console.log(
+          "Worker of Month Error:",
+          error
+        );
+
         setBestWorker(null);
       } finally {
         setLoading(false);
@@ -168,31 +279,58 @@ function WorkerOfMonth({ language = "en" }) {
     fetchTopWorker();
   }, []);
 
+  // ====
+  // LOADING
+  // ====
+
   if (loading) {
     return (
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] py-16 px-5">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white/35 backdrop-blur-xl border border-white/60 rounded-[36px] p-7 md:p-10 shadow-2xl animate-pulse">
-            <div className="h-8 w-56 bg-[#08566E]/20 rounded-full mb-6"></div>
+      <section className="bg-[#E1E9E5] px-4 py-8">
 
-            <div className="grid md:grid-cols-[220px_1fr] gap-8 items-center">
-              <div className="w-44 h-44 rounded-[36px] bg-[#08566E]/20 mx-auto"></div>
+        <div
+          className="
+            w-full
+            max-w-[393px]
+            aspect-[9/16]
+            mx-auto
+            bg-white
+            rounded-[28px]
+            border
+            border-[#6FA8AA]/30
+            p-5
+            animate-pulse
+          "
+        >
 
-              <div>
-                <div className="h-10 w-72 bg-[#08566E]/20 rounded-full"></div>
-                <div className="h-5 w-48 bg-[#08566E]/20 rounded-full mt-4"></div>
-                <div className="h-5 w-full max-w-xl bg-[#08566E]/20 rounded-full mt-5"></div>
+          <div className="h-6 w-48 bg-[#B4DBDC] rounded-full" />
 
-                <div className="grid grid-cols-3 gap-3 mt-7">
-                  <div className="h-24 bg-[#08566E]/15 rounded-2xl"></div>
-                  <div className="h-24 bg-[#08566E]/15 rounded-2xl"></div>
-                  <div className="h-24 bg-[#08566E]/15 rounded-2xl"></div>
-                </div>
+          <div className="h-8 w-64 bg-[#B4DBDC] rounded-lg mt-5" />
 
-                <div className="h-12 w-full bg-[#08566E]/20 rounded-2xl mt-7"></div>
-              </div>
-            </div>
+          <div className="flex justify-between mt-7">
+            <div className="h-7 w-28 bg-[#B4DBDC] rounded-lg" />
+            <div className="h-7 w-24 bg-[#B4DBDC] rounded-lg" />
           </div>
+
+          <div className="grid grid-cols-[1fr_145px] gap-4 mt-7">
+
+            <div>
+              <div className="h-4 w-16 bg-[#B4DBDC] rounded" />
+              <div className="h-9 w-36 bg-[#B4DBDC] rounded mt-2" />
+
+              <div className="h-4 w-20 bg-[#B4DBDC] rounded mt-6" />
+              <div className="h-7 w-28 bg-[#B4DBDC] rounded mt-2" />
+            </div>
+
+            <div className="aspect-square bg-[#B4DBDC] rounded-[22px]" />
+
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-7">
+            <div className="h-20 bg-[#B4DBDC] rounded-xl" />
+            <div className="h-20 bg-[#B4DBDC] rounded-xl" />
+            <div className="h-20 bg-[#B4DBDC] rounded-xl" />
+          </div>
+
         </div>
       </section>
     );
@@ -200,141 +338,612 @@ function WorkerOfMonth({ language = "en" }) {
 
   const worker = bestWorker;
 
-  return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#E1E9E5] via-[#B4DBDC] to-[#9ECFD0] py-16 px-5">
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#08566E]/20 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#6FA8AA]/35 rounded-full blur-3xl"></div>
+  // ====
+  // MAIN UI
+  // ====
 
-      <div className="relative z-10 max-w-6xl mx-auto">
-        <div className="text-center mb-9">
-          <div className="inline-flex items-center gap-2 bg-white/40 backdrop-blur-xl border border-white/60 px-5 py-2 rounded-full shadow-lg text-[#08566E] font-extrabold mb-4">
-            <FaTrophy className="text-yellow-500" />
+  return (
+    <section className="bg-[#E1E9E5] px-4 py-8">
+
+      {/* 9:16 MOBILE DESIGN */}
+      <div
+        className="
+          relative
+          w-full
+          max-w-[393px]
+          aspect-[9/16]
+          mx-auto
+          overflow-hidden
+          bg-[#E1E9E5]
+          rounded-[28px]
+          border-2
+          border-[#08566E]
+          shadow-[0_10px_30px_rgba(8,86,110,0.14)]
+        "
+      >
+
+        {/* BACKGROUND */}
+
+        <div
+          className="
+            absolute
+            -top-20
+            -right-20
+            w-48
+            h-48
+            rounded-full
+            bg-[#B4DBDC]/60
+            blur-3xl
+          "
+        />
+
+        <div
+          className="
+            absolute
+            bottom-[-80px]
+            left-[-60px]
+            w-48
+            h-48
+            rounded-full
+            bg-[#9ECFD0]/50
+            blur-3xl
+          "
+        />
+
+        {/* CONTENT */}
+
+        <div
+          className="
+            relative
+            z-10
+            h-full
+            overflow-y-auto
+            px-5
+            py-5
+          "
+        >
+
+          {/* 
+              BADGE
+           */}
+
+          <div
+            className="
+              inline-flex
+              items-center
+              gap-2
+              px-3
+              py-1.5
+              rounded-full
+              bg-white
+              border
+              border-[#6FA8AA]/40
+              text-[#08566E]
+              text-[9px]
+              font-black
+              uppercase
+              tracking-wide
+            "
+          >
+            <FaTrophy size={10} />
+
             {text.badge}
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-black text-[#08566E]">
+
+          {/* 
+              TITLE
+           */}
+
+          <h2
+            className="
+              mt-4
+              text-[25px]
+              leading-tight
+              font-black
+              text-[#08566E]
+            "
+          >
             {text.title}
           </h2>
 
-          <p className="text-[#08566E]/75 mt-3 font-semibold max-w-2xl mx-auto">
-            {text.subtitle}
-          </p>
+
+          {/* 
+              WORKER ID + VERIFIED
+           */}
+
+          {worker && (
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                gap-2
+                mt-6
+              "
+            >
+
+              <div
+                className="
+                  px-3
+                  py-1.5
+                  rounded-lg
+                  bg-[#08566E]
+                  text-white
+                  text-[8px]
+                  font-black
+                  whitespace-nowrap
+                "
+              >
+                {text.workerId}:{" "}
+                {worker.id || "TOP"}
+              </div>
+
+
+              <div
+                className="
+                  flex
+                  items-center
+                  gap-1.5
+                  px-3
+                  py-1.5
+                  rounded-lg
+                  bg-white
+                  border
+                  border-[#6FA8AA]/40
+                  text-[#08566E]
+                  text-[8px]
+                  font-black
+                  whitespace-nowrap
+                "
+              >
+                <FaUserCheck size={9} />
+
+                {text.verified}
+              </div>
+
+            </div>
+          )}
+
+
+          {/* 
+              WORKER INFORMATION + PHOTO
+           */}
+
+          {!worker ? (
+
+            <div
+              className="
+                mt-10
+                bg-white
+                rounded-2xl
+                p-6
+                text-center
+                border
+                border-[#6FA8AA]/30
+              "
+            >
+              <FaTrophy
+                className="
+                  mx-auto
+                  text-[#08566E]
+                "
+                size={35}
+              />
+
+              <p
+                className="
+                  mt-4
+                  text-lg
+                  font-black
+                  text-[#08566E]
+                "
+              >
+                {text.noData}
+              </p>
+            </div>
+
+          ) : (
+
+            <>
+
+              <div
+                className="
+                  grid
+                  grid-cols-[1fr_145px]
+                  gap-4
+                  items-start
+                  mt-7
+                "
+              >
+
+                {/* LEFT SIDE */}
+
+                <div className="min-w-0">
+
+                  {/* NAME */}
+
+                  <p
+                    className="
+                      text-[9px]
+                      uppercase
+                      tracking-[0.18em]
+                      font-black
+                      text-[#6FA8AA]
+                    "
+                  >
+                    {text.name}
+                  </p>
+
+
+                  <h3
+                    className="
+                      mt-1
+                      text-[25px]
+                      leading-tight
+                      font-black
+                      text-[#08566E]
+                      break-words
+                    "
+                  >
+                    {worker.name || "Top Worker"}
+                  </h3>
+
+
+                  {/* SERVICE */}
+
+                  <p
+                    className="
+                      mt-5
+                      text-[9px]
+                      uppercase
+                      tracking-[0.18em]
+                      font-black
+                      text-[#6FA8AA]
+                    "
+                  >
+                    {text.service}
+                  </p>
+
+
+                  <p
+                    className="
+                      mt-1
+                      text-[16px]
+                      leading-tight
+                      font-black
+                      text-[#0A6F78]
+                    "
+                  >
+                    {getServiceText(
+                      worker.service
+                    )}
+                  </p>
+
+                </div>
+
+
+                {/* RIGHT PHOTO */}
+
+                <div
+                  className="
+                    relative
+                    w-full
+                    aspect-square
+                  "
+                >
+
+                  <div
+                    className="
+                      absolute
+                      inset-0
+                      rounded-[22px]
+                      bg-[#B4DBDC]
+                      p-1
+                    "
+                  >
+
+                    <img
+                      src={
+                        worker.image ||
+                        "https://via.placeholder.com/250"
+                      }
+                      alt={worker.name}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/250";
+                      }}
+                      className="
+                        w-full
+                        h-full
+                        object-cover
+                        rounded-[18px]
+                        bg-white
+                      "
+                    />
+
+                  </div>
+
+
+                  {/* SMALL TROPHY */}
+
+                  <div
+                    className="
+                      absolute
+                      -top-3
+                      -right-3
+                      w-9
+                      h-9
+                      rounded-xl
+                      bg-[#08566E]
+                      text-white
+                      flex
+                      items-center
+                      justify-center
+                      shadow-md
+                      border-2
+                      border-white
+                    "
+                  >
+                    <FaTrophy size={13} />
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* 
+                  THREE STATS
+               */}
+
+              <div
+                className="
+                  grid
+                  grid-cols-3
+                  gap-2
+                  mt-7
+                "
+              >
+
+                {/* RATING */}
+
+                <div
+                  className="
+                    bg-white
+                    rounded-xl
+                    border
+                    border-[#6FA8AA]/30
+                    px-2
+                    py-3
+                    text-center
+                  "
+                >
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-center
+                      gap-1
+                      text-[#6FA8AA]
+                      text-[8px]
+                      font-black
+                    "
+                  >
+                    <FaStar
+                      className="text-[#08566E]"
+                      size={9}
+                    />
+
+                    {text.rating}
+                  </div>
+
+
+                  <div
+                    className="
+                      mt-1
+                      text-[18px]
+                      font-black
+                      text-[#08566E]
+                    "
+                  >
+                    {worker.rating || "—"}
+                  </div>
+
+                </div>
+
+
+                {/* TRUST */}
+
+                <div
+                  className="
+                    bg-white
+                    rounded-xl
+                    border
+                    border-[#6FA8AA]/30
+                    px-2
+                    py-3
+                    text-center
+                  "
+                >
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-center
+                      gap-1
+                      text-[#6FA8AA]
+                      text-[8px]
+                      font-black
+                    "
+                  >
+                    <FaShieldAlt
+                      className="text-[#08566E]"
+                      size={9}
+                    />
+
+                    {text.trust}
+                  </div>
+
+
+                  <div
+                    className="
+                      mt-1
+                      text-[18px]
+                      font-black
+                      text-[#08566E]
+                    "
+                  >
+                    {worker.trustScore || "—"}
+                    {worker.trustScore ? "%" : ""}
+                  </div>
+
+                </div>
+
+
+                {/* AREA */}
+
+                <div
+                  className="
+                    bg-white
+                    rounded-xl
+                    border
+                    border-[#6FA8AA]/30
+                    px-2
+                    py-3
+                    text-center
+                    min-w-0
+                  "
+                >
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-center
+                      gap-1
+                      text-[#6FA8AA]
+                      text-[8px]
+                      font-black
+                    "
+                  >
+                    <FaMapMarkerAlt
+                      className="text-[#08566E]"
+                      size={9}
+                    />
+
+                    {text.area}
+                  </div>
+
+
+                  <div
+                    className="
+                      mt-1
+                      text-[10px]
+                      font-black
+                      text-[#08566E]
+                      truncate
+                    "
+                  >
+                    {worker.location ||
+                      "Local Area"}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* 
+                  STATUS
+               */}
+
+              <div
+                className="
+                  mt-4
+                  flex
+                  items-center
+                  justify-between
+                  bg-[#08566E]
+                  rounded-xl
+                  px-4
+                  py-3
+                "
+              >
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                  "
+                >
+
+                  <span
+                    className="
+                      w-2
+                      h-2
+                      rounded-full
+                      bg-[#B4DBDC]
+                    "
+                  />
+
+                  <span
+                    className="
+                      text-[9px]
+                      font-black
+                      text-white
+                    "
+                  >
+                    Top Performer
+                  </span>
+
+                </div>
+
+
+                <span
+                  className="
+                    text-[8px]
+                    font-black
+                    text-[#B4DBDC]
+                    uppercase
+                  "
+                >
+                  {worker.status ||
+                    "Available"}
+                </span>
+
+              </div>
+
+
+              {/* CERTIFICATE */}
+
+              {worker.certificate && (
+                <a
+                  href={worker.certificate}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="
+                    block
+                    text-center
+                    mt-3
+                    text-[8px]
+                    font-black
+                    text-[#08566E]
+                    underline
+                  "
+                >
+                  ✓ {text.verified}
+                </a>
+              )}
+
+            </>
+          )}
+
         </div>
-
-        {!worker ? (
-          <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[36px] p-10 text-center shadow-2xl">
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-[#08566E] text-[#E1E9E5] flex items-center justify-center text-3xl shadow-xl">
-              <FaTrophy />
-            </div>
-
-            <h3 className="text-2xl md:text-3xl font-black text-[#08566E] mt-6">
-              {text.noData}
-            </h3>
-
-            <p className="text-[#08566E]/70 font-semibold mt-2">
-              Worker records are loading from E-SERVOO database.
-            </p>
-          </div>
-        ) : (
-          <div className="animate-workerSlide bg-white/40 backdrop-blur-xl border border-white/60 rounded-[36px] p-7 md:p-10 shadow-2xl overflow-hidden">
-            <div className="grid md:grid-cols-[220px_1fr] gap-8 items-center">
-              <div className="relative mx-auto">
-                <div className="absolute -inset-3 bg-[#08566E]/20 rounded-[42px] blur-xl"></div>
-
-                <img
-                  src={worker.image || "https://via.placeholder.com/200"}
-                  alt={worker.name}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/200";
-                  }}
-                  className="relative w-44 h-44 rounded-[36px] object-cover border-4 border-[#E1E9E5] shadow-2xl"
-                />
-
-                <div className="absolute -top-4 -right-4 w-14 h-14 rounded-2xl bg-yellow-400 text-[#08566E] flex items-center justify-center text-2xl shadow-xl">
-                  <FaTrophy />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className="bg-[#08566E] text-[#E1E9E5] px-4 py-2 rounded-full text-sm font-extrabold shadow-md">
-                    #{worker.id || "TOP"}
-                  </span>
-
-                  <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-extrabold shadow-md flex items-center gap-2">
-                    <FaUserCheck />
-                    {text.verified}
-                  </span>
-                </div>
-
-                <h3 className="text-3xl md:text-5xl font-black text-[#08566E] leading-tight">
-                  {worker.name}
-                </h3>
-
-                <p className="text-[#0A5E75] font-extrabold text-xl mt-2">
-                  {getServiceText(worker.service)}
-                </p>
-
-                <div className="grid sm:grid-cols-3 gap-4 mt-7">
-                  <div className="bg-[#E1E9E5]/90 rounded-3xl p-5 text-center shadow-md">
-                    <p className="text-[#6FA8AA] font-extrabold text-sm flex justify-center items-center gap-2">
-                      <FaStar className="text-yellow-500" />
-                      {text.rating}
-                    </p>
-
-                    <p className="text-[#08566E] text-2xl font-black mt-1">
-                      {worker.rating || "4.8"}
-                    </p>
-                  </div>
-
-                  <div className="bg-[#E1E9E5]/90 rounded-3xl p-5 text-center shadow-md">
-                    <p className="text-[#6FA8AA] font-extrabold text-sm flex justify-center items-center gap-2">
-                      <FaShieldAlt />
-                      {text.trust}
-                    </p>
-
-                    <p className="text-[#08566E] text-2xl font-black mt-1">
-                      {worker.trustScore || "90"}%
-                    </p>
-                  </div>
-
-                  <div className="bg-[#E1E9E5]/90 rounded-3xl p-5 text-center shadow-md">
-                    <p className="text-[#6FA8AA] font-extrabold text-sm flex justify-center items-center gap-2">
-                      <FaMapMarkerAlt />
-                      {text.area}
-                    </p>
-
-                    <p className="text-[#08566E] text-lg font-black mt-1 truncate">
-                      {worker.location || "Local Area"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-7 bg-[#08566E] rounded-3xl p-5 shadow-xl">
-                  <p className="text-[#E1E9E5] font-black text-lg">
-                    ✔ {text.verified}
-                  </p>
-
-                  <p className="text-[#B4DBDC] font-semibold mt-1">
-                    High trust score, strong service rating and verified worker profile.
-                  </p>
-
-                  {worker.certificate && (
-                    <a
-                      href={worker.certificate}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-block mt-3 text-[#E1E9E5] font-extrabold underline"
-                    >
-                      📜 {text.certificate}
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

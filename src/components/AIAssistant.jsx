@@ -101,7 +101,7 @@ function AIAssistant({ language = localStorage.getItem("lang") || "en" }) {
     });
   }, [messages, typing]);
 
-  /* ================= MULTI-LANGUAGE HUMAN VOICE LOADER ================= */
+  /* === MULTI-LANGUAGE HUMAN VOICE LOADER === */
 
   useEffect(() => {
     const getVoiceScore = (voice) => {
@@ -194,7 +194,7 @@ function AIAssistant({ language = localStorage.getItem("lang") || "en" }) {
     setInput(text);
   };
 
-  /* ================= CONTEXT AWARE MULTI-LANGUAGE PROMPT ================= */
+  /* === CONTEXT AWARE MULTI-LANGUAGE PROMPT === */
 
   const makeLanguagePrompt = (userMessage, conversationMessages) => {
     const selectedLanguage = getLanguageName();
@@ -254,7 +254,7 @@ Reply naturally in the selected language. Do not repeat greeting unless this is 
     `;
   };
 
-  /* ================= HUMANIZED MULTI-LANGUAGE VOICE ================= */
+  /* === HUMANIZED MULTI-LANGUAGE VOICE === */
 
   const speakText = (text) => {
     if (!voiceReply) return;
@@ -430,7 +430,7 @@ Reply naturally in the selected language. Do not repeat greeting unless this is 
     setMessages([getDefaultMessage()]);
   };
 
-  /* ================= VOICE INPUT MULTI-LANGUAGE ================= */
+  /* === VOICE INPUT MULTI-LANGUAGE === */
 
   useEffect(() => {
     const SpeechRecognition =
@@ -513,7 +513,7 @@ Reply naturally in the selected language. Do not repeat greeting unless this is 
     }
   };
 
-  /* ================= DRAG DESKTOP ================= */
+  /* === DRAG DESKTOP === */
 
   const handleMouseDown = (e) => {
     dragging.current = true;
@@ -537,7 +537,7 @@ Reply naturally in the selected language. Do not repeat greeting unless this is 
     dragging.current = false;
   };
 
-  /* ================= DRAG MOBILE ================= */
+  /* === DRAG MOBILE === */
 
   const handleTouchStart = (e) => {
     const touch = e.touches[0];

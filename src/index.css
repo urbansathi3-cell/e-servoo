@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ========== E-SERVOO DESIGN SYSTEM ========== */
+/* === E-SERVOO DESIGN SYSTEM === */
 
 :root {
   color-scheme: only light !important;
@@ -17,7 +17,7 @@
     BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* ========== GLOBAL BASE FIX ========== */
+/* === GLOBAL BASE FIX === */
 
 html {
   scroll-behavior: smooth;
@@ -45,7 +45,7 @@ body {
   margin: 0;
 }
 
-/* ========== PROFESSIONAL TYPOGRAPHY FIX ========== */
+/* === PROFESSIONAL TYPOGRAPHY FIX === */
 
 * {
   font-family: var(--es-font-main) !important;
@@ -82,7 +82,7 @@ button {
   font-weight: 800 !important;
 }
 
-/* ========== READABILITY / CONTRAST FIX ========== */
+/* === READABILITY / CONTRAST FIX === */
 
 .es-readable-text {
   color: rgba(8, 86, 110, 0.9) !important;
@@ -106,7 +106,7 @@ button {
   font-weight: 700 !important;
 }
 
-/* ========== APP LIGHT LOCK ========== */
+/* === APP LIGHT LOCK === */
 
 .es-light-lock {
   background-color: #B4DBDC !important;
@@ -121,7 +121,7 @@ button {
   forced-color-adjust: none !important;
 }
 
-/* ========== FORM FIELD COLOR LOCK ========== */
+/* === FORM FIELD COLOR LOCK === */
 
 input,
 textarea,
@@ -165,7 +165,7 @@ img {
   display: block;
 }
 
-/* ========== CHROME / ANDROID DARK OVERRIDE ========== */
+/* === CHROME / ANDROID DARK OVERRIDE === */
 
 @media (prefers-color-scheme: dark) {
   :root,
@@ -190,7 +190,7 @@ img {
   }
 }
 
-/* ========== UBUNTU / LINUX CONSISTENCY HELPERS ========== */
+/* === UBUNTU / LINUX CONSISTENCY HELPERS === */
 
 .bg-es-page {
   background: #B4DBDC !important;
@@ -205,7 +205,7 @@ img {
   color: #08566E !important;
 }
 
-/* ========== WORKER SLIDE ANIMATION ========== */
+/* === WORKER SLIDE ANIMATION === */
 
 @keyframes workerSlide {
   0% {
@@ -223,7 +223,7 @@ img {
   animation: workerSlide 1.5s ease-out;
 }
 
-/* ========== E-SERVOO AUTH SLIDING ANIMATION ========== */
+/* === E-SERVOO AUTH SLIDING ANIMATION === */
 
 .es-auth-page {
   min-height: 100vh;
@@ -306,7 +306,7 @@ img {
   z-index: 6;
 }
 
-/* ========== AUTH INPUTS ========== */
+/* === AUTH INPUTS === */
 
 .es-input-box {
   width: 100%;
@@ -336,7 +336,7 @@ img {
   box-shadow: 0 0 0 4px rgba(158, 207, 208, 0.35);
 }
 
-/* ========== AUTH OLD BUTTON SUPPORT ========== */
+/* === AUTH OLD BUTTON SUPPORT === */
 
 .es-auth-btn {
   width: 100%;
@@ -375,7 +375,7 @@ img {
   text-decoration: underline;
 }
 
-/* ========== SLIDING TOGGLE PANEL ========== */
+/* === SLIDING TOGGLE PANEL === */
 
 .es-toggle-container {
   position: absolute;
@@ -472,7 +472,7 @@ img {
   transform: translateX(200%);
 }
 
-/* ========== MOBILE AUTH RESPONSIVE ========== */
+/* === MOBILE AUTH RESPONSIVE === */
 
 @media (max-width: 768px) {
   .es-auth-page {
@@ -524,7 +524,7 @@ img {
   }
 }
 
-/* ========== E-SERVOO LIQUID FOOTER NAV ========== */
+/* === E-SERVOO LIQUID FOOTER NAV === */
 
 .es-footer-wrapper {
   position: fixed;
@@ -682,7 +682,7 @@ img {
   }
 }
 
-/* ========== BUTTON CONSISTENCY FIX ========== */
+/* === BUTTON CONSISTENCY FIX === */
 
 /*
   Important:
@@ -815,7 +815,7 @@ button:disabled,
   border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-/* ========== SENIOR CITIZEN MODE ========== */
+/* === SENIOR CITIZEN MODE === */
 
 .senior-mode {
   letter-spacing: 0.2px;
@@ -920,7 +920,7 @@ button:disabled,
   }
 }
 
-/* ========== E-SERVOO SMOOTH LOADER ========== */
+/* === E-SERVOO SMOOTH LOADER === */
 
 .es-loader-screen {
   position: fixed;
@@ -1090,7 +1090,7 @@ button:disabled,
   }
 }
 
-/* ========== E-SERVOO ANIMATED AUTH BUTTON ========== */
+/* === E-SERVOO ANIMATED AUTH BUTTON === */
 
 .es-animated-auth-btn {
   width: 100%;
@@ -1411,7 +1411,7 @@ button:disabled,
     right: 76px;
   }
 }
-/* ========== FINAL E-SERVOO STABILITY PATCH ========== */
+/* === FINAL E-SERVOO STABILITY PATCH === */
 
 /* Prevent accidental white / dark screen */
 html,

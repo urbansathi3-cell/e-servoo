@@ -190,9 +190,9 @@ function Services({
       id="services"
       className="relative min-h-screen overflow-hidden bg-[#F5FAF9] text-[#08566E] pb-28"
     >
-      {/* =====================================================
+      {/* ====
           BACKGROUND
-      ====================================================== */}
+      ===== */}
 
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-[#B4DBDC]/50 blur-3xl" />
@@ -204,9 +204,9 @@ function Services({
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
 
-        {/* =====================================================
+        {/* ====
             MOBILE-APP HEADER
-        ====================================================== */}
+        ===== */}
 
         <div className="sticky top-0 z-40 -mx-4 px-4 pt-3 pb-3 bg-[#F5FAF9]/90 backdrop-blur-xl border-b border-[#DCE9E8]">
 
@@ -246,9 +246,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             LOCATION BAR
-        ====================================================== */}
+        ===== */}
 
         <div className="pt-5">
 
@@ -280,9 +280,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             PAGE INTRO
-        ====================================================== */}
+        ===== */}
 
         <div className="pt-6 pb-5">
 
@@ -305,9 +305,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             SEARCH BAR
-        ====================================================== */}
+        ===== */}
 
         <div className="mb-6">
 
@@ -341,9 +341,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             SERVICE SECTION HEADER
-        ====================================================== */}
+        ===== */}
 
         <div className="flex items-center justify-between mb-3">
 
@@ -364,9 +364,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             SERVICE GRID
-        ====================================================== */}
+        ===== */}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
 
@@ -453,9 +453,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             SMART ASSIGNMENT CARD
-        ====================================================== */}
+        ===== */}
 
         <div className="mt-6">
 
@@ -538,9 +538,9 @@ function Services({
 
         </div>
 
-        {/* =====================================================
+        {/* ====
             TRUST STRIP
-        ====================================================== */}
+        ===== */}
 
         <div className="mt-5 bg-[#E9F4F3] border border-[#CFE4E2] rounded-2xl p-3 flex items-center gap-3">
 
@@ -566,9 +566,9 @@ function Services({
 
       </div>
 
-      {/* =====================================================
+      {/* ====
           3-LINE BOTTOM NAVIGATION
-      ====================================================== */}
+      ===== */}
 
       <div className="fixed bottom-3 left-3 right-3 z-[90]">
 

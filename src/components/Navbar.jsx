@@ -6,6 +6,10 @@ import {
   FaUserCircle,
   FaBars,
   FaTimes,
+  FaBolt,
+  FaEllipsisV,
+  FaGlobe,
+  FaUniversalAccess,
 } from "react-icons/fa";
 import { getStoredUser } from "../utils/storage";
 
@@ -14,304 +18,514 @@ function Navbar() {
 
   const [user, setUser] = useState(() => getStoredUser());
   const [menuOpen, setMenuOpen] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
 
+  // === LANGUAGE ===
+  const [language, setLanguage] = useState(
+    () => localStorage.getItem("language") || "en"
+  );
+
+  // === SENIOR MODE ===
+  const [seniorMode, setSeniorMode] = useState(
+    () => localStorage.getItem("seniorMode") === "true"
+  );
+
+  // === USER REFRESH ===
   useEffect(() => {
     const refreshUser = () => {
       setUser(getStoredUser());
     };
 
-    refreshUser();
-
     window.addEventListener("storage", refreshUser);
-    window.addEventListener("focus", refreshUser);
+    window.addEventListener("user-updated", refreshUser);
 
     return () => {
       window.removeEventListener("storage", refreshUser);
-      window.removeEventListener("focus", refreshUser);
+      window.removeEventListener("user-updated", refreshUser);
     };
   }, []);
 
   const isHome = location.pathname === "/";
 
-  const handleBack = () => {
-    window.history.back();
+  const getUserName = () => {
+    if (!user) return "Guest";
+
+    return (
+      user.name ||
+      user.fullName ||
+      user.username ||
+      "User"
+    );
   };
 
-  const closeMenu = () => {
-    setMenuOpen(false);
+  const userName = getUserName();
+
+  // === LANGUAGE CHANGE ===
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+
+    localStorage.setItem("language", lang);
+
+    window.dispatchEvent(
+      new CustomEvent("language-changed", {
+        detail: lang,
+      })
+    );
+  };
+
+  // === SENIOR MODE ===
+  const handleSeniorMode = () => {
+    const newValue = !seniorMode;
+
+    setSeniorMode(newValue);
+
+    localStorage.setItem("seniorMode", String(newValue));
+
+    window.dispatchEvent(
+      new CustomEvent("senior-mode-changed", {
+        detail: newValue,
+      })
+    );
   };
 
   return (
     <>
-      {/* =====================================================
-          TOP MOBILE APP BAR
-      ===================================================== */}
+      {/* === NAVBAR === */}
+      <nav className="sticky top-0 z-50 px-3 pt-3">
+        <div
+          className="
+            max-w-6xl mx-auto
+            bg-[#E1E9E5]/95
+            backdrop-blur-xl
+            border-2 border-[#08566E]
+            rounded-[24px]
+            shadow-[0_4px_18px_rgba(8,86,110,0.12)]
+            relative
+          "
+        >
+          <div className="h-[68px] px-3 sm:px-5 flex items-center justify-between">
 
-      <nav className="sticky top-0 z-[100] w-full bg-[#E1E9E5]/95 backdrop-blur-2xl border-b border-white/70 shadow-[0_6px_25px_rgba(8,86,110,0.10)]">
-        <div className="mx-auto w-full max-w-6xl px-4 py-3">
-          <div className="flex items-center justify-between">
-
-            {/* LEFT */}
+            {/* === LEFT === */}
             <div className="flex items-center gap-2">
-              {!isHome ? (
+
+              {!isHome && (
                 <button
-                  type="button"
-                  onClick={handleBack}
+                  onClick={() => window.history.back()}
+                  className="
+                    w-10 h-10
+                    rounded-full
+                    bg-white
+                    border border-[#6FA8AA]/40
+                    text-[#08566E]
+                    flex items-center justify-center
+                    active:scale-95
+                    transition
+                  "
                   aria-label="Go back"
-                  className="w-11 h-11 rounded-2xl bg-white/80 border border-white flex items-center justify-center text-[#08566E] text-lg shadow-sm active:scale-95 transition"
                 >
-                  <FaArrowLeft />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setMenuOpen(true)}
-                  aria-label="Open menu"
-                  className="w-11 h-11 rounded-2xl bg-white/80 border border-white flex items-center justify-center text-[#08566E] text-lg shadow-sm active:scale-95 transition"
-                >
-                  <FaBars />
+                  <FaArrowLeft size={14} />
                 </button>
               )}
-            </div>
 
-            {/* CENTER BRAND */}
-            <Link
-              to="/"
-              aria-label="E-SERVOO Home"
-              className="flex items-center gap-2 group"
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-[#6FA8AA]/40 rounded-2xl blur-md"></div>
-
-                <img
-                  src="/logo.png"
-                  alt="E-SERVOO"
-                  className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-contain shadow-md group-hover:scale-105 transition"
-                />
-              </div>
-
-              <div className="leading-none">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#08566E]">
-                  E-SERVOO
-                </h1>
-
-                <p className="hidden sm:block text-[9px] font-black tracking-[0.18em] text-[#6FA8AA] uppercase mt-1">
-                  Smart Local Services
-                </p>
-              </div>
-            </Link>
-
-            {/* RIGHT */}
-            <div className="flex items-center gap-2">
-
-              {/* Notification */}
-              <button
-                type="button"
-                aria-label="Notifications"
-                onClick={() => {
-                  window.dispatchEvent(
-                    new CustomEvent("eservoo-notifications")
-                  );
-                }}
-                className="relative w-11 h-11 rounded-2xl bg-white/80 border border-white flex items-center justify-center text-[#08566E] text-lg shadow-sm active:scale-95 transition"
-              >
-                <FaBell />
-
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border-2 border-white"></span>
-              </button>
-
-              {/* Profile */}
+              {/* LOGO */}
               <Link
-                to={user ? "/profile" : "/"}
-                aria-label={user ? "Profile" : "Login"}
-                className="w-11 h-11 rounded-2xl bg-[#08566E] flex items-center justify-center text-[#E1E9E5] text-xl shadow-md active:scale-95 transition"
+                to="/"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setControlsOpen(false);
+                }}
               >
-                <FaUserCircle />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* =====================================================
-          MOBILE SIDE MENU
-      ===================================================== */}
-
-      {menuOpen && (
-        <div className="fixed inset-0 z-[200]">
-
-          {/* Overlay */}
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={closeMenu}
-            className="absolute inset-0 bg-[#043A4A]/45 backdrop-blur-sm"
-          />
-
-          {/* Drawer */}
-          <aside className="absolute left-0 top-0 bottom-0 w-[82%] max-w-[350px] bg-[#E1E9E5] shadow-[20px_0_70px_rgba(0,0,0,0.25)] rounded-r-[32px] overflow-y-auto">
-
-            {/* Drawer Header */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#043A4A] via-[#08566E] to-[#0A7F88] px-5 pt-8 pb-7">
-
-              <div className="absolute -top-20 -right-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-
-              <div className="relative flex items-center justify-between">
-
-                <Link
-                  to="/"
-                  onClick={closeMenu}
-                  className="flex items-center gap-3"
+                <div
+                  className="
+                    w-10 h-10
+                    rounded-full
+                    bg-[#08566E]
+                    flex items-center justify-center
+                    overflow-hidden
+                    shadow-sm
+                  "
                 >
                   <img
                     src="/logo.png"
                     alt="E-SERVOO"
-                    className="w-14 h-14 rounded-2xl bg-white/90 p-1 object-contain shadow-lg"
+                    className="w-full h-full object-contain"
                   />
+                </div>
 
-                  <div>
-                    <h2 className="text-2xl font-black text-white">
-                      E-SERVOO
-                    </h2>
-
-                    <p className="text-[#B4DBDC] text-xs font-bold mt-1">
-                      Smart Local Services
-                    </p>
+                <div className="leading-none">
+                  <div className="text-[20px] sm:text-[23px] font-black tracking-tight text-[#08566E]">
+                    E-SERVOO
                   </div>
-                </Link>
 
-                <button
-                  type="button"
-                  onClick={closeMenu}
-                  aria-label="Close menu"
-                  className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 text-white flex items-center justify-center"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-
-              {/* User mini card */}
-              <div className="relative mt-6 bg-white/10 border border-white/15 rounded-2xl p-4">
-
-                <p className="text-[#B4DBDC] text-[10px] font-black uppercase tracking-wider">
-                  Welcome
-                </p>
-
-                <p className="text-white text-lg font-black mt-1 truncate">
-                  {user?.name || "E-SERVOO User"}
-                </p>
-
-                <p className="text-white/70 text-xs font-semibold mt-1">
-                  {user
-                    ? "Your trusted local service partner"
-                    : "Login to book a service"}
-                </p>
-              </div>
+                  <div className="text-[7px] sm:text-[8px] font-bold tracking-[0.16em] text-[#6FA8AA] uppercase">
+                    Smart Local Services
+                  </div>
+                </div>
+              </Link>
             </div>
 
-            {/* MENU */}
-            <div className="p-5">
+            {/* === RIGHT === */}
+            <div className="flex items-center gap-2">
 
-              <p className="text-[#6FA8AA] text-xs font-black uppercase tracking-widest mb-3">
-                Explore
-              </p>
+              {/* VERIFIED */}
+              <div className="hidden sm:flex items-center gap-1.5">
+                <div className="w-7 h-7 rounded-full bg-[#08566E] text-white flex items-center justify-center">
+                  <FaBolt size={11} />
+                </div>
 
-              <div className="space-y-2">
+                <div className="leading-none">
+                  <p className="text-[7px] font-black text-[#08566E] uppercase">
+                    Verified
+                  </p>
+
+                  <p className="text-[6px] text-[#6FA8AA] font-bold">
+                    Professionals
+                  </p>
+                </div>
+              </div>
+
+              {/* NOTIFICATION */}
+              <button
+                className="
+                  hidden sm:flex
+                  w-10 h-10
+                  rounded-full
+                  bg-white
+                  border border-[#6FA8AA]/40
+                  items-center justify-center
+                  text-[#08566E]
+                  relative
+                  active:scale-95
+                  transition
+                "
+                aria-label="Notifications"
+              >
+                <FaBell size={14} />
+
+                <span
+                  className="
+                    absolute
+                    top-1
+                    right-1
+                    w-2 h-2
+                    rounded-full
+                    bg-[#08566E]
+                    border-2 border-white
+                  "
+                />
+              </button>
+
+              {/* === 3 DOT CONTROLS === */}
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setControlsOpen((prev) => !prev)
+                  }
+                  className="
+                    w-10 h-10
+                    rounded-full
+                    bg-white
+                    border border-[#6FA8AA]/40
+                    text-[#08566E]
+                    flex items-center justify-center
+                    active:scale-95
+                    transition
+                  "
+                  aria-label="Quick Controls"
+                  aria-expanded={controlsOpen}
+                >
+                  <FaEllipsisV size={16} />
+                </button>
+
+                {/* === CONTROLS DROPDOWN === */}
+                {controlsOpen && (
+                  <div
+                    className="
+                      absolute
+                      right-0
+                      top-12
+                      w-[245px]
+                      bg-[#E1E9E5]
+                      border-2 border-[#08566E]
+                      rounded-[20px]
+                      shadow-[0_10px_30px_rgba(8,86,110,0.20)]
+                      p-3
+                      z-[100]
+                    "
+                  >
+                    {/* TITLE */}
+                    <div className="px-2 pb-2">
+                      <p className="text-[10px] font-black text-[#08566E] uppercase tracking-wide">
+                        Quick Controls
+                      </p>
+
+                      <p className="text-[8px] text-[#6FA8AA] font-semibold">
+                        Language & accessibility
+                      </p>
+                    </div>
+
+                    {/* LANGUAGE */}
+                    <div
+                      className="
+                        bg-white
+                        rounded-[14px]
+                        border border-[#6FA8AA]/30
+                        p-2
+                        mb-2
+                      "
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className="
+                            w-7 h-7
+                            rounded-full
+                            bg-[#08566E]
+                            text-white
+                            flex items-center justify-center
+                          "
+                        >
+                          <FaGlobe size={11} />
+                        </div>
+
+                        <div>
+                          <p className="text-[9px] font-black text-[#08566E]">
+                            Language
+                          </p>
+
+                          <p className="text-[7px] text-[#6FA8AA]">
+                            Choose language
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { id: "en", label: "EN" },
+                          { id: "hi", label: "HI" },
+                          { id: "od", label: "OD" },
+                        ].map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={() =>
+                              handleLanguageChange(item.id)
+                            }
+                            className={`
+                              h-8
+                              rounded-lg
+                              text-[9px]
+                              font-black
+                              transition
+                              ${
+                                language === item.id
+                                  ? "bg-[#08566E] text-white"
+                                  : "bg-[#E1E9E5] text-[#08566E] hover:bg-[#B4DBDC]"
+                              }
+                            `}
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* SENIOR MODE */}
+                    <div
+                      className="
+                        bg-white
+                        rounded-[14px]
+                        border border-[#6FA8AA]/30
+                        p-2
+                      "
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="
+                              w-7 h-7
+                              rounded-full
+                              bg-[#08566E]
+                              text-white
+                              flex items-center justify-center
+                            "
+                          >
+                            <FaUniversalAccess size={13} />
+                          </div>
+
+                          <div>
+                            <p className="text-[9px] font-black text-[#08566E]">
+                              Senior Mode
+                            </p>
+
+                            <p className="text-[7px] text-[#6FA8AA]">
+                              Larger & simpler interface
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* TOGGLE */}
+                        <button
+                          onClick={handleSeniorMode}
+                          className={`
+                            relative
+                            w-11
+                            h-6
+                            rounded-full
+                            transition
+                            ${
+                              seniorMode
+                                ? "bg-[#08566E]"
+                                : "bg-[#B4DBDC]"
+                            }
+                          `}
+                          aria-label="Toggle Senior Mode"
+                          aria-pressed={seniorMode}
+                        >
+                          <span
+                            className={`
+                              absolute
+                              top-[3px]
+                              w-5
+                              h-5
+                              rounded-full
+                              bg-white
+                              shadow-sm
+                              transition-all
+                              ${
+                                seniorMode
+                                  ? "left-[22px]"
+                                  : "left-[3px]"
+                              }
+                            `}
+                          />
+                        </button>
+                      </div>
+
+                      <div className="mt-2 text-right">
+                        <span
+                          className={`
+                            text-[7px]
+                            font-black
+                            uppercase
+                            ${
+                              seniorMode
+                                ? "text-[#08566E]"
+                                : "text-[#6FA8AA]"
+                            }
+                          `}
+                        >
+                          {seniorMode ? "ON" : "OFF"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* === MOBILE MENU === */}
+              <button
+                onClick={() => {
+                  setMenuOpen((prev) => !prev);
+                  setControlsOpen(false);
+                }}
+                className="
+                  sm:hidden
+                  w-10 h-10
+                  rounded-full
+                  bg-white
+                  border border-[#6FA8AA]/40
+                  text-[#08566E]
+                  flex items-center justify-center
+                  active:scale-95
+                  transition
+                "
+                aria-label="Menu"
+              >
+                {menuOpen ? (
+                  <FaTimes size={16} />
+                ) : (
+                  <FaBars size={16} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* === MOBILE MENU === */}
+          {menuOpen && (
+            <div className="sm:hidden px-3 pb-3">
+              <div className="bg-white rounded-[18px] border border-[#6FA8AA]/30 p-3 space-y-2">
 
                 <Link
                   to="/"
-                  onClick={closeMenu}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-white shadow-sm text-[#08566E] font-black active:scale-[0.98] transition"
+                  onClick={() => setMenuOpen(false)}
+                  className="
+                    flex items-center gap-3
+                    px-3 py-3
+                    rounded-xl
+                    text-sm font-bold
+                    text-[#08566E]
+                    hover:bg-[#B4DBDC]/40
+                  "
                 >
-                  <span className="text-xl">🏠</span>
-                  <span>Home</span>
+                  <FaBolt size={13} />
+                  Home
                 </Link>
 
                 <Link
                   to="/services"
-                  onClick={closeMenu}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-white shadow-sm text-[#08566E] font-black active:scale-[0.98] transition"
+                  onClick={() => setMenuOpen(false)}
+                  className="
+                    flex items-center gap-3
+                    px-3 py-3
+                    rounded-xl
+                    text-sm font-bold
+                    text-[#08566E]
+                    hover:bg-[#B4DBDC]/40
+                  "
                 >
-                  <span className="text-xl">🛠️</span>
-                  <span>All Services</span>
+                  <FaBolt size={13} />
+                  Services
                 </Link>
 
                 <Link
-                  to="/bookings"
-                  onClick={closeMenu}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-white shadow-sm text-[#08566E] font-black active:scale-[0.98] transition"
+                  to={user ? "/bookings" : "/login"}
+                  onClick={() => setMenuOpen(false)}
+                  className="
+                    flex items-center gap-3
+                    px-3 py-3
+                    rounded-xl
+                    text-sm font-bold
+                    text-[#08566E]
+                    hover:bg-[#B4DBDC]/40
+                  "
                 >
-                  <span className="text-xl">📋</span>
-                  <span>My Bookings</span>
+                  <FaBell size={13} />
+                  My Bookings
                 </Link>
 
                 <Link
-                  to={user ? "/profile" : "/"}
-                  onClick={closeMenu}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-white shadow-sm text-[#08566E] font-black active:scale-[0.98] transition"
+                  to={user ? "/profile" : "/login"}
+                  onClick={() => setMenuOpen(false)}
+                  className="
+                    flex items-center gap-3
+                    px-3 py-3
+                    rounded-xl
+                    text-sm font-bold
+                    text-[#08566E]
+                    hover:bg-[#B4DBDC]/40
+                  "
                 >
-                  <span className="text-xl">👤</span>
-                  <span>{user ? "My Profile" : "Login"}</span>
+                  <FaUserCircle size={14} />
+                  {user ? userName : "Login"}
                 </Link>
 
               </div>
-
-              {/* Quick Service */}
-              <div className="mt-7">
-
-                <p className="text-[#6FA8AA] text-xs font-black uppercase tracking-widest mb-3">
-                  Quick Service
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMenu();
-                    navigateToServices();
-                  }}
-                  className="w-full rounded-2xl bg-[#08566E] text-[#E1E9E5] p-4 font-black shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition"
-                >
-                  <FaBolt />
-                  Book a Service
-                </button>
-
-              </div>
-
-              {/* Trust */}
-              <div className="mt-7 bg-[#B4DBDC]/45 border border-[#9ECFD0] rounded-2xl p-4">
-
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#08566E]">
-                    ✓
-                  </div>
-
-                  <div>
-                    <p className="text-[#08566E] font-black text-sm">
-                      Verified Local Network
-                    </p>
-
-                    <p className="text-[#06485C] text-xs font-semibold mt-1">
-                      Trusted workers • Smart matching • Local support
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-
             </div>
-          </aside>
+          )}
         </div>
-      )}
+      </nav>
     </>
   );
-}
-
-/* =========================================================
-   NAVIGATION HELPER
-========================================================= */
-
-function navigateToServices() {
-  window.location.href = "/services";
 }
 
 export default Navbar;
