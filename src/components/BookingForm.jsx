@@ -103,7 +103,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     );
 
   // =========================================================
-  // LOAD USER
+  // LOAD USER DETAILS
   // =========================================================
 
   useEffect(() => {
@@ -122,6 +122,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     });
 
     setAcceptedTerms(false);
+    setSuccess(false);
+    setBookingId("");
   }, [selectedWorker]);
 
   // =========================================================
@@ -139,7 +141,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   };
 
   // =========================================================
-  // FORM
+  // FORM CHANGE
   // =========================================================
 
   const handleChange = (event) => {
@@ -166,6 +168,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     setSuccess(false);
     setBookingId("");
     setAcceptedTerms(false);
+    setLoading(false);
     setSelectedWorker(null);
 
     setFormData({
@@ -180,6 +183,16 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   };
 
   // =========================================================
+  // CLOSE
+  // =========================================================
+
+  const closeBooking = () => {
+    if (loading) return;
+
+    setSelectedWorker(null);
+  };
+
+  // =========================================================
   // SUBMIT BOOKING
   // =========================================================
 
@@ -188,7 +201,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
     if (loading) return;
 
-    const cleanPhone = String(formData.phone || "").replace(/\D/g, "");
+    const cleanPhone = String(formData.phone || "").replace(
+      /\D/g,
+      ""
+    );
 
     // -------------------------------------------------------
     // VALIDATION
@@ -200,12 +216,12 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     }
 
     if (cleanPhone.length < 10) {
-      alert("Enter valid phone number.");
+      alert("Enter a valid phone number.");
       return;
     }
 
     if (!formData.address.trim()) {
-      alert("Address is required.");
+      alert("Service address is required.");
       return;
     }
 
@@ -223,7 +239,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
     try {
       // -----------------------------------------------------
-      // WORKER DETAILS
+      // WORKER
       // -----------------------------------------------------
 
       const workerId = getWorkerId();
@@ -242,7 +258,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       const storedToken = getStoredToken();
 
       // -----------------------------------------------------
-      // BOOKING PAYLOAD
+      // PAYLOAD
       // -----------------------------------------------------
 
       const payload = {
@@ -273,7 +289,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         phone: cleanPhone,
         email: storedUser?.email || "",
 
-        // Booking details
+        // Booking
         address: formData.address.trim(),
         issueDescription: formData.issueDescription.trim(),
         urgency: formData.urgency,
@@ -282,29 +298,25 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
         acceptedTerms: true,
       };
 
-      console.log(
-        "========================================"
-      );
+      console.log("========================================");
       console.log("E-SERVOO BOOKING");
       console.log("========================================");
-      console.log("Selected worker:", selectedWorker);
+      console.log("Worker:", selectedWorker);
       console.log("Worker ID:", workerId);
-      console.log("Worker:", finalWorker);
+      console.log("Worker Name:", finalWorker);
       console.log("Service:", finalService);
       console.log("Payload:", payload);
       console.log("API:", API_URL);
 
       // -----------------------------------------------------
-      // VERCEL API
+      // API
       // -----------------------------------------------------
 
       const response = await fetch(API_URL, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify(payload),
       });
 
@@ -314,7 +326,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       );
 
       // -----------------------------------------------------
-      // READ RESPONSE
+      // RESPONSE
       // -----------------------------------------------------
 
       const responseText = await response.text();
@@ -378,7 +390,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       }
 
       // -----------------------------------------------------
-      // WORKER STATUS WARNING
+      // WORKER STATUS
       // -----------------------------------------------------
 
       if (data?.statusUpdated === false) {
@@ -440,7 +452,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   };
 
   // =========================================================
-  // NO WORKER SELECTED
+  // NO WORKER
   // =========================================================
 
   if (!selectedWorker) {
@@ -506,7 +518,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
     String(workerStatus).toLowerCase() === "available";
 
   // =========================================================
-  // URGENCY
+  // URGENCY OPTIONS
   // =========================================================
 
   const urgencyOptions = [
@@ -543,35 +555,49 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
   return (
     <>
       {/* =====================================================
-          SUCCESS POPUP
+          SUCCESS SCREEN
       ===================================================== */}
 
       {success && (
-        <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-md flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[500] bg-[#043A4A]/80 backdrop-blur-md flex items-center justify-center px-4">
 
-          <div className="relative w-full max-w-[390px] bg-[#F8FCFA] rounded-[30px] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.4)] text-center overflow-hidden">
+          <div className="relative w-full max-w-[400px] max-h-[90dvh] overflow-y-auto bg-[#F8FCFA] rounded-[32px] shadow-[0_30px_100px_rgba(0,0,0,0.45)] p-6">
 
-            <div className="absolute -top-20 -left-20 w-44 h-44 bg-[#9ECFD0] rounded-full blur-3xl"></div>
+            {/* Decorative circles */}
 
-            <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-[#6FA8AA] rounded-full blur-3xl"></div>
+            <div className="absolute -top-20 -left-20 w-48 h-48 bg-[#9ECFD0]/60 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="absolute -bottom-20 -right-20 w-52 h-52 bg-[#6FA8AA]/50 rounded-full blur-3xl pointer-events-none"></div>
 
             <div className="relative">
 
-              <div className="w-20 h-20 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center text-4xl shadow-xl">
-                <FaCheckCircle />
+              {/* SUCCESS ICON */}
+
+              <div className="flex justify-center">
+
+                <div className="w-20 h-20 rounded-full bg-green-600 text-white flex items-center justify-center text-4xl shadow-xl">
+                  <FaCheckCircle />
+                </div>
+
               </div>
 
-              <h2 className="text-2xl font-black text-[#043A4A] mt-5">
+              <p className="text-center text-[10px] font-black tracking-[0.25em] text-[#6FA8AA] mt-5 uppercase">
+                E-SERVOO
+              </p>
+
+              <h2 className="text-center text-2xl font-black text-[#043A4A] mt-1">
                 Booking Successful
               </h2>
 
-              <p className="text-sm font-semibold text-[#08566E] mt-2">
+              <p className="text-center text-sm font-semibold text-[#08566E] mt-2">
                 Your service request has been placed.
               </p>
 
-              <div className="mt-5 bg-white rounded-2xl border border-[#B4DBDC] p-4">
+              {/* BOOKING ID */}
 
-                <p className="text-xs text-[#6FA8AA] font-black">
+              <div className="mt-5 bg-white rounded-2xl border border-[#B4DBDC] p-4 text-center">
+
+                <p className="text-[10px] text-[#6FA8AA] font-black tracking-widest">
                   BOOKING ID
                 </p>
 
@@ -581,42 +607,115 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               </div>
 
-              <div className="mt-4 bg-white rounded-2xl border border-[#B4DBDC] p-4 text-left">
+              {/* BOOKING DETAILS */}
 
-                <p className="font-black text-[#043A4A]">
-                  {formData.worker}
-                </p>
+              <div className="mt-4 bg-white rounded-2xl border border-[#B4DBDC] p-4">
 
-                <p className="text-sm font-bold text-[#08566E] mt-1">
-                  {formData.service}
-                </p>
+                <div className="flex items-center justify-between gap-3">
 
-                <p className="text-sm font-semibold text-[#08566E] mt-2">
-                  Priority: {formData.urgency}
-                </p>
+                  <div className="min-w-0">
 
-                <div className="mt-3 bg-[#EAF6F5] rounded-xl p-3">
-                  <p className="text-xs font-black text-[#08566E]">
-                    PRICING
-                  </p>
+                    <p className="text-[10px] text-gray-500 font-black uppercase">
+                      Worker
+                    </p>
 
-                  <p className="text-xs font-semibold text-[#043A4A] mt-1 leading-relaxed">
-                    Service charge is inspection-based.
-                    The final amount will be determined
-                    after inspection.
-                  </p>
+                    <p className="text-base font-black text-[#043A4A] truncate">
+                      {formData.worker}
+                    </p>
+
+                  </div>
+
+                  <div className="w-11 h-11 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E] shrink-0">
+                    <FaUser />
+                  </div>
+
+                </div>
+
+                <div className="mt-4 flex items-center gap-3">
+
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E]">
+                    <FaTools />
+                  </div>
+
+                  <div>
+
+                    <p className="text-[10px] text-gray-500 font-black uppercase">
+                      Service
+                    </p>
+
+                    <p className="text-sm font-black text-[#043A4A]">
+                      {formData.service}
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <div className="mt-4 flex items-center gap-3">
+
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E]">
+                    <FaClock />
+                  </div>
+
+                  <div>
+
+                    <p className="text-[10px] text-gray-500 font-black uppercase">
+                      Priority
+                    </p>
+
+                    <p className="text-sm font-black text-[#043A4A]">
+                      {formData.urgency}
+                    </p>
+
+                  </div>
+
                 </div>
 
               </div>
 
-              <p className="text-sm font-semibold text-[#08566E] mt-4">
-                Our team will contact you shortly.
-              </p>
+              {/* PRICING */}
+
+              <div className="mt-4 bg-[#EAF6F5] border border-[#B4DBDC] rounded-2xl p-4">
+
+                <div className="flex items-start gap-3">
+
+                  <FaClipboardCheck className="text-[#08566E] mt-0.5 shrink-0" />
+
+                  <div>
+
+                    <p className="text-xs font-black text-[#043A4A]">
+                      Inspection-Based Pricing
+                    </p>
+
+                    <p className="text-xs font-semibold text-[#08566E] mt-1 leading-relaxed">
+                      No fixed service charge is shown.
+                      The final amount will be determined
+                      after inspection based on the actual
+                      issue and required work.
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div className="mt-4 flex items-start gap-2 justify-center">
+
+                <FaShieldAlt className="text-green-600 mt-0.5" />
+
+                <p className="text-xs text-gray-500 font-semibold text-center">
+                  Our team will contact you shortly.
+                </p>
+
+              </div>
+
+              {/* DONE */}
 
               <button
                 type="button"
                 onClick={resetBookingForm}
-                className="w-full mt-5 py-3.5 rounded-2xl bg-[#08566E] text-white font-black shadow-xl active:scale-[0.98] transition"
+                className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-[#043A4A] via-[#08566E] to-[#0A7F88] text-white font-black shadow-xl active:scale-[0.98] transition"
               >
                 Done
               </button>
@@ -627,12 +726,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
       )}
 
       {/* =====================================================
-          MOBILE SHOPPING STYLE MODAL
+          BOOKING MODAL
       ===================================================== */}
 
-      <div className="fixed inset-0 z-[200] bg-[#EEF4F3]">
-
-        {/* MOBILE APP CONTAINER */}
+      <div className="fixed inset-0 z-[200] bg-[#DDE8E8]">
 
         <div className="relative mx-auto w-full max-w-[430px] h-[100dvh] bg-[#F7FAF9] overflow-hidden shadow-2xl">
 
@@ -640,12 +737,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
               TOP BAR
           ================================================= */}
 
-          <div className="absolute top-0 left-0 right-0 z-[50] h-[62px] bg-white/95 backdrop-blur-xl border-b border-gray-200 flex items-center justify-between px-4">
+          <div className="absolute top-0 left-0 right-0 z-[50] h-[64px] bg-white/95 backdrop-blur-xl border-b border-gray-200 flex items-center justify-between px-4">
 
             <button
               type="button"
-              onClick={() => setSelectedWorker(null)}
-              className="w-10 h-10 rounded-full bg-[#F1F5F4] flex items-center justify-center text-[#043A4A] active:scale-95 transition"
+              onClick={closeBooking}
+              disabled={loading}
+              className="w-10 h-10 rounded-full bg-[#F1F5F4] flex items-center justify-center text-[#043A4A] active:scale-95 transition disabled:opacity-50"
               aria-label="Close booking"
             >
               <FaTimes />
@@ -653,12 +751,12 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
             <div className="text-center">
 
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#6FA8AA]">
+              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-[#6FA8AA]">
                 E-SERVOO
               </p>
 
               <p className="text-sm font-black text-[#043A4A]">
-                Worker Details
+                Book Service
               </p>
 
             </div>
@@ -670,116 +768,116 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
           </div>
 
           {/* =================================================
-              SCROLLABLE CONTENT
+              CONTENT
           ================================================= */}
 
-          <div className="h-full overflow-y-auto pb-32 pt-[62px]">
+          <div className="h-full overflow-y-auto pb-10 pt-[64px]">
 
             {/* =================================================
                 WORKER HERO
             ================================================= */}
 
-            <div className="bg-white">
+            <section className="bg-white">
 
-              <div className="relative w-full h-[260px] bg-[#DDEBE9]">
+              <div className="relative w-full h-[245px] bg-[#DDEBE9]">
 
                 <img
                   src={workerImage || "/logo.png"}
                   alt={workerName}
                   referrerPolicy="no-referrer"
                   onError={(event) => {
-                    event.currentTarget.src =
-                      "/logo.png";
+                    event.currentTarget.src = "/logo.png";
                   }}
                   className="w-full h-full object-cover"
                 />
 
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/75 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent"></div>
 
-                <div className="absolute left-4 bottom-4 right-4 flex items-end justify-between">
+                <div className="absolute left-4 right-4 bottom-4">
 
-                  <div className="text-white min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                        isAvailable
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {isAvailable
+                        ? "AVAILABLE"
+                        : "BUSY"}
+                    </span>
 
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
-                          isAvailable
-                            ? "bg-green-500"
-                            : "bg-red-500"
-                        }`}
-                      >
-                        {isAvailable
-                          ? "AVAILABLE"
-                          : "BUSY"}
-                      </span>
-
-                      <span className="bg-white/90 text-[#043A4A] px-2.5 py-1 rounded-full text-[10px] font-black">
-                        VERIFIED
-                      </span>
-
-                    </div>
-
-                    <h1 className="text-2xl font-black mt-2 drop-shadow-lg truncate">
-                      {workerName}
-                    </h1>
-
-                    <p className="text-sm font-bold text-white/90 truncate">
-                      {workerService}
-                    </p>
+                    <span className="px-2.5 py-1 rounded-full bg-white/90 text-[#043A4A] text-[10px] font-black flex items-center gap-1">
+                      <FaCheckCircle className="text-green-600" />
+                      VERIFIED
+                    </span>
 
                   </div>
 
+                  <h1 className="text-2xl font-black text-white mt-2 drop-shadow-lg truncate">
+                    {workerName}
+                  </h1>
+
+                  <p className="text-sm font-bold text-white/90 truncate">
+                    {workerService}
+                  </p>
+
                 </div>
+
               </div>
 
-              {/* =================================================
-                  RATING BAR
-              ================================================= */}
+              {/* STATS */}
 
-              <div className="px-4 py-4 border-b border-gray-200">
+              <div className="grid grid-cols-3 divide-x border-b border-gray-200">
 
-                <div className="flex items-center gap-3">
+                <div className="py-4 text-center">
 
-                  <div className="flex items-center gap-1 bg-green-600 text-white px-3 py-2 rounded-xl font-black shrink-0">
+                  <p className="text-sm font-black text-[#043A4A] flex items-center justify-center gap-1">
                     {workerRating}
-                    <FaStar className="text-xs" />
-                  </div>
+                    <FaStar className="text-yellow-500 text-xs" />
+                  </p>
 
-                  <div className="h-5 w-px bg-gray-300 shrink-0"></div>
+                  <p className="text-[10px] text-gray-500 font-bold mt-1">
+                    Rating
+                  </p>
 
-                  <div className="min-w-0">
-                    <p className="text-xs text-gray-500 font-semibold">
-                      Trust Score
-                    </p>
+                </div>
 
-                    <p className="text-sm font-black text-[#043A4A]">
-                      {workerTrustScore}%
-                    </p>
-                  </div>
+                <div className="py-4 text-center">
 
-                  <div className="h-5 w-px bg-gray-300 shrink-0"></div>
+                  <p className="text-sm font-black text-[#043A4A]">
+                    {workerTrustScore}%
+                  </p>
 
-                  <div className="min-w-0">
-                    <p className="text-xs text-gray-500 font-semibold">
-                      Experience
-                    </p>
+                  <p className="text-[10px] text-gray-500 font-bold mt-1">
+                    Trust
+                  </p>
 
-                    <p className="text-sm font-black text-[#043A4A] truncate">
-                      {workerExperience}
-                    </p>
-                  </div>
+                </div>
+
+                <div className="py-4 text-center">
+
+                  <p className="text-sm font-black text-[#043A4A] truncate px-2">
+                    {workerExperience}
+                  </p>
+
+                  <p className="text-[10px] text-gray-500 font-bold mt-1">
+                    Experience
+                  </p>
 
                 </div>
 
               </div>
-            </div>
+
+            </section>
 
             {/* =================================================
-                INSPECTION BASED PRICING
+                PRICING
             ================================================= */}
 
-            <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+            <section className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
 
               <div className="flex items-start gap-4">
 
@@ -787,10 +885,10 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   <FaClipboardCheck />
                 </div>
 
-                <div className="min-w-0">
+                <div>
 
-                  <p className="text-[11px] font-black text-gray-500 uppercase tracking-wide">
-                    PRICING INFORMATION
+                  <p className="text-[10px] font-black text-[#6FA8AA] uppercase tracking-widest">
+                    PRICING
                   </p>
 
                   <h3 className="text-lg font-black text-[#043A4A] mt-1">
@@ -798,38 +896,37 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   </h3>
 
                   <p className="text-sm text-gray-600 font-semibold mt-1 leading-relaxed">
-                    Service charge is inspection-based.
                     The final amount will be determined
-                    after inspection.
+                    after the worker inspects the actual
+                    issue and required work.
                   </p>
 
                 </div>
 
               </div>
 
-              <div className="mt-4 bg-[#F1F9F8] border border-[#B4DBDC] rounded-2xl p-3">
+              <div className="mt-4 rounded-2xl bg-[#F1F9F8] border border-[#B4DBDC] p-3">
 
                 <div className="flex items-start gap-2">
 
                   <FaShieldAlt className="text-[#08566E] mt-0.5 shrink-0" />
 
                   <p className="text-xs text-[#043A4A] font-bold leading-relaxed">
-                    No fixed service charge is shown here.
-                    The final amount depends on the actual
-                    issue, inspection and required work.
+                    No fixed service charge is displayed
+                    before inspection.
                   </p>
 
                 </div>
 
               </div>
 
-            </div>
+            </section>
 
             {/* =================================================
-                LOCATION / SERVICE INFO
+                SERVICE INFORMATION
             ================================================= */}
 
-            <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+            <section className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
 
               <h3 className="text-lg font-black text-[#043A4A]">
                 Service Information
@@ -847,7 +944,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                   <div className="min-w-0">
 
-                    <p className="text-[11px] text-gray-500 font-bold">
+                    <p className="text-[10px] text-gray-500 font-black">
                       SERVICE AREA
                     </p>
 
@@ -869,7 +966,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                   <div className="min-w-0">
 
-                    <p className="text-[11px] text-gray-500 font-bold">
+                    <p className="text-[10px] text-gray-500 font-black">
                       SERVICE
                     </p>
 
@@ -897,9 +994,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                         <FaCertificate />
                       </div>
 
-                      <div className="min-w-0">
+                      <div>
 
-                        <p className="text-[11px] text-gray-500 font-bold">
+                        <p className="text-[10px] text-gray-500 font-black">
                           VERIFICATION
                         </p>
 
@@ -911,33 +1008,33 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                     </div>
 
-                    <FaChevronRight className="text-[#08566E] shrink-0" />
+                    <FaChevronRight className="text-[#08566E]" />
 
                   </a>
                 )}
 
               </div>
 
-            </div>
+            </section>
 
             {/* =================================================
                 BOOKING FORM
             ================================================= */}
 
-            <div className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
+            <section className="bg-white mt-2 px-4 py-5 border-y border-gray-200">
 
               <div className="mb-5">
 
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#6FA8AA]">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6FA8AA]">
                   SERVICE REQUEST
                 </p>
 
                 <h2 className="text-2xl font-black text-[#043A4A] mt-1">
-                  Book This Worker
+                  Your Details
                 </h2>
 
                 <p className="text-xs text-gray-500 font-semibold mt-1">
-                  Your saved details are pre-filled.
+                  Your saved information is pre-filled.
                 </p>
 
               </div>
@@ -962,7 +1059,8 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     placeholder="Enter your name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold"
+                    disabled={loading}
+                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold disabled:opacity-60"
                     required
                   />
 
@@ -983,7 +1081,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     placeholder="Enter phone number"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold"
+                    disabled={loading}
+                    inputMode="numeric"
+                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold disabled:opacity-60"
                     required
                   />
 
@@ -1001,10 +1101,11 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   <input
                     type="text"
                     name="address"
-                    placeholder="Enter service address"
+                    placeholder="Enter complete service address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold"
+                    disabled={loading}
+                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold disabled:opacity-60"
                     required
                   />
 
@@ -1030,12 +1131,13 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                         <button
                           key={option.value}
                           type="button"
+                          disabled={loading}
                           onClick={() =>
                             changeUrgency(
                               option.value
                             )
                           }
-                          className={`rounded-2xl p-3 border text-left transition active:scale-[0.97] ${
+                          className={`rounded-2xl p-3 border text-left transition active:scale-[0.97] disabled:opacity-60 ${
                             isActive
                               ? `${option.active} shadow-lg`
                               : "bg-[#F8FCFA] border-[#B4DBDC] text-[#043A4A]"
@@ -1082,62 +1184,71 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     placeholder="Example: Fan is not working, switch board issue..."
                     value={formData.issueDescription}
                     onChange={handleChange}
-                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold resize-none"
+                    disabled={loading}
                     rows="4"
+                    className="w-full mt-2 p-3.5 rounded-2xl bg-[#F8FCFA] border border-[#B4DBDC] text-[#043A4A] placeholder:text-gray-400 outline-none focus:border-[#08566E] font-bold resize-none disabled:opacity-60"
                     required
                   />
 
                 </div>
 
                 {/* =================================================
-                    BOOKING SUMMARY
+                    SUMMARY
                 ================================================= */}
 
                 <div className="bg-[#043A4A] rounded-3xl p-4 shadow-xl">
 
                   <div className="flex items-center justify-between">
 
-                    <p className="text-[#D9F4F2] text-xs font-black uppercase tracking-wide">
-                      Booking Summary
-                    </p>
+                    <div>
+
+                      <p className="text-[#9ECFD0] text-[10px] font-black uppercase tracking-widest">
+                        BOOKING SUMMARY
+                      </p>
+
+                      <p className="text-white text-sm font-black mt-1">
+                        Review your request
+                      </p>
+
+                    </div>
 
                     <FaClipboardCheck className="text-[#9ECFD0]" />
 
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3 mt-4 text-sm">
+                  <div className="mt-4 space-y-3">
 
-                    <div className="flex justify-between gap-3">
+                    <div className="flex justify-between gap-4">
 
-                      <span className="text-[#D9F4F2] font-bold">
+                      <span className="text-[#D9F4F2] text-xs font-bold">
                         Worker
                       </span>
 
-                      <span className="font-black text-white text-right">
+                      <span className="text-white text-xs font-black text-right">
                         {workerName}
                       </span>
 
                     </div>
 
-                    <div className="flex justify-between gap-3">
+                    <div className="flex justify-between gap-4">
 
-                      <span className="text-[#D9F4F2] font-bold">
+                      <span className="text-[#D9F4F2] text-xs font-bold">
                         Service
                       </span>
 
-                      <span className="font-black text-white text-right">
+                      <span className="text-white text-xs font-black text-right">
                         {workerService}
                       </span>
 
                     </div>
 
-                    <div className="flex justify-between gap-3">
+                    <div className="flex justify-between gap-4">
 
-                      <span className="text-[#D9F4F2] font-bold">
+                      <span className="text-[#D9F4F2] text-xs font-bold">
                         Urgency
                       </span>
 
-                      <span className="font-black text-white text-right">
+                      <span className="text-white text-xs font-black text-right">
                         {formData.urgency}
                       </span>
 
@@ -1145,7 +1256,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
                   </div>
 
-                  {/* INSPECTION PRICING MESSAGE */}
+                  {/* PRICING */}
 
                   <div className="mt-4 bg-white/10 border border-white/20 rounded-2xl p-3">
 
@@ -1160,9 +1271,9 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                         </p>
 
                         <p className="text-[#D9F4F2] text-[11px] font-semibold mt-1 leading-relaxed">
-                          Service charge is inspection-based.
-                          The final amount will be determined
-                          after inspection.
+                          Final pricing will be determined
+                          after inspection based on the actual
+                          issue and required work.
                         </p>
 
                       </div>
@@ -1190,6 +1301,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                     <input
                       type="checkbox"
                       checked={acceptedTerms}
+                      disabled={loading}
                       onChange={(event) =>
                         setAcceptedTerms(
                           event.target.checked
@@ -1231,7 +1343,7 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
                   {acceptedTerms && (
                     <p className="text-green-700 text-[11px] font-black mt-3">
                       ✅ Terms accepted. You can now
-                      confirm booking.
+                      confirm your booking.
                     </p>
                   )}
 
@@ -1277,19 +1389,19 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               </form>
 
-            </div>
+            </section>
 
             {/* =================================================
-                BOTTOM INFO
+                VERIFIED INFO
             ================================================= */}
 
-            <div className="px-4 py-6 bg-[#F1F7F6]">
+            <section className="px-4 py-6 bg-[#F1F7F6]">
 
               <div className="bg-white rounded-3xl border border-[#B4DBDC] p-4">
 
                 <div className="flex items-start gap-3">
 
-                  <div className="w-10 h-10 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E] shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-[#E8F5F3] flex items-center justify-center text-[#08566E] shrink-0">
                     <FaShieldAlt />
                   </div>
 
@@ -1313,13 +1425,11 @@ function BookingForm({ selectedWorker, setSelectedWorker }) {
 
               <div className="h-6"></div>
 
-            </div>
+            </section>
 
           </div>
 
-          {/* =================================================
-              MOBILE BOTTOM SAFE AREA
-          ================================================= */}
+          {/* BOTTOM FADE */}
 
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F7FAF9] to-transparent z-40"></div>
 
