@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { translations } from "../translations";
 import {
@@ -22,11 +23,19 @@ import {
   FaBroom,
   FaUtensils,
   FaLocationArrow,
+  FaTimes,
 } from "react-icons/fa";
 
-function Hero({ language = "en" }) {
+function Hero({
+  language = "en",
+  customerLocation,
+  setCustomerLocation,
+}) {
   const navigate = useNavigate();
   const t = translations[language] || translations.en;
+
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState("");
 
   const text = {
     badge: t.heroBadge || "Smart Local Services Hub",
@@ -41,11 +50,7 @@ function Hero({ language = "en" }) {
     title: "E-SERVOO",
 
     subtitle:
-      language === "hi"
-        ? "Right Professional. Right Service. Right When You Need It."
-        : language === "od"
-          ? "Right Professional. Right Service. Right When You Need It."
-          : "Right Professional. Right Service. Right When You Need It.",
+      "Right Professional. Right Service. Right When You Need It.",
 
     description:
       language === "hi"
@@ -98,10 +103,10 @@ function Hero({ language = "en" }) {
 
     selectLocation:
       language === "hi"
-        ? "Select your location"
+        ? "Use your current location"
         : language === "od"
-          ? "ଆପଣଙ୍କ ସ୍ଥାନ ବାଛନ୍ତୁ"
-          : "Select your location",
+          ? "ଆପଣଙ୍କ ବର୍ତ୍ତମାନ ସ୍ଥାନ ବ୍ୟବହାର କରନ୍ତୁ"
+          : "Use your current location",
 
     quickAccess:
       language === "hi"
@@ -116,6 +121,55 @@ function Hero({ language = "en" }) {
         : language === "od"
           ? "Smart Assignment"
           : "Smart Assignment",
+
+    locationGetting:
+      language === "hi"
+        ? "Location detect ho rahi hai..."
+        : language === "od"
+          ? "ସ୍ଥାନ ଚିହ୍ନଟ ହେଉଛି..."
+          : "Detecting your location...",
+
+    locationReady:
+      language === "hi"
+        ? "Location confirmed"
+        : language === "od"
+          ? "ସ୍ଥାନ ନିଶ୍ଚିତ ହୋଇଛି"
+          : "Location confirmed",
+
+    nearbyWorkers:
+      language === "hi"
+        ? "Nearby Workers"
+        : language === "od"
+          ? "ନିକଟସ୍ଥ କର୍ମଚାରୀ"
+          : "Nearby Workers",
+
+    locationPermission:
+      language === "hi"
+        ? "Nearby workers dekhne ke liye location allow karein."
+        : language === "od"
+          ? "ନିକଟସ୍ଥ କର୍ମଚାରୀ ଦେଖିବା ପାଇଁ ସ୍ଥାନ ଅନୁମତି ଦିଅନ୍ତୁ।"
+          : "Allow location access to find nearby workers.",
+
+    locationDenied:
+      language === "hi"
+        ? "Location permission allow nahi hui. Browser settings se location allow karein."
+        : language === "od"
+          ? "ସ୍ଥାନ ଅନୁମତି ମିଳିଲା ନାହିଁ। Browser settings ରୁ location allow କରନ୍ତୁ।"
+          : "Location permission was not granted. Please allow location from your browser settings.",
+
+    locationUnsupported:
+      language === "hi"
+        ? "Aapke browser me location support nahi hai."
+        : language === "od"
+          ? "ଆପଣଙ୍କ browser ରେ location support ନାହିଁ।"
+          : "Location is not supported by this browser.",
+
+    retryLocation:
+      language === "hi"
+        ? "Try Again"
+        : language === "od"
+          ? "ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ"
+          : "Try Again",
   };
 
   const pushEvent = (eventName, extraData = {}) => {
@@ -127,6 +181,221 @@ function Hero({ language = "en" }) {
       ...extraData,
     });
   };
+
+  /*
+   * ============================================================
+   * LOCATION HELPERS
+   * ============================================================
+   */
+
+  const hasCustomerLocation =
+    customerLocation &&
+    typeof customerLocation.latitude === "number" &&
+    typeof customerLocation.longitude === "number";
+
+  const getCoordinates = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(
+          new Error("GEOLOCATION_NOT_SUPPORTED")
+        );
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          });
+        },
+        (error) => {
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 30000,
+        }
+      );
+    });
+  };
+
+  /*
+   * Reverse geocoding.
+   *
+   * This converts:
+   *
+   * latitude + longitude
+   *
+   * into a readable address.
+   *
+   * We use OpenStreetMap's Nominatim endpoint for this prototype.
+   */
+  const reverseGeocode = async (
+    latitude,
+    longitude
+  ) => {
+    try {
+      const url =
+        `https://nominatim.openstreetmap.org/reverse` +
+        `?format=jsonv2` +
+        `&lat=${encodeURIComponent(latitude)}` +
+        `&lon=${encodeURIComponent(longitude)}` +
+        `&zoom=18` +
+        `&addressdetails=1`;
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Reverse geocoding failed: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      return (
+        data?.display_name ||
+        "Current Location"
+      );
+    } catch (error) {
+      console.warn(
+        "Reverse geocoding failed:",
+        error
+      );
+
+      return "Current Location";
+    }
+  };
+
+  /*
+   * ============================================================
+   * REQUEST CUSTOMER LOCATION
+   * ============================================================
+   */
+
+  const requestCustomerLocation = async () => {
+    if (locationLoading) return;
+
+    setLocationLoading(true);
+    setLocationError("");
+
+    pushEvent("location_request_started");
+
+    try {
+      const coordinates = await getCoordinates();
+
+      const address = await reverseGeocode(
+        coordinates.latitude,
+        coordinates.longitude
+      );
+
+      const locationData = {
+        address,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+        accuracy: coordinates.accuracy,
+      };
+
+      /*
+       * Update App.jsx state.
+       */
+      if (typeof setCustomerLocation === "function") {
+        setCustomerLocation(locationData);
+      }
+
+      /*
+       * Also broadcast an event so other components can
+       * listen for the location without requiring direct props.
+       */
+      window.dispatchEvent(
+        new CustomEvent(
+          "eservoo-location-updated",
+          {
+            detail: locationData,
+          }
+        )
+      );
+
+      /*
+       * Save locally as a backup.
+       */
+      try {
+        localStorage.setItem(
+          "eservoo_customer_location",
+          JSON.stringify(locationData)
+        );
+      } catch (storageError) {
+        console.warn(
+          "Unable to save location locally:",
+          storageError
+        );
+      }
+
+      pushEvent("location_request_success", {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+        accuracy: coordinates.accuracy,
+      });
+    } catch (error) {
+      console.warn(
+        "Customer location error:",
+        error
+      );
+
+      let message = text.locationDenied;
+
+      if (
+        error?.message ===
+        "GEOLOCATION_NOT_SUPPORTED"
+      ) {
+        message = text.locationUnsupported;
+      } else if (error?.code === 1) {
+        message = text.locationDenied;
+      } else if (error?.code === 2) {
+        message =
+          language === "hi"
+            ? "Location detect nahi ho pa rahi. GPS/location ON karke dobara try karein."
+            : language === "od"
+              ? "ସ୍ଥାନ ଚିହ୍ନଟ ହେଉନାହିଁ। GPS/location ON କରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"
+              : "Unable to detect your location. Turn on GPS/location and try again.";
+      } else if (error?.code === 3) {
+        message =
+          language === "hi"
+            ? "Location request timeout ho gaya. Dobara try karein."
+            : language === "od"
+              ? "ସ୍ଥାନ request timeout ହୋଇଛି। ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"
+              : "Location request timed out. Please try again.";
+      }
+
+      setLocationError(message);
+
+      pushEvent("location_request_failed", {
+        error_code: error?.code || "unknown",
+      });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  /*
+   * If App already has a saved location, clear any old
+   * temporary error message.
+   */
+  useEffect(() => {
+    if (hasCustomerLocation) {
+      setLocationError("");
+    }
+  }, [
+    customerLocation?.latitude,
+    customerLocation?.longitude,
+  ]);
 
   const handleBookNow = () => {
     pushEvent("hero_cta_click", {
@@ -170,6 +439,25 @@ function Hero({ language = "en" }) {
 
   const handleLocation = () => {
     pushEvent("hero_location_click");
+
+    if (hasCustomerLocation) {
+      navigate("/services");
+      return;
+    }
+
+    requestCustomerLocation();
+  };
+
+  const handleNearbyWorkers = () => {
+    pushEvent("nearby_workers_click", {
+      has_customer_location: hasCustomerLocation,
+    });
+
+    if (!hasCustomerLocation) {
+      requestCustomerLocation();
+      return;
+    }
+
     navigate("/services");
   };
 
@@ -211,21 +499,15 @@ function Hero({ language = "en" }) {
           </div>
 
           <h1 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#08566E]">
-
             {text.title}
-
           </h1>
 
           <p className="mt-2 text-base sm:text-xl font-black text-[#043A4A]">
-
             {text.subtitle}
-
           </p>
 
           <p className="hidden sm:block mt-3 max-w-2xl mx-auto text-sm text-[#315D67] font-semibold leading-relaxed">
-
             {text.description}
-
           </p>
 
         </div>
@@ -247,13 +529,10 @@ function Hero({ language = "en" }) {
               <div className="flex items-center gap-2">
 
                 <div className="w-9 h-9 rounded-xl bg-[#08566E] text-white flex items-center justify-center">
-
                   <FaUserCheck />
-
                 </div>
 
                 <div>
-
                   <p className="text-[10px] font-black text-[#08566E]">
                     VERIFIED
                   </p>
@@ -261,7 +540,6 @@ function Hero({ language = "en" }) {
                   <p className="text-[9px] font-bold text-[#6FA8AA]">
                     Professionals
                   </p>
-
                 </div>
 
               </div>
@@ -312,8 +590,6 @@ function Hero({ language = "en" }) {
               "
             >
 
-              {/* PHONE SCREEN */}
-
               <div className="absolute inset-0 bg-[#F7FAF9] overflow-hidden">
 
                 {/* =================================================
@@ -357,30 +633,85 @@ function Hero({ language = "en" }) {
                   <button
                     type="button"
                     onClick={handleLocation}
-                    className="w-full flex items-center gap-3 bg-white border border-[#DDEAE9] rounded-[20px] px-3.5 py-3 shadow-sm active:scale-[0.99] transition text-left"
+                    disabled={locationLoading}
+                    className="w-full flex items-center gap-3 bg-white border border-[#DDEAE9] rounded-[20px] px-3.5 py-3 shadow-sm active:scale-[0.99] transition text-left disabled:opacity-80"
                   >
 
                     <div className="w-9 h-9 rounded-xl bg-[#E5F3F2] flex items-center justify-center text-[#08566E] shrink-0">
 
-                      <FaMapMarkerAlt className="text-sm" />
+                      {locationLoading ? (
+                        <FaLocationArrow className="text-sm animate-pulse" />
+                      ) : (
+                        <FaMapMarkerAlt className="text-sm" />
+                      )}
 
                     </div>
 
                     <div className="flex-1 min-w-0">
 
                       <p className="text-[8px] uppercase tracking-wider text-[#8AA7AA] font-black">
-                        {text.location}
+
+                        {hasCustomerLocation
+                          ? text.locationReady
+                          : text.location}
+
                       </p>
 
                       <p className="text-[11px] text-[#043A4A] font-black truncate">
-                        {text.selectLocation}
+
+                        {locationLoading
+                          ? text.locationGetting
+                          : hasCustomerLocation
+                            ? customerLocation.address ||
+                              "Current Location"
+                            : text.selectLocation}
+
                       </p>
 
                     </div>
 
-                    <FaChevronRight className="text-[#6FA8AA] text-[10px]" />
+                    {hasCustomerLocation ? (
+                      <span className="w-7 h-7 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                        <FaCheckCircle className="text-xs" />
+                      </span>
+                    ) : (
+                      <FaChevronRight className="text-[#6FA8AA] text-[10px]" />
+                    )}
 
                   </button>
+
+                  {/* LOCATION ERROR */}
+
+                  {locationError && (
+                    <div className="mt-2 bg-red-50 border border-red-100 rounded-2xl px-3 py-2.5">
+
+                      <div className="flex items-start gap-2">
+
+                        <div className="w-6 h-6 rounded-full bg-red-100 text-red-500 flex items-center justify-center shrink-0">
+                          <FaTimes className="text-[9px]" />
+                        </div>
+
+                        <div className="flex-1">
+
+                          <p className="text-[8px] text-red-700 font-bold leading-relaxed">
+                            {locationError}
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={requestCustomerLocation}
+                            disabled={locationLoading}
+                            className="mt-1.5 text-[8px] text-[#08566E] font-black underline"
+                          >
+                            {text.retryLocation}
+                          </button>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+                  )}
 
                 </div>
 
@@ -491,7 +822,6 @@ function Hero({ language = "en" }) {
                       onClick={handleServices}
                       className="bg-white border border-[#E1EBEA] rounded-2xl p-2.5 shadow-sm active:scale-95 transition"
                     >
-
                       <div className="w-8 h-8 mx-auto rounded-xl bg-[#E7F4F3] text-[#08566E] flex items-center justify-center">
                         <FaBolt className="text-xs" />
                       </div>
@@ -499,7 +829,6 @@ function Hero({ language = "en" }) {
                       <p className="mt-1.5 text-[7px] font-black text-[#315D67]">
                         Electrician
                       </p>
-
                     </button>
 
                     <button
@@ -507,7 +836,6 @@ function Hero({ language = "en" }) {
                       onClick={handleServices}
                       className="bg-white border border-[#E1EBEA] rounded-2xl p-2.5 shadow-sm active:scale-95 transition"
                     >
-
                       <div className="w-8 h-8 mx-auto rounded-xl bg-[#E7F4F3] text-[#08566E] flex items-center justify-center">
                         <FaWrench className="text-xs" />
                       </div>
@@ -515,7 +843,6 @@ function Hero({ language = "en" }) {
                       <p className="mt-1.5 text-[7px] font-black text-[#315D67]">
                         Plumber
                       </p>
-
                     </button>
 
                     <button
@@ -523,7 +850,6 @@ function Hero({ language = "en" }) {
                       onClick={handleServices}
                       className="bg-white border border-[#E1EBEA] rounded-2xl p-2.5 shadow-sm active:scale-95 transition"
                     >
-
                       <div className="w-8 h-8 mx-auto rounded-xl bg-[#E7F4F3] text-[#08566E] flex items-center justify-center">
                         <FaBroom className="text-xs" />
                       </div>
@@ -531,7 +857,6 @@ function Hero({ language = "en" }) {
                       <p className="mt-1.5 text-[7px] font-black text-[#315D67]">
                         Cleaner
                       </p>
-
                     </button>
 
                     <button
@@ -539,7 +864,6 @@ function Hero({ language = "en" }) {
                       onClick={handleServices}
                       className="bg-white border border-[#E1EBEA] rounded-2xl p-2.5 shadow-sm active:scale-95 transition"
                     >
-
                       <div className="w-8 h-8 mx-auto rounded-xl bg-[#FFF2DE] text-[#D98520] flex items-center justify-center">
                         <FaUtensils className="text-xs" />
                       </div>
@@ -547,7 +871,6 @@ function Hero({ language = "en" }) {
                       <p className="mt-1.5 text-[7px] font-black text-[#315D67]">
                         Cook
                       </p>
-
                     </button>
 
                   </div>
@@ -597,17 +920,16 @@ function Hero({ language = "en" }) {
                         </p>
 
                         <p className="text-[11px] font-black text-[#08566E] truncate">
-                          Verified Professional
+                          {hasCustomerLocation
+                            ? "Nearby Professional"
+                            : "Verified Professional"}
                         </p>
 
                         <div className="flex items-center gap-2 mt-1">
 
                           <span className="flex items-center gap-1 text-[8px] font-bold text-[#777]">
-
                             <FaStar className="text-yellow-500" />
-
                             4.9
-
                           </span>
 
                           <span className="text-[#CCC]">
@@ -615,7 +937,9 @@ function Hero({ language = "en" }) {
                           </span>
 
                           <span className="text-[8px] font-bold text-[#777]">
-                            Nearby
+                            {hasCustomerLocation
+                              ? "Location Ready"
+                              : "Nearby"}
                           </span>
 
                         </div>
@@ -643,7 +967,9 @@ function Hero({ language = "en" }) {
                         <FaMapMarkerAlt className="mx-auto text-[#08566E] text-[10px]" />
 
                         <p className="text-[7px] font-black text-[#6FA8AA] mt-1">
-                          Nearby
+                          {hasCustomerLocation
+                            ? "Location"
+                            : "Nearby"}
                         </p>
 
                       </div>
@@ -672,6 +998,30 @@ function Hero({ language = "en" }) {
 
                   </div>
 
+                  {/* =================================================
+                      NEARBY WORKERS CTA
+                  ================================================== */}
+
+                  <button
+                    type="button"
+                    onClick={handleNearbyWorkers}
+                    className={`mt-2.5 w-full rounded-2xl py-2.5 flex items-center justify-center gap-2 font-black text-[9px] transition active:scale-[0.98] ${
+                      hasCustomerLocation
+                        ? "bg-[#08566E] text-white shadow-md"
+                        : "bg-[#E7F4F3] text-[#08566E] border border-[#CFE4E2]"
+                    }`}
+                  >
+
+                    <FaLocationArrow />
+
+                    {hasCustomerLocation
+                      ? text.nearbyWorkers
+                      : text.locationPermission}
+
+                    <FaArrowRight className="text-[8px]" />
+
+                  </button>
+
                 </div>
 
                 {/* =================================================
@@ -682,20 +1032,16 @@ function Hero({ language = "en" }) {
 
                   <div className="grid grid-cols-3 gap-2">
 
-                    {/* LINE 1 */}
-
                     <button
                       type="button"
                       onClick={handleServices}
                       className="flex items-center gap-2 bg-white border border-[#E0EBEA] rounded-xl px-2.5 py-2.5 text-left active:scale-95 transition"
                     >
-
                       <FaTools className="text-[#08566E] text-[10px]" />
 
                       <span className="text-[7px] font-black text-[#315D67]">
                         {text.services}
                       </span>
-
                     </button>
 
                     <button
@@ -703,13 +1049,11 @@ function Hero({ language = "en" }) {
                       onClick={handleBookings}
                       className="flex items-center gap-2 bg-white border border-[#E0EBEA] rounded-xl px-2.5 py-2.5 text-left active:scale-95 transition"
                     >
-
                       <FaClipboardList className="text-[#08566E] text-[10px]" />
 
                       <span className="text-[7px] font-black text-[#315D67]">
                         {text.bookings}
                       </span>
-
                     </button>
 
                     <button
@@ -717,43 +1061,35 @@ function Hero({ language = "en" }) {
                       onClick={handleRewards}
                       className="flex items-center gap-2 bg-white border border-[#E0EBEA] rounded-xl px-2.5 py-2.5 text-left active:scale-95 transition"
                     >
-
                       <FaGift className="text-[#D98520] text-[10px]" />
 
                       <span className="text-[7px] font-black text-[#315D67]">
                         {text.rewards}
                       </span>
-
                     </button>
-
-                    {/* LINE 2 */}
 
                     <button
                       type="button"
                       onClick={handleProfile}
                       className="flex items-center gap-2 bg-white border border-[#E0EBEA] rounded-xl px-2.5 py-2.5 text-left active:scale-95 transition"
                     >
-
                       <FaUser className="text-[#08566E] text-[10px]" />
 
                       <span className="text-[7px] font-black text-[#315D67]">
                         {text.profile}
                       </span>
-
                     </button>
 
                     <button
                       type="button"
-                      onClick={handleServices}
+                      onClick={handleNearbyWorkers}
                       className="flex items-center gap-2 bg-white border border-[#E0EBEA] rounded-xl px-2.5 py-2.5 text-left active:scale-95 transition"
                     >
-
                       <FaRoute className="text-[#08566E] text-[10px]" />
 
                       <span className="text-[7px] font-black text-[#315D67]">
                         Nearby
                       </span>
-
                     </button>
 
                     <button
@@ -761,13 +1097,11 @@ function Hero({ language = "en" }) {
                       onClick={handleBookNow}
                       className="flex items-center gap-2 bg-[#08566E] border border-[#08566E] rounded-xl px-2.5 py-2.5 text-left active:scale-95 transition"
                     >
-
                       <FaBolt className="text-[#E1E9E5] text-[10px]" />
 
                       <span className="text-[7px] font-black text-white">
                         Book Now
                       </span>
-
                     </button>
 
                   </div>
@@ -783,9 +1117,7 @@ function Hero({ language = "en" }) {
                   <div className="rounded-2xl bg-[#E9F4F3] border border-[#CFE4E2] px-3 py-2.5 flex items-center gap-2.5">
 
                     <div className="w-8 h-8 rounded-xl bg-[#08566E] text-white flex items-center justify-center shrink-0">
-
                       <FaShieldAlt className="text-xs" />
-
                     </div>
 
                     <div className="min-w-0">
@@ -819,13 +1151,11 @@ function Hero({ language = "en" }) {
                       onClick={() => navigate("/")}
                       className="flex flex-col items-center gap-1 w-12 text-[#08566E]"
                     >
-
                       <FaHome className="text-xs" />
 
                       <span className="text-[6px] font-black">
                         Home
                       </span>
-
                     </button>
 
                     <button
@@ -833,13 +1163,11 @@ function Hero({ language = "en" }) {
                       onClick={handleServices}
                       className="flex flex-col items-center gap-1 w-12 text-[#7A999D]"
                     >
-
                       <FaTools className="text-xs" />
 
                       <span className="text-[6px] font-black">
                         Services
                       </span>
-
                     </button>
 
                     <button
@@ -847,9 +1175,7 @@ function Hero({ language = "en" }) {
                       onClick={handleBookNow}
                       className="relative -mt-7 w-12 h-12 rounded-full bg-[#08566E] border-[4px] border-[#F7FAF9] shadow-[0_8px_25px_rgba(8,86,110,0.35)] text-white flex items-center justify-center active:scale-95 transition"
                     >
-
                       <FaBolt className="text-sm" />
-
                     </button>
 
                     <button
@@ -857,13 +1183,11 @@ function Hero({ language = "en" }) {
                       onClick={handleBookings}
                       className="flex flex-col items-center gap-1 w-12 text-[#7A999D]"
                     >
-
                       <FaClipboardList className="text-xs" />
 
                       <span className="text-[6px] font-black">
                         Bookings
                       </span>
-
                     </button>
 
                     <button
@@ -871,13 +1195,11 @@ function Hero({ language = "en" }) {
                       onClick={handleProfile}
                       className="flex flex-col items-center gap-1 w-12 text-[#7A999D]"
                     >
-
                       <FaUser className="text-xs" />
 
                       <span className="text-[6px] font-black">
                         Profile
                       </span>
-
                     </button>
 
                   </div>
