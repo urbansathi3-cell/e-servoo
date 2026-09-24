@@ -93,6 +93,7 @@ function TopCommandBar({
       <div className="max-w-6xl mx-auto">
         <div className="relative overflow-hidden rounded-3xl bg-[#E1E9E5]/85 backdrop-blur-xl border border-white/80 shadow-2xl">
           <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#9ECFD0] rounded-full blur-2xl opacity-70"></div>
+
           <div className="absolute -bottom-14 -right-12 w-40 h-40 bg-[#6FA8AA] rounded-full blur-2xl opacity-50"></div>
 
           <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
@@ -155,6 +156,7 @@ function LoginRequiredModal({
     <div className="fixed inset-0 z-[200] bg-black/55 backdrop-blur-md flex items-center justify-center px-4">
       <div className="relative w-full max-w-md overflow-hidden rounded-[32px] bg-[#E1E9E5] border border-white/80 shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
         <div className="absolute -top-16 -left-16 w-40 h-40 bg-[#9ECFD0] rounded-full blur-3xl opacity-80"></div>
+
         <div className="absolute -bottom-20 -right-16 w-52 h-52 bg-[#6FA8AA] rounded-full blur-3xl opacity-70"></div>
 
         <div className="relative p-7 text-center">
@@ -205,6 +207,10 @@ function HomePage({
   showWelcome,
   setShowWelcome,
   workerLoggedIn,
+
+  // NEW
+  customerLocation,
+  setCustomerLocation,
 }) {
   if (showWelcome) {
     return <Welcome setShowWelcome={setShowWelcome} />;
@@ -222,6 +228,10 @@ function HomePage({
         <BookingForm
           selectedWorker={selectedWorker}
           setSelectedWorker={setSelectedWorker}
+
+          // NEW
+          customerLocation={customerLocation}
+          setCustomerLocation={setCustomerLocation}
         />
       ) : (
         <>
@@ -235,7 +245,13 @@ function HomePage({
           </RevealOnScroll>
 
           <RevealOnScroll delay={120}>
-            <Hero language={language} />
+            <Hero
+              language={language}
+
+              // NEW
+              customerLocation={customerLocation}
+              setCustomerLocation={setCustomerLocation}
+            />
           </RevealOnScroll>
 
           <RevealOnScroll delay={180}>
@@ -289,13 +305,172 @@ function App() {
   const [language, setLanguage] = useState(() => {
     const savedLang = localStorage.getItem("lang");
 
-    if (savedLang === "en" || savedLang === "hi" || savedLang === "od") {
+    if (
+      savedLang === "en" ||
+      savedLang === "hi" ||
+      savedLang === "od"
+    ) {
       return savedLang;
     }
 
     localStorage.setItem("lang", "en");
     return "en";
   });
+
+  /*
+   * ============================================================
+   * CUSTOMER LOCATION
+   * ============================================================
+   *
+   * This state will be shared with:
+   *
+   * Hero
+   * Workers
+   * BookingForm
+   * SmartRecommendations
+   *
+   * Later we will also use it for distance calculation.
+   *
+   * Example:
+   *
+   * {
+   *   address: "Rajgangpur, Odisha",
+   *   latitude: 22.267,
+   *   longitude: 84.897,
+   *   accuracy: 20
+   * }
+   */
+
+  const [customerLocation, setCustomerLocation] = useState(() => {
+    try {
+      const savedLocation = localStorage.getItem(
+        "eservoo_customer_location"
+      );
+
+      if (!savedLocation) {
+        return {
+          address: "",
+          latitude: null,
+          longitude: null,
+          accuracy: null,
+        };
+      }
+
+      const parsed = JSON.parse(savedLocation);
+
+      if (
+        typeof parsed !== "object" ||
+        parsed === null
+      ) {
+        throw new Error("Invalid saved location");
+      }
+
+      return {
+        address: parsed.address || "",
+        latitude:
+          typeof parsed.latitude === "number"
+            ? parsed.latitude
+            : null,
+        longitude:
+          typeof parsed.longitude === "number"
+            ? parsed.longitude
+            : null,
+        accuracy:
+          typeof parsed.accuracy === "number"
+            ? parsed.accuracy
+            : null,
+      };
+    } catch (error) {
+      console.warn(
+        "Unable to restore customer location:",
+        error
+      );
+
+      return {
+        address: "",
+        latitude: null,
+        longitude: null,
+        accuracy: null,
+      };
+    }
+  });
+
+  /*
+   * Save customer location locally.
+   *
+   * This means if the user refreshes the website,
+   * we don't immediately lose the last confirmed location.
+   */
+  useEffect(() => {
+    try {
+      if (
+        customerLocation &&
+        typeof customerLocation === "object"
+      ) {
+        localStorage.setItem(
+          "eservoo_customer_location",
+          JSON.stringify(customerLocation)
+        );
+      }
+    } catch (error) {
+      console.warn(
+        "Unable to save customer location:",
+        error
+      );
+    }
+  }, [customerLocation]);
+
+  /*
+   * Listen for location updates from LocationPicker
+   * or any future location component.
+   *
+   * Other components can dispatch:
+   *
+   * window.dispatchEvent(
+   *   new CustomEvent("eservoo-location-updated", {
+   *     detail: {
+   *       address: "...",
+   *       latitude: 22,
+   *       longitude: 84
+   *     }
+   *   })
+   * );
+   */
+  useEffect(() => {
+    const handleLocationUpdated = (event) => {
+      const location = event?.detail;
+
+      if (!location) return;
+
+      setCustomerLocation({
+        address: location.address || "",
+        latitude:
+          typeof location.latitude === "number"
+            ? location.latitude
+            : null,
+        longitude:
+          typeof location.longitude === "number"
+            ? location.longitude
+            : null,
+        accuracy:
+          typeof location.accuracy === "number"
+            ? location.accuracy
+            : null,
+      });
+    };
+
+    window.addEventListener(
+      "eservoo-location-updated",
+      handleLocationUpdated
+    );
+
+    return () => {
+      window.removeEventListener(
+        "eservoo-location-updated",
+        handleLocationUpdated
+      );
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -320,22 +495,37 @@ function App() {
       setPendingWorker(null);
       setSelectedWorker(null);
       setShowLoginScreen(true);
+
       localStorage.removeItem("openCustomerLogin");
     };
 
-    window.addEventListener("open-customer-login", openCustomerLogin);
+    window.addEventListener(
+      "open-customer-login",
+      openCustomerLogin
+    );
 
-    if (localStorage.getItem("openCustomerLogin") === "true") {
+    if (
+      localStorage.getItem("openCustomerLogin") === "true"
+    ) {
       openCustomerLogin();
     }
 
     return () => {
-      window.removeEventListener("open-customer-login", openCustomerLogin);
+      window.removeEventListener(
+        "open-customer-login",
+        openCustomerLogin
+      );
     };
   }, []);
 
   const changeLanguage = (lang) => {
-    if (lang !== "en" && lang !== "hi" && lang !== "od") return;
+    if (
+      lang !== "en" &&
+      lang !== "hi" &&
+      lang !== "od"
+    ) {
+      return;
+    }
 
     setLanguage(lang);
     localStorage.setItem("lang", lang);
@@ -424,6 +614,10 @@ function App() {
                 showWelcome={showWelcome}
                 setShowWelcome={setShowWelcome}
                 workerLoggedIn={workerLoggedIn}
+
+                // NEW
+                customerLocation={customerLocation}
+                setCustomerLocation={setCustomerLocation}
               />
             }
           />
@@ -442,15 +636,24 @@ function App() {
             }
           />
 
-          <Route path="/contact" element={<Contact language={language} />} />
+          <Route
+            path="/contact"
+            element={<Contact language={language} />}
+          />
 
-          <Route path="/terms" element={<Terms language={language} />} />
+          <Route
+            path="/terms"
+            element={<Terms language={language} />}
+          />
 
           <Route
             path="/dashboard"
             element={
               isLoggedIn ? (
-                <CustomerDashboard language={language} />
+                <CustomerDashboard
+                  language={language}
+                  customerLocation={customerLocation}
+                />
               ) : (
                 <AuthScreen
                   setIsLoggedIn={handleCustomerLoginState}
@@ -464,7 +667,10 @@ function App() {
             path="/bookings"
             element={
               isLoggedIn ? (
-                <MyBookings language={language} />
+                <MyBookings
+                  language={language}
+                  customerLocation={customerLocation}
+                />
               ) : (
                 <AuthScreen
                   setIsLoggedIn={handleCustomerLoginState}
@@ -474,7 +680,10 @@ function App() {
             }
           />
 
-          <Route path="/rewards" element={<Rewards />} />
+          <Route
+            path="/rewards"
+            element={<Rewards />}
+          />
 
           <Route
             path="/worker-login"
@@ -488,7 +697,11 @@ function App() {
 
           <Route
             path="/worker-dashboard"
-            element={<WorkerDashboard language={language} />}
+            element={
+              <WorkerDashboard
+                language={language}
+              />
+            }
           />
 
           <Route
@@ -498,19 +711,28 @@ function App() {
                 <BookingForm
                   selectedWorker={selectedWorker}
                   setSelectedWorker={setSelectedWorker}
+
+                  // NEW
+                  customerLocation={customerLocation}
+                  setCustomerLocation={setCustomerLocation}
                 />
               ) : (
                 <Workers
                   language={language}
                   setSelectedWorker={handleWorkerSelect}
                   selectedService={selectedService}
+
+                  // NEW
+                  customerLocation={customerLocation}
                 />
               )
             }
           />
         </Routes>
 
-        {!selectedWorker && !showLoginScreen && <FooterNav />}
+        {!selectedWorker && !showLoginScreen && (
+          <FooterNav />
+        )}
       </div>
 
       {showLoginRequired && (
