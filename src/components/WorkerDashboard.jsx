@@ -315,20 +315,126 @@ function WorkerDashboard() {
   = */
 
   useEffect(() => {
-    const savedWorker = getStoredWorker();
+  const savedWorker = getStoredWorker();
 
-    if (!savedWorker) {
-      setWorker(null);
+  if (!savedWorker) {
+    setWorker(null);
+    setBookings([]);
+    setLoading(false);
+    return;
+  }
+
+  setWorker(savedWorker);
+
+  const workerName =
+    getValue(
+      savedWorker,
+      [
+        "name",
+        "Name",
+        "worker",
+        "Worker",
+        "workerName",
+        "WorkerName",
+      ],
+      ""
+    );
+
+  const workerId =
+    getValue(
+      savedWorker,
+      [
+        "id",
+        "ID",
+        "WorkerID",
+        "WorkerId",
+        "workerId",
+        "workerID",
+        "workerid",
+      ],
+      ""
+    );
+
+  if (!workerName && !workerId) {
+    setBookings([]);
+    setLoading(false);
+    return;
+  }
+
+  setLoading(true);
+
+  const params = new URLSearchParams();
+
+  params.set("action", "workerBookings");
+
+  if (workerName) {
+    params.set("worker", workerName);
+  }
+
+  if (workerId) {
+    params.set("workerId", workerId);
+  }
+
+  params.set("nocache", Date.now().toString());
+
+  console.log("WORKER DASHBOARD FETCH");
+  console.log("Worker:", savedWorker);
+  console.log("Worker ID:", workerId);
+  console.log("Worker Name:", workerName);
+  console.log("URL:", `${API_URL}?${params.toString()}`);
+
+  fetch(`${API_URL}?${params.toString()}`)
+    .then(async (response) => {
+      const text = await response.text();
+
+      console.log(
+        "Worker bookings response status:",
+        response.status
+      );
+
+      console.log(
+        "Worker bookings raw response:",
+        text
+      );
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch (error) {
+        throw new Error(
+          "Invalid worker bookings response"
+        );
+      }
+
+      return data;
+    })
+    .then((data) => {
+      console.log(
+        "Worker bookings parsed:",
+        data
+      );
+
+      if (Array.isArray(data)) {
+        setBookings(data);
+      } else if (Array.isArray(data.bookings)) {
+        setBookings(data.bookings);
+      } else {
+        setBookings([]);
+      }
+
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error(
+        "Worker bookings fetch failed:",
+        error
+      );
+
       setBookings([]);
       setLoading(false);
-      return;
-    }
-
-    setWorker(savedWorker);
-
-    fetchAssignedJobs(savedWorker, true);
-    fetchIncome(savedWorker);
-  }, []);
+    });
+}, []);
 
   /* =
      AUTO REFRESH JOBS

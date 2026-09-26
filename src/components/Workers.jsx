@@ -18,8 +18,7 @@ import {
   FaUserCheck,
 } from "react-icons/fa";
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbzrxIGOLW5qH-brmoLxLjWuF3k3RWgiMOeCWvAass6IKSBzL1c9cUW-JlSFKOufpJUvUA/exec";
+const API_URL = "/api/booking";
 
 const LOCATION_STORAGE_KEY = "e-servoo-user-location";
 
