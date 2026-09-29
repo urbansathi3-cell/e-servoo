@@ -462,18 +462,22 @@ function Workers({
     ).trim();
 
   const getWorkerService = (worker) =>
-    String(
-      getValue(
-        worker,
-        [
-          "service",
-          "Service",
-          "category",
-          "Category",
-        ],
-        "Service"
-      )
-    ).trim();
+  String(
+    getValue(
+      worker,
+      [
+        "service",
+        "Service",
+        "service name",
+        "Service Name",
+        "workerService",
+        "Worker Service",
+        "category",
+        "Category",
+      ],
+      ""
+    )
+  ).trim();
 
   const getWorkerPhone = (worker) =>
     String(
