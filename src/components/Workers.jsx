@@ -731,6 +731,7 @@ function Workers({
     });
   };
 
+
   // ====================================================
   // SERVICE FILTERS
   // ====================================================
@@ -772,6 +773,54 @@ function Workers({
     // Search
     const searchText =
       normalize(search);
+  const getValue = (worker, keys, fallback = "") => {
+  if (!worker || typeof worker !== "object") {
+    return fallback;
+  }
+
+  // Exact match
+  for (const key of keys) {
+    if (
+      worker[key] !== undefined &&
+      worker[key] !== null &&
+      String(worker[key]).trim() !== ""
+    ) {
+      return worker[key];
+    }
+  }
+
+  // Flexible match: ignores spaces, capital letters, etc.
+  const normalizedWorker = Object.keys(worker).reduce(
+    (acc, key) => {
+      const normalizedKey = String(key)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+      acc[normalizedKey] = worker[key];
+      return acc;
+    },
+    {}
+  );
+
+  for (const key of keys) {
+    const normalizedKey = String(key)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "");
+
+    if (
+      normalizedWorker[normalizedKey] !== undefined &&
+      normalizedWorker[normalizedKey] !== null &&
+      String(normalizedWorker[normalizedKey]).trim() !== ""
+    ) {
+      return normalizedWorker[normalizedKey];
+    }
+  }
+
+  return fallback;
+};
+
 
     if (searchText) {
       list = list.filter((worker) => {
@@ -783,9 +832,32 @@ function Workers({
           getWorkerService(worker)
         );
 
+
         const location = normalize(
           getWorkerLocation(worker)
         );
+
+ const getWorkerService = (worker) => {
+  return String(
+    getValue(
+      worker,
+      [
+        "service",
+        "Service",
+        "service name",
+        "Service Name",
+        "services",
+        "Services",
+        "workerService",
+        "Worker Service",
+        "category",
+        "Category",
+      ],
+      ""
+    )
+  ).trim();
+};
+
 
         return (
           name.includes(searchText) ||
