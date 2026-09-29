@@ -36,6 +36,7 @@ const getValue = (object, keys, fallback = "") => {
     return fallback;
   }
 
+  // First try exact key match
   for (const key of keys) {
     if (
       object[key] !== undefined &&
@@ -43,6 +44,35 @@ const getValue = (object, keys, fallback = "") => {
       String(object[key]).trim() !== ""
     ) {
       return object[key];
+    }
+  }
+
+  // Then try normalized key match
+  const normalizedObject = Object.keys(object).reduce(
+    (acc, objectKey) => {
+      const normalizedKey = String(objectKey)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+      acc[normalizedKey] = object[objectKey];
+      return acc;
+    },
+    {}
+  );
+
+  for (const key of keys) {
+    const normalizedKey = String(key)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "");
+
+    if (
+      normalizedObject[normalizedKey] !== undefined &&
+      normalizedObject[normalizedKey] !== null &&
+      String(normalizedObject[normalizedKey]).trim() !== ""
+    ) {
+      return normalizedObject[normalizedKey];
     }
   }
 
