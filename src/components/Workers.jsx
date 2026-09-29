@@ -18,7 +18,7 @@ import {
   FaUserCheck,
 } from "react-icons/fa";
 
-const API_URL = "/api/booking";
+const API_URL = "https://script.google.com/macros/s/AKfycbwdzfwwDpqx3c9w7FrpXBCUnXG_pyj2h26Gv1_-Rjzc995Sej-Y-4noKRd3HZfE-66ZGA/exec";
 
 const LOCATION_STORAGE_KEY = "e-servoo-user-location";
 
@@ -446,16 +446,55 @@ function Workers({
   };
 
   useEffect(() => {
-    fetchWorkers(true);
+  const fetchWorkers = async (showLoader = false) => {
+    if (showLoader) {
+      setLoading(true);
+    }
 
-    const interval = setInterval(() => {
-      fetchWorkers(false);
-    }, 5000);
+    try {
+      const response = await fetch(
+        `${API_URL}?action=workers&nocache=${Date.now()}`
+      );
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log("Workers API response:", data);
+
+      const workerList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.workers)
+        ? data.workers
+        : Array.isArray(data?.data)
+        ? data.data
+        : null;
+
+      if (workerList !== null) {
+        console.log("Workers received:", workerList);
+        setWorkers(workerList);
+      } else {
+        console.warn("Invalid workers response:", data);
+        // Existing workers ko clear nahi karna
+      }
+    } catch (error) {
+      console.error("Workers fetch error:", error);
+      // Temporary error par existing workers ko clear nahi karna
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchWorkers(true);
+
+  const interval = setInterval(() => {
+    fetchWorkers(false);
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, []);
 
   // ====================================================
   // WORKER HELPERS
@@ -736,14 +775,23 @@ function Workers({
   // SERVICE FILTERS
   // ====================================================
 
-  const serviceFilters = [
+  const serviceFilters = Array.from(
+  new Set([
     "All",
     "Electrician",
     "Plumber",
     "Carpenter",
     "Cleaner",
     "Cook",
-  ];
+    "Painter",
+    "AC Repair",
+    "Home Tutor",
+    "Appliance Repair",
+    "CCTV Service",
+    "Mehendi Artist",
+    "Mason",
+  ])
+);
 
   // ====================================================
   // VISIBLE WORKERS
@@ -1405,9 +1453,10 @@ function Workers({
                         )}
 
                         <div className="absolute bottom-4 left-4 right-4 text-white">
-                          <h3 className="text-xl font-black text-[#E1E9E5] truncate">
+                          <h3 className="font-black text-base md:text-xl leading-tight line-clamp-1 text-[#e3eef1]">
   {workerName}
 </h3>
+
                           <p className="text-[#E1E9E5] font-bold text-sm">
   {getServiceText(service)}
 </p>
