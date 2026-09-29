@@ -1299,15 +1299,12 @@ function Workers({
                         )}
 
                         <div className="absolute bottom-4 left-4 right-4 text-white">
-                          <h3 className="text-xl font-black truncate">
-                            {workerName}
-                          </h3>
-
-                          <p className="text-[#D9F4F2] font-bold text-sm">
-                            {getServiceText(
-                              service
-                            )}
-                          </p>
+                          <h3 className="text-xl font-black text-[#E1E9E5] truncate">
+  {workerName}
+</h3>
+                          <p className="text-[#E1E9E5] font-bold text-sm">
+  {getServiceText(service)}
+</p>
                         </div>
                       </div>
 
